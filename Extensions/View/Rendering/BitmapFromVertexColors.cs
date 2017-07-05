@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+using Grasshopper.Kernel;
+using Rhino.Geometry;
+using Extensions;
+
+
+namespace Extensions.View
+{
+    public class BitMapFromVertexColors : GH_Component
+    {
+        public BitMapFromVertexColors() : base("Bitmap from mesh", "BitmapMesh", "Bitmap from vertex colors.", "Extensions", "Rendering") { }
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.PaintBrush01;
+        public override Guid ComponentGuid => new Guid("{7aedf2f4-75e2-48be-94c5-fe116caf8b26}");
+
+
+        protected override void RegisterInputParams(GH_InputParamManager pManager)
+        {
+            pManager.AddMeshParameter("Mesh", "M", "Single mesh with render colors.", GH_ParamAccess.item);
+            pManager.AddTextParameter("File path", "F", "File path to a png image.", GH_ParamAccess.item);
+        }
+
+        protected override void RegisterOutputParams(GH_OutputParamManager pManager)
+        {
+            pManager.AddMeshParameter("Mesh", "M", "Mesh with uv coords to map bitmap and unwelded vertices.", GH_ParamAccess.item);
+        }
+
+        protected override void SolveInstance(IGH_DataAccess DA)
+        {
+            Mesh mesh = new Mesh();
+            string file = string.Empty;
+            DA.GetData(0, ref mesh);
+            DA.GetData(1, ref file);
+
+            Mesh outMesh = RenderExtensions.BitmapFromVertexColors(mesh, file);
+
+            DA.SetData(0, outMesh);
+        }
+    }
+}
