@@ -7,12 +7,8 @@ using System.Drawing;
 using Rhino.PlugIns;
 using Grasshopper.Kernel;
 
-
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
 [assembly: AssemblyTitle("Extensions")]
-[assembly: AssemblyDescription("Extensions for Grasshopper")]
+[assembly: AssemblyDescription("Assorted components for Grasshopper")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Design Computation Lab - UCL")]
 [assembly: AssemblyProduct("Extensions")]
@@ -20,26 +16,13 @@ using Grasshopper.Kernel;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
+[assembly: Guid("66d4e86f-ec84-40c9-8e32-8cf8875c3feb")]
 
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("66d4e86f-ec84-40c9-8e32-8cf8875c3feb")] // This will also be the Guid of the Rhino plug-in
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+
+[assembly: GH_Loading(GH_LoadingDemand.ForceDirect)]
 
 namespace Extensions
 {
@@ -47,13 +30,45 @@ namespace Extensions
     {
         public ExtensionsInfo()
         {
-            var dllPath = Path.Combine(Directory.GetCurrentDirectory(), "Robots.gha");
+            string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            UriBuilder uri = new UriBuilder(codeBase);
+            string path = Uri.UnescapeDataString(uri.Path);
+            string folder = Path.GetDirectoryName(path);
+            const string resName = "Robots.gha";
+            var dllPath = Path.Combine(folder, resName);
             Assembly.LoadFile(dllPath);
+
+            var assembly = Assembly.GetExecutingAssembly();
+            using (var input = assembly.GetManifestResourceStream(resName))
+            {
+                if (input == null) return;
+                Assembly.Load(StreamToBytes(input));
+            }
+        }
+
+        static byte[] StreamToBytes(Stream input)
+        {
+            if (input == null) return null;
+
+            var capacity = input.CanSeek ? (int)input.Length : 0;
+            using (var output = new MemoryStream(capacity))
+            {
+                int readLength;
+                var buffer = new byte[4096];
+
+                do
+                {
+                    readLength = input.Read(buffer, 0, buffer.Length);
+                    output.Write(buffer, 0, readLength);
+                }
+                while (readLength != 0);
+                return output.ToArray();
+            }
         }
 
         public override string Name => "Extensions";
         public override Bitmap Icon => Properties.Resources.DCLLogo;
-        public override string Description => "Extensions for Grasshopper";
+        public override string Description => "Assorted components for Grasshopper";
         public override Guid Id => new Guid("29035877-56b2-45cd-b65d-bf19a046d30b");
         public override string AuthorName => "Design Computation Lab - UCL";
         public override string AuthorContact => "v.soler@ucl.ac.uk";

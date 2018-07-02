@@ -9,7 +9,7 @@ namespace Extensions.View
 {
     public class BitMapFromVertexColors : GH_Component
     {
-        public BitMapFromVertexColors() : base("Bitmap from mesh", "BitmapMesh", "Bitmap from vertex colors.", "Extensions", "Rendering") { }
+        public BitMapFromVertexColors() : base("Bitmap from mesh", "BitmapMesh", "Creates a bitmap from a mesh with multiple vertex colors and assigns the corresponding uv coordinates to the mesh.", "Extensions", "Rendering") { }
         protected override System.Drawing.Bitmap Icon => Properties.Resources.PaintBrush01;
         public override Guid ComponentGuid => new Guid("{7aedf2f4-75e2-48be-94c5-fe116caf8b26}");
 
@@ -17,7 +17,7 @@ namespace Extensions.View
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
             pManager.AddMeshParameter("Mesh", "M", "Single mesh with render colors.", GH_ParamAccess.item);
-            pManager.AddTextParameter("File path", "F", "File path to a png image.", GH_ParamAccess.item);
+            pManager.AddTextParameter("File path", "F", "File path to a PNG image.", GH_ParamAccess.item);
         }
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)

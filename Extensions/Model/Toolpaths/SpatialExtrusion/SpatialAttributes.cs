@@ -15,6 +15,8 @@ namespace Extensions.Toolpaths
         public double DistanceAhead { get; set; }
         public double DistanceHorizontal { get; set; }
 
+        public List<GeometryBase> Environment { get; set; }
+
         public CartesianTarget ReferenceTarget { get; set; }
 
         public Speed Approach { get; set; }
@@ -33,7 +35,7 @@ namespace Extensions.Toolpaths
 
         public Command AheadCommand { get; set; }
 
-        public SpatialAttributes(IList<double> variables, CartesianTarget target, IList<double> speeds, IList<double> waits, IList<int> dos)
+        public SpatialAttributes(IList<double> variables, CartesianTarget target, IList<double> speeds, IList<double> waits, IList<int> dos, IList<GeometryBase> environment)
         {
             if (variables.Count != 6) throw new Exception(" There must be 6 variables.");
             if (speeds.Count != 5) throw new Exception(" There must be 5 speeds.");
@@ -47,6 +49,8 @@ namespace Extensions.Toolpaths
             DistanceAhead = variables[4];
             DistanceHorizontal = variables[5];
 
+            Environment = new List<GeometryBase>(environment);
+
             ReferenceTarget = target;
 
             Approach = new Speed(name: "Approach", translation: speeds[0]);
@@ -57,7 +61,7 @@ namespace Extensions.Toolpaths
 
             var waitAfterStart = new Wait(waits[0]);
 
-            StopExtrusion = new Group() { new SetDO(dos[0], false), new SetDO(dos[1], false)};
+            StopExtrusion = new Group() { new SetDO(dos[0], false), new SetDO(dos[1], false) };
             FastExtrusion = new Group() { new SetDO(dos[0], true), new SetDO(dos[1], false), waitAfterStart };
             MediumExtrusion = new Group() { new SetDO(dos[0], false), new SetDO(dos[1], true), waitAfterStart };
             SlowExtrusion = new Group() { new SetDO(dos[0], true), new SetDO(dos[1], true), waitAfterStart };
@@ -67,6 +71,5 @@ namespace Extensions.Toolpaths
 
             AheadCommand = new Group() { StopExtrusion, new Wait(waits[1]) };
         }
-
     }
 }

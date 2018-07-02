@@ -59,6 +59,7 @@ namespace Extensions.Toolpaths
                 _prev = _vertices[_index - 1];
                 _prevVector = _prev._point - _point;
             }
+
             if (_index < _vertices.Count - 1)
             {
                 _post = _vertices[_index + 1];
@@ -82,13 +83,41 @@ namespace Extensions.Toolpaths
 
         bool IsSupported(Point3d point)
         {
-            if (point.Z < _tol) return true;
+            {
+                var meshes = _att.Environment.OfType<Mesh>();
 
-            Polyline subPolyline = new Polyline(_vertices.Select(v => v._point).Take(_index - 1));
-            Point3d closest = subPolyline.ClosestPoint(point);
-            Vector3d vector = point - closest;
-            Vector3d horizontal = new Vector3d(vector.X, vector.Y, 0);
-            return (horizontal.Length < _att.Diameter * 0.5) && vector.Z > 0 && vector.Z < _att.Diameter * 1.1;
+                if (meshes.Count() > 0)
+                {
+                    var environmentMesh = new Mesh();
+                    foreach (var mesh in meshes)
+                        environmentMesh.Append(mesh);
+
+                    Point3d closest = environmentMesh.ClosestPoint(point);
+                    if (point.DistanceTo(closest) < 0.1) return true;
+                }
+            }
+
+            var curves = _att.Environment.OfType<Curve>();
+            var polylines = new List<Polyline>();
+
+            foreach (var curve in curves)
+            {
+                if (!curve.TryGetPolyline(out Polyline polyline)) continue;
+                polylines.Add(polyline);
+            }
+
+            polylines.Add(new Polyline(_vertices.Select(v => v._point).Take(_index)));
+
+            foreach (var polyline in polylines)
+            {
+                Point3d closest = polyline.ClosestPoint(point);
+                Vector3d vector = point - closest;
+                Vector3d horizontal = new Vector3d(vector.X, vector.Y, 0);
+                bool isSupported = (horizontal.Length < _att.Diameter * 0.5) && vector.Z >= 0 && vector.Z < _att.Diameter * 1.1;
+                if (isSupported) return true;
+            }
+
+            return false;
         }
 
         void CalcDown()
@@ -149,7 +178,7 @@ namespace Extensions.Toolpaths
             throw new Exception($" ExtrusionSpeed case in node {_index} not considered.");
         }
 
-        public List<Target> GetTargets()
+        public List<Target> GetTargets(bool hasToWait)
         {
             var targets = new List<Target>();
 
@@ -167,7 +196,7 @@ namespace Extensions.Toolpaths
                 var approachTarget = target.ShallowClone() as CartesianTarget;
                 approachTarget.Plane = new Plane(target.Plane.Origin + Vector3d.ZAxis * _att.DistancePlunge, target.Plane.XAxis, target.Plane.YAxis);
                 approachTarget.Speed = _att.Approach;
-                approachTarget.Command = null;
+                approachTarget.Command = hasToWait ? new Stop() : null;
                 targets.Add(approachTarget);
             }
 
