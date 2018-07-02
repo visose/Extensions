@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 using Rhino.Geometry;
-using Extensions.Model.Spatial;
-using MoreLinq;
-using static System.Math;
 
 namespace Extensions.Model.Document
 {

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using Rhino.Geometry;
 using Robots;
-using static System.Math;
 
 namespace Extensions.Toolpaths
 {

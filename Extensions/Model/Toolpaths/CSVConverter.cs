@@ -4,7 +4,6 @@ using System.IO;
 using System.Collections.Generic;
 using Rhino.Geometry;
 using Robots;
-using static System.Math;
 
 namespace Extensions.Toolpaths
 {

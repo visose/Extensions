@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Rhino.Geometry;
 using Rhino.Geometry.Intersect;
@@ -9,7 +7,6 @@ using MoreLinq;
 using Extensions.Model.Spatial;
 using static System.Math;
 using static Extensions.Model.Util;
-using System.Collections.Concurrent;
 
 namespace Extensions.Model.Discrete
 {

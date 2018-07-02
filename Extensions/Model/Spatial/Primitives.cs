@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Rhino.Geometry;
+﻿using Rhino.Geometry;
 
 namespace Extensions.Model.Spatial
 {
@@ -39,7 +34,6 @@ namespace Extensions.Model.Spatial
 
             return (X == other.X && Y == other.Y && Z == other.Z);
         }
-
 
         // Lifted from Geometry3Sharp
         public override int GetHashCode()
