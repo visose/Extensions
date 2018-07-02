@@ -99,10 +99,18 @@ namespace Extensions
 
         public static Mesh SetTextureCoords(Mesh mesh, IEnumerable<Point3d> coords)
         {
-            var coords2f = coords.Select(p => new Point2f(p.X, p.Y)).ToArray();
+            if (!coords.Any()) throw new Exception(" There should be at least one texture coordinate.");
+
+            var coords2f = coords.Select(p => new Point2f(p.X, p.Y)).ToList();
+            if(coords2f.Count < mesh.Vertices.Count)
+            {
+                var last = coords2f.Last();
+                int difference = mesh.Vertices.Count - coords2f.Count;
+                coords2f.AddRange(Enumerable.Repeat(last, difference));
+            }
 
             mesh.ClearTextureData();
-            mesh.TextureCoordinates.AddRange(coords2f);
+            mesh.TextureCoordinates.AddRange(coords2f.ToArray());
 
             return mesh;
         }

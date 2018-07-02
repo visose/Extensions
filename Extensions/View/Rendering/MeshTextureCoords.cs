@@ -10,18 +10,18 @@ namespace Extensions.View
     public class MeshTextureCoords : GH_Component
     {
         public MeshTextureCoords() : base("Mesh texture coordinates", "MeshTexCoords", "Sets mesh texture coordinates.", "Extensions", "Rendering") { }
-        protected override System.Drawing.Bitmap Icon => Properties.Resources.Cube;
+        protected override System.Drawing.Bitmap Icon => Properties.Resources.EyeDropper;
         public override Guid ComponentGuid => new Guid("{297d173d-4eac-4a93-947c-fa8216e73cfa}");
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
-            pManager.AddMeshParameter("Mesh", "M", "Single mesh with render colors.", GH_ParamAccess.item);
-            pManager.AddPointParameter("Texture coords", "T", "Texture coordinates. Must equal the number of mesh vertices. The Z components will be ignored.", GH_ParamAccess.list);
+            pManager.AddMeshParameter("Mesh", "M", "Mesh object.", GH_ParamAccess.item);
+            pManager.AddPointParameter("Texture coords", "T", "Texture coordinates as a list of 3D points. The Z component will be ignored.", GH_ParamAccess.list);
         }
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.AddMeshParameter("Mesh", "M", "Mesh with texture coordinates set.", GH_ParamAccess.item);
+            pManager.AddMeshParameter("Mesh", "M", "Resulting mesh with texture coordinates.", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
