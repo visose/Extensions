@@ -6,6 +6,7 @@ using Rhino.Geometry;
 using Extensions.Model.Spatial;
 using ClipperLib;
 using static Extensions.Model.Util;
+using System.Collections.Concurrent;
 
 namespace Extensions.Model.Simulations.DifferentialGrowth
 {
@@ -13,7 +14,7 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
     {
         internal List<Particle> Particles = new List<Particle>();
         internal List<Spring> Springs = new List<Spring>();
-        internal BucketSearchDense3d Search;
+        internal BucketSearchDense3d<Particle> Search;
         internal double Radius;
 
         public double Growth;
@@ -38,7 +39,7 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
 
             var box = Polyline != null ? Polyline.BoundingBox : mesh.GetBoundingBox(true);
 
-            Search = new BucketSearchDense3d(box, Radius * 2);
+            Search = new BucketSearchDense3d<Particle>(box, Radius * 2);
 
             foreach (var polyline in polylines)
             {
@@ -76,9 +77,13 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
 
         void Grow()
         {
-            Parallel.ForEach(Springs, spring =>
+            Parallel.ForEach(Partitioner.Create(0, Springs.Count), range =>
             {
-                spring.RestLength = spring.Length + Growth;
+                for (int i = range.Item1; i < range.Item2; i++)
+                {
+                    var spring = Springs[i];
+                    spring.RestLength = spring.Length + Growth;
+                }
             });
         }
 
@@ -107,20 +112,38 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
                 if (Mesh != null)
                 {
                     var pullPoints = Mesh.PullPointsToMesh(Particles.Select(p => p.Position));
-                    Parallel.For(0, Particles.Count, i => Particles[i].Forces(pullPoints[i]));
+                    Parallel.ForEach(Partitioner.Create(0, Particles.Count), range =>
+                    {
+                        for (int i = range.Item1; i < range.Item2; i++)
+                            Particles[i].Forces(pullPoints[i]);
+                    });
                 }
                 else
                 {
-                    Parallel.ForEach(Particles, p => p.Forces());
+                    Parallel.ForEach(Partitioner.Create(0, Particles.Count), range =>
+                    {
+                        for (int i = range.Item1; i < range.Item2; i++)
+                            Particles[i].Forces();
+                    });
                 }
 
-                // Watch.Start();
+                Parallel.ForEach(Partitioner.Create(0, Springs.Count), range =>
+                {
+                    for (int i = range.Item1; i < range.Item2; i++)
+                        Springs[i].Forces(10);
+                });
 
-                //Watch.Stop();
-                Parallel.ForEach(Springs, s => s.Forces(10));
+                Parallel.ForEach(Partitioner.Create(0, Particles.Count), range =>
+                {
+                    for (int i = range.Item1; i < range.Item2; i++)
+                        Particles[i].Move();
+                });
 
-                Parallel.ForEach(Particles, p => p.Move());
-                Parallel.ForEach(Springs, s => s.Update());
+                Parallel.ForEach(Partitioner.Create(0, Springs.Count), range =>
+                {
+                    for (int i = range.Item1; i < range.Item2; i++)
+                        Springs[i].Update();
+                });
 
                 totVel = 0;
                 foreach (var particle in Particles)

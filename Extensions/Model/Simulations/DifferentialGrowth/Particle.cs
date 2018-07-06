@@ -80,6 +80,9 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
             }
         }
 
+
+        // Code lifted from https://github.com/Dan-Piker/K2Goals/blob/master/Angle.cs
+
         void KeepAngle(double weight)
         {
             /// <param name="RA">Rest Angle.</param>
@@ -90,7 +93,7 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
             /// 
             if (this.neighbours.Count != 2) return;
 
-            double restAngle = 0;//Math.PI;
+            double restAngle = 0;
 
             Point3d P0 = this.neighbours[0]._p;
             Point3d P1 = _p;
@@ -118,11 +121,6 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
             this.delta.Add(-ShearA * weight, weight);
             this.delta.Add(ShearB * weight, weight);
             this.neighbours[1].delta.Add(-ShearB * weight, weight);
-
-           // Move[0] = ShearA;
-           // Move[1] = -ShearA;
-           // Move[2] = ShearB;
-           // Move[3] = -ShearB;
         }
 
         void Pull(double weight)
