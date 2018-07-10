@@ -256,9 +256,10 @@ namespace Extensions.Model.Spatial
                 var key = new Vector3i(element.Position, _factor);
                 key.X -= _start.X;
                 key.Y -= _start.Y;
+                key.Z -= _start.Z;
 
-                if (key.X < 0 || key.Y < 0) continue;
-                if (key.X >= _size.X || key.Y >= _size.Y) continue;
+                if (key.X < 0 || key.Y < 0 || key.Z < 0) continue;
+                if (key.X >= _size.X || key.Y >= _size.Y || key.Z >= _size.Z) continue;
 
                 List<T> bucket = _table[key.X][key.Y][key.Z];
 
@@ -277,7 +278,9 @@ namespace Extensions.Model.Spatial
             var center = new Vector3i(element.Position, _factor);
             center.X -= _start.X;
             center.Y -= _start.Y;
-            var keys = new Vector3i[9];
+            center.Z -= _start.Z;
+
+            var keys = new Vector3i[27];
 
             int count = 0;
             for (int i = -1; i < 2; i++)
@@ -289,8 +292,8 @@ namespace Extensions.Model.Spatial
 
             foreach (var key in keys)
             {
-                if (key.X < 0 || key.Y < 0) continue;
-                if (key.X >= _size.X || key.Y >= _size.Y) continue;
+                if (key.X < 0 || key.Y < 0 || key.Z < 0) continue;
+                if (key.X >= _size.X || key.Y >= _size.Y || key.Z >= _size.Z) continue;
 
                 List<T> bucket = _table[key.X][key.Y][key.Z];
                 if (bucket == null) continue;

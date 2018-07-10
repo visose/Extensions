@@ -12,11 +12,17 @@ namespace Extensions.View
     public class SpatialExtrusion : GH_Component
     {
         public SpatialExtrusion() : base("Spatial extrusion", "Spatial", "Create a spatial extrusion toolpath given a polyline. Requires the Robots plugin.", "Extensions", "Toolpaths") { }
-        public override GH_Exposure Exposure => GH_Exposure.primary;
+        public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
         protected override System.Drawing.Bitmap Icon => Properties.Resources.Spatial;
         public override Guid ComponentGuid => new Guid("{79EE65B3-CB2F-4704-8B01-C7C9F379B7C4}");
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
+        {
+            if (ExtensionsInfo.IsRobotsInstalled)
+                Inputs(pManager);
+        }
+
+        void Inputs(GH_InputParamManager pManager)
         {
             pManager.AddCurveParameter("Polylines", "P", "Polylines", GH_ParamAccess.list);
             pManager.AddNumberParameter("Variables", "V", "0. Extrusion diameter (mm).\r\n1. Plunge distance (mm).\r\n2. Unsupported nodes vertical offset (mm).\r\n3. Unsupported segments rotation compensation (rad). \r\n4. Distance ahead to stop in upwards segments as a factor of length (0..1).\r\n5. Horizontal displacement before downward segment (mm).", GH_ParamAccess.list);
@@ -30,11 +36,16 @@ namespace Extensions.View
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
+            if (ExtensionsInfo.IsRobotsInstalled)
+                Outputs(pManager);
+        }
+
+        void Outputs(GH_OutputParamManager pManager)
+        {
             pManager.AddParameter(new TargetParameter(), "Targets", "T", "Targets", GH_ParamAccess.list);
             pManager.AddLineParameter("Segments", "S", "Line segments", GH_ParamAccess.list);
             pManager.AddIntegerParameter("Attributes", "A", "Segment types.\r\n0. Unsupported segment & unsupported node & up.\r\n1. Supported segment & unsupported node & up.\r\n2. Unsupported segment & supported node & up.\r\n3. Supported segment & Supported node & up.\r\n4. Unsupported segment & unsupported node & down.\r\n5. Supported segment & unsupported node & down.\r\n6. Unsupported segment & supported node & down.\r\n7. Supported segment & supported node & down.", GH_ParamAccess.list);
         }
-
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {

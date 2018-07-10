@@ -28,6 +28,8 @@ namespace Extensions
 {
     public class ExtensionsInfo : GH_AssemblyInfo
     {
+        internal static bool IsRobotsInstalled;
+
         public ExtensionsInfo()
         {
             string codeBase = Assembly.GetExecutingAssembly().CodeBase;
@@ -36,33 +38,16 @@ namespace Extensions
             string folder = Path.GetDirectoryName(path);
             const string resName = "Robots.gha";
             var dllPath = Path.Combine(folder, resName);
-            Assembly.LoadFile(dllPath);
 
-            var assembly = Assembly.GetExecutingAssembly();
-            using (var input = assembly.GetManifestResourceStream(resName))
+            IsRobotsInstalled = File.Exists(dllPath);
+
+            if (IsRobotsInstalled)
             {
-                if (input == null) return;
-                Assembly.Load(StreamToBytes(input));
+                Assembly.LoadFile(dllPath);
             }
-        }
-
-        static byte[] StreamToBytes(Stream input)
-        {
-            if (input == null) return null;
-
-            var capacity = input.CanSeek ? (int)input.Length : 0;
-            using (var output = new MemoryStream(capacity))
+            else
             {
-                int readLength;
-                var buffer = new byte[4096];
-
-                do
-                {
-                    readLength = input.Read(buffer, 0, buffer.Length);
-                    output.Write(buffer, 0, readLength);
-                }
-                while (readLength != 0);
-                return output.ToArray();
+                Rhino.RhinoApp.WriteLine("Extensions plugin: Some components that require the Robots plugin will not be loaded.");
             }
         }
 

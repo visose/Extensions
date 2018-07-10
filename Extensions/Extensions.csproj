@@ -96,6 +96,7 @@
     <Compile Include="Model\Discrete\VoxelTiles.cs" />
     <Compile Include="Model\Document\Cache.cs" />
     <Compile Include="Model\Document\Debug.cs" />
+    <Compile Include="Model\Document\IO.cs" />
     <Compile Include="Model\Geometry\BallPivot.cs" />
     <Compile Include="Model\Geometry\PolygonFill.cs" />
     <Compile Include="Model\Regions\Region.cs" />
@@ -125,8 +126,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="View\Discrete\VoxelTiles.cs" />
     <Compile Include="View\Discrete\CurveSnap.cs" />
+    <Compile Include="View\Document\DisplayStyle.cs" />
+    <Compile Include="View\Document\Upload.cs" />
     <Compile Include="View\Geometry\DifferentialGrowth.cs" />
     <Compile Include="View\Discrete\UnityExport.cs" />
+    <Compile Include="View\Document\Export.cs" />
+    <Compile Include="View\Goo.cs" />
     <Compile Include="View\Toolpaths\LayeredToolpath.cs" />
     <Compile Include="View\Geometry\Remesher.cs" />
     <Compile Include="View\Geometry\StraightSkeleton.cs" />
@@ -194,6 +199,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Icons\Layers.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Icons\Save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Icons\CloudUpload.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Icons\Eye.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Icons\EyeParam.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

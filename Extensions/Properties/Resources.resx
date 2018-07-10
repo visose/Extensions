@@ -121,14 +121,23 @@
   <data name="Brick" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\Brick.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="CloudUpload" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icons\CloudUpload.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Cube" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\Cube.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="DCLLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\DCLLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Eye" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icons\Eye.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="EyeDropper" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\EyeDropper.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="EyeParam" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icons\EyeParam.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Fingerprint" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\Fingerprint.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -156,6 +165,9 @@
   </data>
   <data name="Robots" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Robots.gha;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Save" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Icons\Save.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Spatial" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Icons\Spatial.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

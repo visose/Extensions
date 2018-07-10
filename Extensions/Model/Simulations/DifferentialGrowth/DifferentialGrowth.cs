@@ -35,7 +35,8 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
             Radius = radius;
             Growth = radius * 0.5;
             _convergence = convergence;
-            Boundary = mesh.GetNakedEdges().First();
+            Boundary = mesh?.GetNakedEdges().First();
+
 
             var box = Polyline != null ? Polyline.BoundingBox : mesh.GetBoundingBox(true);
 

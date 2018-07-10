@@ -16,20 +16,6 @@ namespace Extensions.Model.Discrete
         static Vector3d[] _edgeNormals;
         static Vector3d[] _cornerNormals;
 
-        static Mesh UnitBox(double scale = 1.0)
-        {
-            double l = 0.5 * scale;
-            var corner = new Point3d(l, l, l);
-            var bbox = new BoundingBox(-corner, corner);
-            var meshBox = Mesh.CreateFromBox(bbox, 1, 1, 1);
-            meshBox.Weld(PI2);
-            meshBox.Vertices.CombineIdentical(true, true);
-            meshBox.Compact();
-            meshBox.RebuildNormals();
-
-            return meshBox;
-        }
-
         static VoxelTiles()
         {
             var box = UnitBox();
@@ -42,6 +28,20 @@ namespace Extensions.Model.Discrete
                                 v.Unitize();
                                 return v;
                             }).ToArray();
+        }
+
+        static Mesh UnitBox(double scale = 1.0)
+        {
+            double l = 0.5 * scale;
+            var corner = new Point3d(l, l, l);
+            var bbox = new BoundingBox(-corner, corner);
+            var meshBox = Mesh.CreateFromBox(bbox, 1, 1, 1);
+            meshBox.Weld(PI2);
+            meshBox.Vertices.CombineIdentical(true, true);
+            meshBox.Compact();
+            meshBox.RebuildNormals();
+
+            return meshBox;
         }
 
         public static IList<Voxel> Create(Mesh boundary, double length, List<Curve> alignments, double alignmentDistance, List<GeometryBase> attractors, double attractorDistance, int[] typesCount)
@@ -188,11 +188,9 @@ namespace Extensions.Model.Discrete
                 var tangent = Vector3d.Zero;
                 var curvature = Vector3d.Zero;
 
-                double currentMax = double.MaxValue;
-
                 foreach (var curve in curves)
                 {
-                    if (curve.ClosestPoint(p, out double t, currentMax))
+                    if (curve.ClosestPoint(p, out double t, maxDistance))
                     {
                         var weight = maxDistance - curve.PointAt(t).DistanceTo(p);
                         tangent += curve.TangentAt(t) * weight;
