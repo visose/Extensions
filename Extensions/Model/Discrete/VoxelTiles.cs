@@ -209,9 +209,9 @@ namespace Extensions.Model.Discrete
                 else
                 {
                     var normal = Vector3d.CrossProduct(tangent, curvature);
-                    var snapPlane = SnapPlane(voxel, normal, tangent);
-                    voxel.Location = snapPlane.plane;
-                    voxel.SnapType = snapPlane.snapType;
+                    var (plane, snapType) = SnapPlane(voxel, normal, tangent);
+                    voxel.Location = plane;
+                    voxel.SnapType = snapType;
                 }
             }
         }

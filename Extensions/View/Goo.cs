@@ -8,7 +8,7 @@ using Rhino.Geometry;
 
 namespace Extensions.View
 {
-    public class GH_DisplayStyle : GH_Goo<DisplayStyle>
+    public class GH_DisplayStyle : GH_Goo<DisplayStyle>, IGH_PreviewData
     {
         public GH_DisplayStyle() { Value = new DisplayStyle(null, Color.Black); }
         public GH_DisplayStyle(GH_DisplayStyle goo) { Value = goo.Value; }
@@ -37,9 +37,28 @@ namespace Extensions.View
 
             return false;
         }
+
+        public BoundingBox ClippingBox => Value.Geometry.GetBoundingBox(true);
+
+        public void DrawViewportMeshes(GH_PreviewMeshArgs args)
+        {
+            if (Value.Geometry is Mesh)
+                args.Pipeline.DrawMeshShaded(Value.Geometry as Mesh, args.Material);
+        }
+
+
+        public void DrawViewportWires(GH_PreviewWireArgs args)
+        {
+            //if (Value.Geometry is Mesh)
+            //    args.Pipeline.DrawMeshWires(Value.Geometry as Mesh, Value.Color);
+
+            if (Value.Geometry is Curve)
+                args.Pipeline.DrawCurve(Value.Geometry as Curve, Value.Color);
+        }
+
     }
 
-    public class DisplayStyleParameter : GH_PersistentParam<GH_DisplayStyle>
+    public class DisplayStyleParameter : GH_PersistentParam<GH_DisplayStyle>, IGH_PreviewObject
     {
         public DisplayStyleParameter() : base("Display style", "Style", "Display style.", "Extensions", "Parameters") { }
         public override GH_Exposure Exposure => GH_Exposure.primary;
@@ -55,5 +74,11 @@ namespace Extensions.View
             values = new List<GH_DisplayStyle>();
             return GH_GetterResult.success;
         }
+
+        public bool Hidden { get; set; }
+        public bool IsPreviewCapable => true;
+        public BoundingBox ClippingBox => base.Preview_ComputeClippingBox();
+        public void DrawViewportWires(IGH_PreviewArgs args) => base.Preview_DrawWires(args);
+        public void DrawViewportMeshes(IGH_PreviewArgs args) => base.Preview_DrawMeshes(args);
     }
 }
