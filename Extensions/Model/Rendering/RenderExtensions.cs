@@ -11,7 +11,8 @@ namespace Extensions
     {
         public static Mesh BitmapFromVertexColors(Mesh mesh, string file)
         {          
-            if (!Directory.Exists(Path.GetDirectoryName(file))) throw new FileNotFoundException($" File \"{file}\" not found.", file);
+            var path = Path.GetDirectoryName(file);
+            if (!Directory.Exists(path)) throw new DirectoryNotFoundException($" Directory \"{path}\" not found.");
 
             mesh.Unweld(0, false);
             mesh.TextureCoordinates.Clear();
@@ -54,12 +55,17 @@ namespace Extensions
             }
 
             bitmap.Save(file, System.Drawing.Imaging.ImageFormat.Png);
+
+            mesh.VertexColors.Clear();
+
             return mesh;
         }
 
         public static IEnumerable<Mesh> BitmapFromSolidColoredMeshes(IEnumerable<Mesh> meshes, string file)
         {
-            if (!Directory.Exists(Path.GetDirectoryName(file))) throw new FileNotFoundException($" File \"{file}\" not found.", file);
+            var path = Path.GetDirectoryName(file);
+            if (!Directory.Exists(path)) throw new DirectoryNotFoundException($" Directory \"{path}\" not found.");
+
             int count = meshes.Count();
             int size = (int)Math.Ceiling(Math.Sqrt(count));
             float fSize = (float)size * 2;

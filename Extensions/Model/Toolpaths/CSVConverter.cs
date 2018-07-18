@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Rhino.Geometry;
 using Robots;
 
-namespace Extensions.Toolpaths
+namespace Extensions.Model.Toolpaths
 {
     // pX,pY,pZ,nX,nY,nZ,F'
 

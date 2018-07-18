@@ -38,7 +38,7 @@ namespace Extensions.View
             DA.GetData(2, ref height);
             DA.GetData(3, ref region);
 
-            var column = new Model.Toolpath.Column(mesh, diameter, height, region);
+            var column = new Model.Toolpaths.Column(mesh, diameter, height, region);
 
             var original = column.Contours.Select(p => new PolylineCurve(p));
             var contours = column.Layers.SelectMany(p => p.Select(c => new PolylineCurve(c)));

@@ -7,43 +7,48 @@ using Rhino.DocObjects;
 using System.Net;
 using System.Threading.Tasks;
 using Rhino.UI;
+using Rhino.Display;
+using Rhino;
 
 namespace Extensions.Model.Document
 {
     public static class IO
     {
-        public static string Export(List<DisplayStyle> geometries, int exportType, string folder, string fileName)
+        public enum ExportType { HTML, FBX };
+
+        public static string Export(List<DisplayGeometry> geometries, ExportType exportType, string folder, string fileName)
         {
-            var doc = Rhino.RhinoDoc.ActiveDoc;
+            var doc = RhinoDoc.ActiveDoc;
             var guids = new List<Guid>(geometries.Count);
+
+            bool flipYZ = exportType == ExportType.FBX;
 
             foreach (var geometry in geometries)
             {
-                int layerIndex;
-
-                var layer = doc.Layers.FindName(geometry.Layer, Rhino.RhinoMath.UnsetIntIndex);
-
-                if (layer == null)
-                {
-                    layerIndex = doc.Layers.Add(new Layer() { Name = geometry.Layer });
-                }
-                else
-                {
-                    layerIndex = layer.Index;
-                }
-
-                var att = new ObjectAttributes
-                {
-                    ColorSource = ObjectColorSource.ColorFromObject,
-                    ObjectColor = geometry.Color,
-                    LayerIndex = layerIndex
-                };
-
-                guids.Add(doc.Objects.Add(geometry.Geometry, att));
+                guids.Add(geometry.Bake(doc, null, flipYZ));
             }
 
-            string filePath = Path.Combine(folder, $"{fileName}.html");
-            Rhino.RhinoApp.RunScript($"-_SaveAs \"{filePath}\" ui=yes launch=yes _Enter", false);
+            doc.Objects.UnselectAll(false);
+            doc.Objects.Select(guids, true);
+
+            string filePath = Path.Combine(folder, fileName);
+
+            switch (exportType)
+            {
+                case ExportType.HTML:
+                    {
+                        RhinoApp.RunScript($"-_Export \"{filePath}.html\" ui=yes launch=yes _Enter", false);
+                        break;
+                    }
+                case ExportType.FBX:
+                    {
+                        RhinoApp.RunScript($"-_Export \"{filePath}.fbx\" _Enter _Enter", false);
+                        break;
+                    }
+                default:
+                    break;
+            }
+
             doc.Objects.Delete(guids, true);
 
             return filePath;
@@ -55,7 +60,7 @@ namespace Extensions.Model.Document
         {
             if (_uploadTask != null && !_uploadTask.IsCompleted)
             {
-                Rhino.RhinoApp.WriteLine("Please wait until the last upload has completed.");
+                RhinoApp.WriteLine("Please wait until the last upload has completed.");
                 return;
             }
 
@@ -87,30 +92,14 @@ namespace Extensions.Model.Document
                     }
                 }
 
-                Rhino.RhinoApp.InvokeOnUiThread(new Action(() => StatusBar.HideProgressMeter()));
+                RhinoApp.InvokeOnUiThread(new Action(() => StatusBar.HideProgressMeter()));
 
                 using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
                 {
                     Action text = () => Rhino.RhinoApp.WriteLine($"Web upload of file '{fileName}.html' complete, status: {response.StatusDescription}");
-                    Rhino.RhinoApp.InvokeOnUiThread(text);
+                    RhinoApp.InvokeOnUiThread(text);
                 }
             });
         }
-    }
-
-    public class DisplayStyle
-    {
-        public GeometryBase Geometry { get; set; }
-        public Color Color { get; set; }
-        public string Layer { get; set; }
-
-        public DisplayStyle(GeometryBase geometry, Color color, string layer = "")
-        {
-            Geometry = geometry;
-            Color = color;
-            Layer = layer;
-        }
-
-        public override string ToString() => $"Display Style ({Geometry.ObjectType}, {Color.Name}, {Layer})";
     }
 }

@@ -7,7 +7,7 @@ using Robots.Commands;
 using static System.Math;
 
 
-namespace Extensions.Toolpaths
+namespace Extensions.Model.Toolpaths.SpatialExtrusion
 {
     class Vertex
     {

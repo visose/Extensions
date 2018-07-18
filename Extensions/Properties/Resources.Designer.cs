@@ -173,6 +173,56 @@ namespace Extensions.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap LayersAdd {
+            get {
+                object obj = ResourceManager.GetObject("LayersAdd", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LayersClean {
+            get {
+                object obj = ResourceManager.GetObject("LayersClean", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LayersConfig {
+            get {
+                object obj = ResourceManager.GetObject("LayersConfig", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LayersConfigParam {
+            get {
+                object obj = ResourceManager.GetObject("LayersConfigParam", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LayersSubtract {
+            get {
+                object obj = ResourceManager.GetObject("LayersSubtract", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap PaintBrush01 {
             get {
                 object obj = ResourceManager.GetObject("PaintBrush01", resourceCulture);
@@ -207,16 +257,6 @@ namespace Extensions.Properties {
             get {
                 object obj = ResourceManager.GetObject("Puzzle", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] Robots {
-            get {
-                object obj = ResourceManager.GetObject("Robots", resourceCulture);
-                return ((byte[])(obj));
             }
         }
         

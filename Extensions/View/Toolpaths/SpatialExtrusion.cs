@@ -6,12 +6,13 @@ using Rhino.Geometry;
 using Robots;
 using Robots.Grasshopper;
 using static Extensions.Model.Util;
+using Extensions.Model.Toolpaths.SpatialExtrusion;
 
 namespace Extensions.View
 {
-    public class SpatialExtrusion : GH_Component
+    public class CreateSpatialExtrusion : GH_Component
     {
-        public SpatialExtrusion() : base("Spatial extrusion", "Spatial", "Create a spatial extrusion toolpath given a polyline. Requires the Robots plugin.", "Extensions", "Toolpaths") { }
+        public CreateSpatialExtrusion() : base("Spatial extrusion", "Spatial", "Create a spatial extrusion toolpath given a polyline. Requires the Robots plugin.", "Extensions", "Toolpaths") { }
         public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
         protected override System.Drawing.Bitmap Icon => Properties.Resources.Spatial;
         public override Guid ComponentGuid => new Guid("{79EE65B3-CB2F-4704-8B01-C7C9F379B7C4}");
@@ -72,8 +73,8 @@ namespace Extensions.View
             var environment = new List<GeometryBase>();
             DA.GetDataList(6, environment);
 
-            var attributes = new Toolpaths.SpatialAttributes(variables, (target.Value) as CartesianTarget, speeds, waits, dos, environment);
-            var spatial = new Toolpaths.SpatialExtrusion(polylines, attributes);
+            var attributes = new SpatialAttributes(variables, (target.Value) as CartesianTarget, speeds, waits, dos, environment);
+            var spatial = new SpatialExtrusion(polylines, attributes);
 
             DA.SetDataList(0, spatial.Targets);
             DA.SetDataList(1, spatial.Display.Select(d => d.segment));

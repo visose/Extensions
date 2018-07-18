@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using Extensions;
-
+using Extensions.Model.Document;
+using Rhino.Display;
 
 namespace Extensions.View
 {
@@ -22,7 +23,8 @@ namespace Extensions.View
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.AddMeshParameter("Mesh", "M", "Mesh with uv coords to map bitmap and unwelded vertices.", GH_ParamAccess.item);
+            //  pManager.AddMeshParameter("Mesh", "M", "Mesh with uv coords to map bitmap and unwelded vertices.", GH_ParamAccess.item);
+            pManager.AddParameter(new DisplayGeometryParameter(), "Dispay mesh", "M", "Display mesh.", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -33,8 +35,12 @@ namespace Extensions.View
             DA.GetData(1, ref file);
 
             Mesh outMesh = RenderExtensions.BitmapFromVertexColors(mesh, file);
+            var material = new DisplayMaterial();
+            material.Transparency = 0;
+            material.SetBitmapTexture(file, true);
 
-            DA.SetData(0, outMesh);
+            var display = new DisplayGeometry(outMesh, material);
+            DA.SetData(0, new GH_DisplayGeometry(display));
         }
     }
 }

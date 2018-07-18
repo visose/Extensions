@@ -9,7 +9,7 @@ using Extensions.Model.Document;
 using MoreLinq;
 using static System.Math;
 
-namespace Extensions.Model.Toolpath
+namespace Extensions.Model.Toolpaths
 {
     class Column
     {

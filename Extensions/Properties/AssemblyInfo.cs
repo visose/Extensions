@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Drawing;
 using Rhino.PlugIns;
 using Grasshopper.Kernel;
+using System.Linq;
 
 [assembly: AssemblyTitle("Extensions")]
 [assembly: AssemblyDescription("Assorted components for Grasshopper")]
@@ -49,13 +50,14 @@ namespace Extensions
             {
                 Rhino.RhinoApp.WriteLine("Extensions plugin: Some components that require the Robots plugin will not be loaded.");
             }
+
         }
 
-        public override string Name => "Extensions";
+        public override string Name => Assembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
         public override Bitmap Icon => Properties.Resources.DCLLogo;
-        public override string Description => "Assorted components for Grasshopper";
+        public override string Description => Assembly.GetCustomAttribute<AssemblyDescriptionAttribute>().Description;
         public override Guid Id => new Guid("29035877-56b2-45cd-b65d-bf19a046d30b");
-        public override string AuthorName => "Design Computation Lab - UCL";
+        public override string AuthorName => Assembly.GetCustomAttribute<AssemblyCompanyAttribute>().Company;
         public override string AuthorContact => "v.soler@ucl.ac.uk";
     }
 }

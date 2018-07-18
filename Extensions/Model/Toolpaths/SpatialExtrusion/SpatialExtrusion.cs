@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using Rhino.Geometry;
 using Robots;
 
-namespace Extensions.Toolpaths
+namespace Extensions.Model.Toolpaths.SpatialExtrusion
 {
-    internal class SpatialExtrusion
+     class SpatialExtrusion
     {
-        public List<Target> Targets { get; private set; } = new List<Target>();
-        public List<(Line segment, int type)> Display { get; private set; } = new List<(Line segment, int type)>();
+        public List<Target> Targets { get; } = new List<Target>();
+        public List<(Line segment, int type)> Display { get; } = new List<(Line segment, int type)>();
 
         public SpatialExtrusion(IEnumerable<Polyline> polylines, SpatialAttributes attributes)
         {
