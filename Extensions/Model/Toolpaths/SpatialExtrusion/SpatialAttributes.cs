@@ -4,7 +4,7 @@ using Rhino.Geometry;
 using Robots;
 using Robots.Commands;
 
-namespace Extensions.Toolpaths
+namespace Extensions.Model.Toolpaths.SpatialExtrusion
 {
     internal class SpatialAttributes
     {

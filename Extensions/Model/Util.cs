@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Rhino.Geometry;
 using static System.Math;
 
@@ -145,6 +146,21 @@ namespace Extensions.Model
 
             double pt = s_min + t_min;
             return pl.PointAt(pt);
+        }
+
+        public static Mesh FlipYZ(this Mesh mesh)
+        {
+            var vertices = mesh.Vertices.Select(v => new Point3d(v.X, v.Z, -v.Y)).ToList();
+            var normals = mesh.Normals.Select(v => new Vector3f(v.X, v.Z, -v.Y)).ToArray();
+            var uv = mesh.TextureCoordinates.ToArray();
+            var faces = mesh.Faces;
+
+            var result = new Mesh();
+            result.Vertices.AddVertices(vertices);
+            result.Normals.AddRange(normals);
+            result.Faces.AddFaces(faces);
+            result.TextureCoordinates.AddRange(uv);
+            return result;
         }
     }
 }
