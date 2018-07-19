@@ -12,7 +12,7 @@ namespace Extensions.View
 {
     public class CreateMillingAttributes : GH_Component
     {
-        public CreateMillingAttributes() : base("Milling attributes", "MillAtt", "Milling attributes.", "Extensions", "Toolpaths") { }
+        public CreateMillingAttributes() : base("Milling Attributes", "MillAtt", "Milling attributes.", "Extensions", "Toolpaths") { }
         public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
         protected override System.Drawing.Bitmap Icon => Properties.Resources.LayersConfig;
         public override Guid ComponentGuid => new Guid("{F6A3EFA3-2CC5-4E17-BEE8-E8B9AA6648B5}");

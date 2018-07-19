@@ -7,15 +7,15 @@ namespace Extensions.View
 {
     public class CurveSnap : GH_Component
     {
-        public CurveSnap() : base("Curve snap", "CurveSnap", "Snaps curves to discrete intervals and directions.", "Extensions", "Discrete") { }
+        public CurveSnap() : base("Curve Snap", "CrvSnap", "Snaps curves to discrete intervals and directions.", "Extensions", "Discrete") { }
         protected override System.Drawing.Bitmap Icon => Properties.Resources.Polyline;
         public override Guid ComponentGuid => new Guid("{4F45F86C-6B7E-4327-9475-467CB82DAF13}");
 
         protected override void RegisterInputParams(GH_InputParamManager pManager)
         {
             pManager.AddCurveParameter("Curve", "C", "Curve.", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Segment length", "L", "Length of the segments.", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("Snap type", "S", "Directions based on spherical mapping. Right click for types.", GH_ParamAccess.item, 0);
+            pManager.AddNumberParameter("Segment Length", "L", "Length of the segments.", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("Snap Type", "S", "Directions based on spherical mapping. Right click for types.", GH_ParamAccess.item, 0);
             pManager.AddIntegerParameter("Subdivisions", "D", "Number of spherical subdivisions.", GH_ParamAccess.item, 0);
 
             var param = pManager[2] as Param_Integer;
@@ -26,7 +26,7 @@ namespace Extensions.View
 
         protected override void RegisterOutputParams(GH_OutputParamManager pManager)
         {
-            pManager.AddCurveParameter("Discretized curve", "C", "Discretized curve.", GH_ParamAccess.item);
+            pManager.AddCurveParameter("Discretized Curve", "C", "Discretized curve.", GH_ParamAccess.item);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)

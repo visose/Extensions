@@ -11,7 +11,7 @@ namespace Extensions.View
 {
     public class Upload : GH_Component
     {
-        public Upload() : base("Upload file", "Upload", "Upload a file to the web.", "Extensions", "Document") { }
+        public Upload() : base("Upload File", "Upload", "Upload a file to the web.", "Extensions", "Document") { }
         protected override Bitmap Icon => Properties.Resources.CloudUpload;
         public override Guid ComponentGuid => new Guid("{DCA98559-B42A-4FEB-9226-E182977D8228}");
 

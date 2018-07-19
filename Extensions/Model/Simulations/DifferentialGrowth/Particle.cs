@@ -9,7 +9,7 @@ using static Extensions.Model.Util;
 
 namespace Extensions.Model.Simulations.DifferentialGrowth
 {
-    public class Particle : IPositionable
+    public class Particle : IPositionable, IEquatable<Particle>
     {
         Point3d _p;
         //Point3d _pPrev;
@@ -48,13 +48,13 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
 
         void Collision(double weight)
         {
-
-            var collided = _simulation.Search.GetClosests(this)
-              .Where(p => !neighbours.Contains(p));
+            var collided = _simulation.Search.GetClosests(this);
 
             foreach (Particle collider in collided)
             {
-                Vector3d vector = collider.Position - _p;
+                if (neighbours.Contains(collider)) continue;
+
+                Vector3d vector = collider._p - _p;
                 double distance = vector.Length;
                 vector *= ((distance - _simulation.Radius * 2) / distance) * 0.5;
                 this.delta.Add(vector * weight, weight);
@@ -146,6 +146,11 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
 
             delta.SetZero();
             deltas.Clear();
+        }
+
+        bool IEquatable<Particle>.Equals(Particle other)
+        {
+            return this == other;
         }
     }
 }

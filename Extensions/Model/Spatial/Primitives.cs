@@ -1,4 +1,5 @@
 ﻿using Rhino.Geometry;
+using System;
 
 namespace Extensions.Model.Spatial
 {
@@ -7,7 +8,7 @@ namespace Extensions.Model.Spatial
         Point3d Position { get; }
     }
 
-    public struct Vector3i
+    public struct Vector3i : IEquatable<Vector3i>
     {
         public int X;
         public int Y;
@@ -28,11 +29,24 @@ namespace Extensions.Model.Spatial
             Z = point.Z > 0 ? (int)point.Z : (int)point.Z - 1;
         }
 
+        public static bool operator ==(Vector3i a, Vector3i b)
+        {
+            return a.X == b.X && a.Y == b.Y && a.Z == b.Z;
+        }
+
+        public static bool operator !=(Vector3i a, Vector3i b)
+        {
+            return !(a == b);
+        }
+
+        public bool Equals(Vector3i other)
+        {
+            return this == other;
+        }
+
         public override bool Equals(object obj)
         {
-            Vector3i other = (Vector3i)obj;
-
-            return (X == other.X && Y == other.Y && Z == other.Z);
+            return this == (Vector3i)obj;
         }
 
         // Lifted from Geometry3Sharp
@@ -51,7 +65,7 @@ namespace Extensions.Model.Spatial
         }
     }
 
-    public struct Vector2i
+    public struct Vector2i : IEquatable<Vector2i>
     {
         public int X;
         public int Y;
@@ -67,6 +81,40 @@ namespace Extensions.Model.Spatial
             point *= scale;
             X = point.X > 0 ? (int)point.X : (int)point.X - 1;
             Y = point.Y > 0 ? (int)point.Y : (int)point.Y - 1;
+        }
+
+        public static bool operator ==(Vector2i a, Vector2i b)
+        {
+            return a.X == b.X && a.Y == b.Y;
+        }
+
+        public static bool operator !=(Vector2i a, Vector2i b)
+        {
+            return !(a == b);
+        }
+
+        public bool Equals(Vector2i other)
+        {
+            return this == other;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this == (Vector2i)obj;
+        }
+
+        // Lifted from Geometry3Sharp
+        public override int GetHashCode()
+        {
+            //return 137 * X + 149 * Y + 163 * Z;
+            unchecked // Overflow is fine, just wrap
+            {
+                int hash = (int)2166136261;
+                // Suitable nullity checks etc, of course :)
+                hash = (hash * 16777619) ^ X.GetHashCode();
+                hash = (hash * 16777619) ^ Y.GetHashCode();
+                return hash;
+            }
         }
     }
 }

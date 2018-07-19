@@ -221,9 +221,6 @@
     <None Include="Resources\Icons\EyeParam.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Icons\LayerConfig.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Icons\LayersSubtract.png" />
   </ItemGroup>
   <ItemGroup>
@@ -234,6 +231,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Icons\LayersConfigParam.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Icons\LayersConfig.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

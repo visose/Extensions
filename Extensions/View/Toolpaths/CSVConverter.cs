@@ -11,7 +11,7 @@ namespace Extensions.View
 {
     public class CSVConverter : GH_Component
     {
-        public CSVConverter() : base("CSV to robot targets", "CSVRobot", "Converts a CSV file to robot targets.", "Extensions", "Toolpaths") { }
+        public CSVConverter() : base("CSV Toolpath", "CSVPath", "Converts a CSV file to robot targets.", "Extensions", "Toolpaths") { }
         public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
         protected override System.Drawing.Bitmap Icon => Properties.Resources.Fingerprint;
         public override Guid ComponentGuid => new Guid("{0C7F5A9E-40CC-4A87-AB23-6333D274FF14}");

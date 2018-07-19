@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Rhino.Geometry;
 
 namespace Extensions.Model.Spatial
@@ -52,7 +53,7 @@ namespace Extensions.Model.Spatial
 
                 foreach (var other in value)
                 {
-                    if (element.Position == other.Position) continue;
+                    if (element.Equals(other)) continue;
 
                     double distance = (element.Position - other.Position).SquareLength;
                     if (distance <= _distanceSquared)
@@ -114,7 +115,7 @@ namespace Extensions.Model.Spatial
 
                 foreach (var other in value)
                 {
-                    if (element as IPositionable == other as IPositionable) continue;
+                    if (element.Equals(other)) continue;
 
                     double distance = (element.Position - other.Position).SquareLength;
                     if (distance <= _distanceSquared)
@@ -203,7 +204,7 @@ namespace Extensions.Model.Spatial
 
                 foreach (var other in bucket)
                 {
-                    if (element as IPositionable == other as IPositionable) continue;
+                    if (element.Equals(other)) continue;
 
                     double distance = (element.Position - other.Position).SquareLength;
                     if (distance <= _distanceSquared)
@@ -215,7 +216,7 @@ namespace Extensions.Model.Spatial
         }
     }
 
-    public class BucketSearchDense3d<T> where T : IPositionable
+    public class BucketSearchDense3d<T> where T : class, IPositionable// IEquatable<T>
     {
         List<T>[][][] _table;
         double _distanceSquared;
@@ -247,9 +248,9 @@ namespace Extensions.Model.Spatial
                 for (int j = 0; j < _size.Y; j++)
                     for (int k = 0; k < _size.Z; k++)
                     {
-                    var bucket = _table[i][j][k];
-                    if (bucket != null) bucket.Clear();
-                }
+                        var bucket = _table[i][j][k];
+                        if (bucket != null) bucket.Clear();
+                    }
 
             foreach (var element in elements)
             {
@@ -290,6 +291,8 @@ namespace Extensions.Model.Spatial
 
             var elements = new List<T>();
 
+            Point3d a = element.Position;
+
             foreach (var key in keys)
             {
                 if (key.X < 0 || key.Y < 0 || key.Z < 0) continue;
@@ -300,9 +303,17 @@ namespace Extensions.Model.Spatial
 
                 foreach (var other in bucket)
                 {
-                    if (element.Position == other.Position) continue;
+                    // if (element.Equals(other)) continue;
+                    if (element == other) continue;
 
-                    double distance = (element.Position - other.Position).SquareLength;
+                    Point3d b = other.Position;
+                    double dx = a.X - b.X;
+                    double dy = a.Y - b.Y;
+                    double dz = a.Z - b.Z;
+
+                    double distance = dx * dx + dy * dy + dz * dz;
+                 
+                  //  double distance = (position - other.Position).SquareLength;
                     if (distance <= _distanceSquared)
                         elements.Add(other);
                 }
