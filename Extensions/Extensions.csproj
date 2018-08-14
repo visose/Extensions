@@ -56,6 +56,9 @@
     <Reference Include="Grasshopper, Version=6.6.18177.16150, Culture=neutral, PublicKeyToken=dda4f5ec2cd80803, processorArchitecture=MSIL">
       <HintPath>..\packages\Grasshopper.6.6.18177.16151\lib\net45\Grasshopper.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ConcurrencyVisualizer.Markers">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\Extensions\4hhyuhoo.ghy\SDK\Managed\4.0\Microsoft.ConcurrencyVisualizer.Markers.dll</HintPath>
+    </Reference>
     <Reference Include="MoreLinq, Version=3.0.0.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\morelinq.3.0.0\lib\net451\MoreLinq.dll</HintPath>
@@ -118,6 +121,9 @@
     <Compile Include="Model\Spatial\BucketSearch.cs" />
     <Compile Include="Model\Spatial\Octree.cs" />
     <Compile Include="Model\Spatial\Primitives.cs" />
+    <Compile Include="Model\Toolpaths\Extrusion\ExtrusionVisualizer.cs" />
+    <Compile Include="Model\Toolpaths\Extrusion\ExtrusionAttributes.cs" />
+    <Compile Include="Model\Toolpaths\Extrusion\ExtrusionToolpath.cs" />
     <Compile Include="Model\Toolpaths\Milling\MillingAttributes.cs" />
     <Compile Include="Model\Toolpaths\Milling\MillingToolpath.cs" />
     <Compile Include="Model\Toolpaths\SpatialExtrusion\SpatialAttributes.cs" />
@@ -139,6 +145,10 @@
     <Compile Include="View\Discrete\UnityExport.cs" />
     <Compile Include="View\Document\Export.cs" />
     <Compile Include="View\Goo.cs" />
+    <Compile Include="View\Toolpaths\ExtrusionAttributes.cs" />
+    <Compile Include="View\Toolpaths\ExtrusionToolpathCustom.cs" />
+    <Compile Include="View\Toolpaths\ExtrusionVisualizer.cs" />
+    <Compile Include="View\Toolpaths\ExtrusionToolpath.cs" />
     <Compile Include="View\Toolpaths\MillingToolpath.cs" />
     <Compile Include="View\Toolpaths\MillingAttributes.cs" />
     <Compile Include="View\Toolpaths\LayeredToolpath.cs" />
@@ -233,6 +243,8 @@
     <None Include="Resources\Icons\LayersConfigParam.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Icons\LayersDraw.png" />
+    <None Include="Resources\Icons\LayersAddParam.png" />
     <Content Include="Resources\Icons\LayersConfig.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

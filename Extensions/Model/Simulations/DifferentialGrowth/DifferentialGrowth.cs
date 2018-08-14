@@ -23,7 +23,6 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
         public Polyline Polyline;
         public List<List<Polyline>> AllPolylines = new List<List<Polyline>>();
         public Polyline Boundary;
-        public System.Diagnostics.Stopwatch Watch = new System.Diagnostics.Stopwatch();
 
         int _convergence;
 
@@ -37,17 +36,16 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
             _convergence = convergence;
             Boundary = mesh?.GetNakedEdges().First();
 
-
             var box = Polyline != null ? Polyline.BoundingBox : mesh.GetBoundingBox(true);
 
-            Search = new BucketSearchDense3d<Particle>(box, Radius * 2);
+            Search = new BucketSearchDense3d<Particle>(box, radius);
 
             foreach (var polyline in polylines)
             {
                 if (polyline == null) continue;
                 var startPl = new Particle(polyline[0], this);
 
-                int j = polyline.IsClosed ? -1 : 0;
+                int j = polyline.IsClosed ? -2 : -1;
 
                 for (int i = 1; i < polyline.Count + j; i++)
                 {
@@ -71,7 +69,7 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
                 Update();
                 AllPolylines.Add(GetPolylines());
                 double length = GetLengthSquared();
-                if (Math.Abs(lastLength - length) < 1.0) break;
+                if (Math.Abs(lastLength - length) < 1) break;
                 lastLength = length;
             }
         }
@@ -93,7 +91,7 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
             for (int i = Springs.Count - 1; i >= 0; i--)
             {
                 var spring = Springs[i];
-                if (spring.Length > Radius)
+                if (spring.Length > Radius * 0.5)
                     spring.Split(i);
             }
         }
@@ -112,8 +110,26 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
 
                 if (Mesh != null)
                 {
-                    var pullPoints = Mesh.PullPointsToMesh(Particles.Select(p => p.Position));
-                    Parallel.ForEach(Partitioner.Create(0, Particles.Count), range =>
+                    var particlesCount = Particles.Count;
+                    var points = new List<Point3d>(particlesCount);
+                    var pullPoints = new Point3d[particlesCount];
+
+                    for (int i = 0; i < particlesCount; i++)
+                        points.Add(Particles[i].Position);
+
+                    Parallel.ForEach(Partitioner.Create(0, particlesCount), range =>
+                    {
+                        var subPoints = points.GetRange(range.Item1, range.Item2 - range.Item1);
+                        var subPulled = Mesh.PullPointsToMesh(subPoints);
+
+                        int count = 0;
+                        for (int i = range.Item1; i < range.Item2; i++)
+                            pullPoints[i] = subPulled[count++];
+                    });
+
+                    // var pullPoints = Mesh.PullPointsToMesh(points);
+
+                    Parallel.ForEach(Partitioner.Create(0, particlesCount), range =>
                     {
                         for (int i = range.Item1; i < range.Item2; i++)
                             Particles[i].Forces(pullPoints[i]);
@@ -149,7 +165,7 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
                 totVel = 0;
                 foreach (var particle in Particles)
                     totVel += particle.Velocity.SquareLength;
-            } while (totVel > 0.001 && iterations-- >= 0);
+            } while (totVel > 0.001 && iterations-- > 0);
         }
 
         public List<Polyline> GetPolylines()

@@ -98,6 +98,9 @@ namespace Extensions.Model.Spatial
 
         public IEnumerable<T> GetClosests(T element)
         {
+            var position = element.Position;
+            var index = element.Index;
+
             var center = new Vector3i(element.Position, _factor);
             var keys = new Vector3i[27];
 
@@ -115,9 +118,9 @@ namespace Extensions.Model.Spatial
 
                 foreach (var other in value)
                 {
-                    if (element.Equals(other)) continue;
+                    if (other.Index >= index) continue;
 
-                    double distance = (element.Position - other.Position).SquareLength;
+                    double distance = (position - other.Position).SquareLength;
                     if (distance <= _distanceSquared)
                         elements.Add(other);
                 }
@@ -216,9 +219,10 @@ namespace Extensions.Model.Spatial
         }
     }
 
-    public class BucketSearchDense3d<T> where T : class, IPositionable// IEquatable<T>
+    public class BucketSearchDense3d<T> where T : IPositionable
     {
-        List<T>[][][] _table;
+        List<int>[,,] _table;
+        Element<T>[] _elements;
         double _distanceSquared;
         double _factor;
         Vector3i _start;
@@ -232,23 +236,24 @@ namespace Extensions.Model.Spatial
             _start = new Vector3i(box.Corner(true, true, true), _factor);
             var end = new Vector3i(box.Corner(false, false, false), _factor);
             _size = new Vector3i(end.X - _start.X + 1, end.Y - _start.Y + 1, end.Z - _start.Z + 1);
-
-            _table = new List<T>[_size.X][][];
-            for (int i = 0; i < _size.X; i++)
-            {
-                _table[i] = new List<T>[_size.Y][];
-                for (int j = 0; j < _size.Y; j++)
-                    _table[i][j] = new List<T>[_size.Z];
-            }
+            _table = new List<int>[_size.X, _size.Y, _size.Z];
         }
 
-        public void Populate(IEnumerable<T> elements)
+        public void Populate(IList<T> elements)
         {
+            _elements = new Element<T>[elements.Count];
+
+            for (int i = 0; i < elements.Count; i++)
+            {
+                var e = elements[i];
+                _elements[i] = new Element<T> { Index = e.Index, Position = e.Position, Value = e };
+            }
+
             for (int i = 0; i < _size.X; i++)
                 for (int j = 0; j < _size.Y; j++)
                     for (int k = 0; k < _size.Z; k++)
                     {
-                        var bucket = _table[i][j][k];
+                        var bucket = _table[i, j, k];
                         if (bucket != null) bucket.Clear();
                     }
 
@@ -262,21 +267,24 @@ namespace Extensions.Model.Spatial
                 if (key.X < 0 || key.Y < 0 || key.Z < 0) continue;
                 if (key.X >= _size.X || key.Y >= _size.Y || key.Z >= _size.Z) continue;
 
-                List<T> bucket = _table[key.X][key.Y][key.Z];
+                List<int> bucket = _table[key.X, key.Y, key.Z];
 
                 if (bucket == null)
                 {
-                    bucket = new List<T>();
-                    _table[key.X][key.Y][key.Z] = bucket;
+                    bucket = new List<int>();
+                    _table[key.X, key.Y, key.Z] = bucket;
                 }
 
-                bucket.Add(element);
+                bucket.Add(element.Index);
             }
         }
 
         public IEnumerable<T> GetClosests(T element)
         {
-            var center = new Vector3i(element.Position, _factor);
+            int index = element.Index;
+            Point3d a = element.Position;
+
+            var center = new Vector3i(a, _factor);
             center.X -= _start.X;
             center.Y -= _start.Y;
             center.Z -= _start.Z;
@@ -289,22 +297,31 @@ namespace Extensions.Model.Spatial
                     for (int k = -1; k < 2; k++)
                         keys[count++] = new Vector3i(center.X + i, center.Y + j, center.Z + k);
 
-            var elements = new List<T>();
+            int itemCount = 0;
 
-            Point3d a = element.Position;
+            foreach (var key in keys)
+            {
+                if (key.X < 0 || key.Y < 0 || key.Z < 0) continue;
+                if (key.X >= _size.X || key.Y >= _size.Y || key.Z >= _size.Z) continue;
+                var bucket = _table[key.X, key.Y, key.Z];
+                if (bucket != null)
+                    itemCount += bucket.Count;
+            }
+
+            var elements = new List<T>(itemCount);
 
             foreach (var key in keys)
             {
                 if (key.X < 0 || key.Y < 0 || key.Z < 0) continue;
                 if (key.X >= _size.X || key.Y >= _size.Y || key.Z >= _size.Z) continue;
 
-                List<T> bucket = _table[key.X][key.Y][key.Z];
+                List<int> bucket = _table[key.X, key.Y, key.Z];
                 if (bucket == null) continue;
 
-                foreach (var other in bucket)
+                foreach (var otherIndex in bucket)
                 {
-                    // if (element.Equals(other)) continue;
-                    if (element == other) continue;
+                    if (otherIndex >= index) continue;
+                    var other = _elements[otherIndex];
 
                     Point3d b = other.Position;
                     double dx = a.X - b.X;
@@ -312,14 +329,20 @@ namespace Extensions.Model.Spatial
                     double dz = a.Z - b.Z;
 
                     double distance = dx * dx + dy * dy + dz * dz;
-                 
-                  //  double distance = (position - other.Position).SquareLength;
+
                     if (distance <= _distanceSquared)
-                        elements.Add(other);
+                        elements.Add(other.Value);
                 }
             }
 
             return elements;
+        }
+
+        struct Element<Q>
+        {
+            public int Index;
+            public Point3d Position;
+            public Q Value;
         }
     }
 }

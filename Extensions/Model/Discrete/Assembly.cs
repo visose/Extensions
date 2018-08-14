@@ -17,13 +17,14 @@ namespace Extensions.Model.Discrete
 
         private Assembly() { }
 
-        public static void Export(List<string> blockNames, string instanceLayerName, double angleLimit, double breakForce, string fileName, RhinoDoc doc)
+        public static void Export(List<string> blockNames, string instanceLayerName, double density, double angleLimit, double breakForce, string fileName, RhinoDoc doc)
         {
             var definitions = blockNames.Select(n => doc.InstanceDefinitions.First(i => i.Name == n));
             var instanceLayer = doc.Layers.FindName(instanceLayerName);
+
             var assembly = new Assembly()
             {
-                Tiles = definitions.Select(d => new Tile(d, doc)).ToList(),
+                Tiles = definitions.Select(d => new Tile(d, density, doc)).ToList(),
                 Instances = definitions
                          .SelectMany(d => d.GetReferences(1).Where(i => i.Attributes.LayerIndex == instanceLayer.Index))
                          .Select(d => new Instance(d.InstanceDefinition.Index, d.InstanceXform))
@@ -45,28 +46,28 @@ namespace Extensions.Model.Discrete
         public int Index { get; set; }
         public float Mass { get; set; }
         public Vector3Export Centroid { get; set; }
-        public List<ExportMesh> Renderers { get; set; }
-        public List<ExportMesh> Colliders { get; set; }
-        public List<Orient> Faces { get; set; }
+        public List<MeshExport> Renderers { get; set; }
+        public List<MeshExport> Colliders { get; set; }
+        public List<Vector3Export> Faces { get; set; }
 
         private Tile() { }
 
-        public Tile(InstanceDefinition definition, RhinoDoc doc)
+        public Tile(InstanceDefinition definition, double density, RhinoDoc doc)
         {
             Index = definition.Index;
 
-              var geometry = definition.GetObjects();
+            var geometry = definition.GetObjects();
 
-            int renderIndex = doc.Layers.FindName("Renders").Index;
+            int renderIndex = doc.Layers.FindName("Render").Index;
 
             var renderMeshes = geometry
                       .Where(g => g.Attributes.LayerIndex == renderIndex)
                       .Select(g => g.Geometry as Mesh)
                       .ToList();
-  
-            Renderers = renderMeshes.Select(m => new ExportMesh(m)).ToList();
 
-            int collisionsIndex = doc.Layers.FindName("Collisions").Index;
+            Renderers = renderMeshes.Select(m => new MeshExport(m)).ToList();
+
+            int collisionsIndex = doc.Layers.FindName("Collision").Index;
 
             var meshColliders = geometry
                  .Where(g => g.Attributes.LayerIndex == collisionsIndex)
@@ -75,12 +76,11 @@ namespace Extensions.Model.Discrete
 
             Colliders = meshColliders
                 .Select(m => m.Offset(0.001))
-                 .Select(m => new ExportMesh(m))
+                 .Select(m => new MeshExport(m))
                  .ToList();
 
             Point3d centroid = Point3d.Origin;
             double mass = 0.0;
-            double density = 2400 * 0.5;
 
             foreach (var mesh in meshColliders)
             {
@@ -96,15 +96,23 @@ namespace Extensions.Model.Discrete
 
             int facesIndex = doc.Layers.FindName("Faces").Index;
 
+            //Faces = geometry
+            //         .Where(g => g.Attributes.LayerIndex == facesIndex)
+            //         .Select(g =>
+            //          {
+            //              Curve curve = g.Geometry as Curve;
+            //              curve.TryGetPolyline(out Polyline pl);
+            //              var plane = new Plane(pl[1], pl[2], pl[0]);
+            //              plane.Origin = (pl[0] * 0.5 + pl[2] * 0.5);
+            //              return new Orient(plane);
+            //          }).ToList();
+
             Faces = geometry
                      .Where(g => g.Attributes.LayerIndex == facesIndex)
                      .Select(g =>
                       {
-                          Curve curve = g.Geometry as Curve;
-                          curve.TryGetPolyline(out Polyline pl);
-                          var plane = new Plane(pl[1], pl[2], pl[0]);
-                          plane.Origin = (pl[0] * 0.5 + pl[2] * 0.5);
-                          return new Orient(plane);
+                          var point = g.Geometry as Point;
+                          return new Vector3Export(point.Location);
                       }).ToList();
         }
     }
@@ -112,7 +120,7 @@ namespace Extensions.Model.Discrete
     public class Instance
     {
         public int DefinitionIndex;
-        public Orient Orient;
+        public Pose Pose;
 
         private Instance() { }
 
@@ -122,19 +130,19 @@ namespace Extensions.Model.Discrete
 
             var plane = Plane.WorldXY;
             plane.Transform(transform);
-            Orient = new Orient(plane);
+            Pose = new Pose(plane);
         }
     }
 
-    public class ExportMesh
+    public class MeshExport
     {
         public List<Vector3Export> Vertices { get; set; }
         public List<Vector2Export> TextureCoordinates { get; set; }
         public List<int> Faces { get; set; }
 
-        private ExportMesh() { }
+        private MeshExport() { }
 
-        public ExportMesh(Mesh mesh)
+        public MeshExport(Mesh mesh)
         {
             mesh.Faces.ConvertQuadsToTriangles();
 
@@ -176,15 +184,15 @@ namespace Extensions.Model.Discrete
         }
     }
 
-    public struct Orient
+    public struct Pose
     {
-        public Vector3Export Center;
-        public QuaternionExport Rotation;
+        public Vector3Export position;
+        public QuaternionExport rotation;
 
-        public Orient(Plane plane)
+        public Pose(Plane plane)
         {
-            Center = new Vector3Export(plane.Origin);
-            Rotation = new QuaternionExport(plane);
+            position = new Vector3Export(plane.Origin);
+            rotation = new QuaternionExport(plane);
         }
     }
 

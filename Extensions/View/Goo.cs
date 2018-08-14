@@ -6,6 +6,7 @@ using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
 using Extensions.Model.Document;
 using Extensions.Model.Toolpaths.Milling;
+using Extensions.Model.Toolpaths.Extrusion;
 using Rhino.Geometry;
 using Rhino.Display;
 using Rhino;
@@ -136,12 +137,23 @@ namespace Extensions.View
     public class GH_MillingAttributes : GH_Goo<MillingAttributes>
     {
         public GH_MillingAttributes() { Value = null; }
-        public GH_MillingAttributes(GH_MillingAttributes goo) { Value = goo.Value; }
         public GH_MillingAttributes(MillingAttributes native) { Value = native; }
-        public override IGH_Goo Duplicate() => new GH_MillingAttributes(this);
+        public override IGH_Goo Duplicate() => new GH_MillingAttributes(Value);
         public override bool IsValid => true;
         public override string TypeName => "Milling Attributes";
         public override string TypeDescription => "Milling attributes.";
+        public override string ToString() => Value?.ToString();
+        public override object ScriptVariable() => Value;
+    }
+
+    public class GH_ExtrusionAttributes : GH_Goo<ExtrusionAttributes>
+    {
+        public GH_ExtrusionAttributes() { Value = null; }
+        public GH_ExtrusionAttributes(ExtrusionAttributes native) { Value = native; }
+        public override IGH_Goo Duplicate() => new GH_ExtrusionAttributes(Value);
+        public override bool IsValid => true;
+        public override string TypeName => "Extrusion Attributes";
+        public override string TypeDescription => "Extrusion attributes.";
         public override string ToString() => Value?.ToString();
         public override object ScriptVariable() => Value;
     }
@@ -186,6 +198,26 @@ namespace Extensions.View
                 data.BakeGeometry(doc, att, out Guid id);
                 obj_ids.Add(id);
             }
+        }
+    }
+
+    public class ExtrusionAttributesParameter : GH_PersistentParam<GH_ExtrusionAttributes>
+    {
+        public ExtrusionAttributesParameter() : base("Extrusion Attributes", "ExtrAtt", "Extrusion attributes.", "Extensions", "Parameters") { }
+        public override GH_Exposure Exposure => GH_Exposure.primary;
+        protected override Bitmap Icon => Properties.Resources.LayersConfigParam;
+        public override Guid ComponentGuid => new Guid("{D63464DC-BBAB-4A88-923A-8D9381FB1D0B}");
+
+        protected override GH_GetterResult Prompt_Singular(ref GH_ExtrusionAttributes value)
+        {
+            value = new GH_ExtrusionAttributes(null);
+            return GH_GetterResult.success;
+        }
+
+        protected override GH_GetterResult Prompt_Plural(ref List<GH_ExtrusionAttributes> values)
+        {
+            values = new List<GH_ExtrusionAttributes>();
+            return GH_GetterResult.success;
         }
     }
 

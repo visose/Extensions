@@ -40,12 +40,10 @@ namespace Extensions.Model.Toolpaths
             var zoneValues = new List<double>(lines.Length);
             var types = new List<double>(lines.Length);
 
-
-
             foreach (var line in lines)
             {
                 var fields = line.Split(',');
-                if (fields.Length != count) continue;//throw new Exception(" Number of values in a line is not correct.");
+                if (fields.Length != count) continue; //throw new Exception(" Number of values in a line is not correct.");
 
                 var numbers = fields.Select(s =>
                 {

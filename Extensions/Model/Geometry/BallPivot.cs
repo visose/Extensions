@@ -132,7 +132,8 @@ namespace Extensions.Model.Geometry
 
     class Point : IPositionable
     {
-        public Point3d Position { get; set; }
+        Point3d _p;
+        public ref Point3d Position => ref _p;
         public Vector3d Normal { get; set; }
         public int Index { get; set; }
     }

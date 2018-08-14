@@ -5,7 +5,8 @@ namespace Extensions.Model.Spatial
 {
     public interface IPositionable
     {
-        Point3d Position { get; }
+        int Index { get; }
+        ref Point3d Position { get; }
     }
 
     public struct Vector3i : IEquatable<Vector3i>
@@ -24,9 +25,9 @@ namespace Extensions.Model.Spatial
         public Vector3i(Point3d point, double scale)
         {
             point *= scale;
-            X = point.X > 0 ? (int)point.X : (int)point.X - 1;
-            Y = point.Y > 0 ? (int)point.Y : (int)point.Y - 1;
-            Z = point.Z > 0 ? (int)point.Z : (int)point.Z - 1;
+            X = point.X >= 0 ? (int)point.X : (int)point.X - 1;
+            Y = point.Y >= 0 ? (int)point.Y : (int)point.Y - 1;
+            Z = point.Z >= 0 ? (int)point.Z : (int)point.Z - 1;
         }
 
         public static bool operator ==(Vector3i a, Vector3i b)
@@ -79,8 +80,8 @@ namespace Extensions.Model.Spatial
         public Vector2i(Point3d point, double scale)
         {
             point *= scale;
-            X = point.X > 0 ? (int)point.X : (int)point.X - 1;
-            Y = point.Y > 0 ? (int)point.Y : (int)point.Y - 1;
+            X = point.X >= 0 ? (int)point.X : (int)point.X - 1;
+            Y = point.Y >= 0 ? (int)point.Y : (int)point.Y - 1;
         }
 
         public static bool operator ==(Vector2i a, Vector2i b)

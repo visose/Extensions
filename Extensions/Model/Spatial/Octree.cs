@@ -110,10 +110,7 @@ namespace Extensions.Model.Spatial
             else if (center.Z > (corner.Z + zLength))
                 dmin += (center.Z - (corner.Z + zLength)) * (center.Z - (corner.Z + zLength));
 
-            if (dmin <= squareRadius)
-                return true;
-            else
-                return false;
+            return dmin <= squareRadius;
         }
     }
 }

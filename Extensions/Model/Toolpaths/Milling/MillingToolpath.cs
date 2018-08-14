@@ -9,14 +9,15 @@ using static Extensions.Model.Util;
 
 namespace Extensions.Model.Toolpaths.Milling
 {
-    class MillingToolpath
+    class MillingToolpath : IToolpath
     {
+        public IEnumerable<Target> Targets => _targets;
+        public List<int> SubPrograms { get; set; } = new List<int>();
+
         readonly MillingAttributes _att;
         readonly Tool _tool;
         readonly BoundingBox _bbox;
-
-        public List<Target> Targets { get; set; } = new List<Target>();
-        public List<int> SubPrograms { get; set; } = new List<int>();
+        readonly List<Target> _targets = new List<Target>();
 
         public MillingToolpath(IList<Polyline> paths, BoundingBox box, MillingAttributes attributes)
         {
@@ -28,9 +29,9 @@ namespace Extensions.Model.Toolpaths.Milling
 
         void CreateTargets(IList<Polyline> paths)
         {
-            Point3d current = Point3d.Unset;
-
             var safeZ = _bbox.Max.Z + _att.SafeZOffset;
+            double layerZ = _att.StepDown + _att.SafeZOffset;
+            _targets.Add(HomeStart());
 
             foreach (var path in paths)
             {
@@ -38,31 +39,35 @@ namespace Extensions.Model.Toolpaths.Milling
                 var last = path[path.Count - 1];
 
                 var firstSafe = new Point3d(first.X, first.Y, safeZ);
-                Targets.Add(CreateTarget(firstSafe, _att.SafeSpeed, _att.SafeZone));
+                _targets.Add(CreateTarget(firstSafe, _att.SafeSpeed, _att.SafeZone));
 
-                var firstOffset = first + Vector3d.ZAxis * _att.SafeZOffset;
-                Targets.Add(CreateTarget(firstOffset, _att.SafeSpeed, _att.SafeZone));
 
-                Targets.Add(CreateTarget(first, _att.PlungeSpeed, _att.PlungeZone));
+                var firstOffset = first + Vector3d.ZAxis * layerZ;
+                _targets.Add(CreateTarget(firstOffset, _att.SafeSpeed, _att.SafeZone));
+
+                _targets.Add(CreateTarget(first, _att.PlungeSpeed, _att.PlungeZone));
 
                 for (int i = 1; i < path.Count - 1; i++)
-                    Targets.Add(CreateTarget(path[i], _att.CutSpeed, _att.CutZone));
+                    _targets.Add(CreateTarget(path[i], _att.CutSpeed, _att.CutZone));
 
-                Targets.Add(CreateTarget(last, _att.CutSpeed, _att.PlungeZone));
+                _targets.Add(CreateTarget(last, _att.CutSpeed, _att.PlungeZone));
 
-                var lastOffset = last + Vector3d.ZAxis * _att.SafeZOffset;
-                Targets.Add(CreateTarget(lastOffset, _att.PlungeSpeed, _att.PlungeZone));
+                var lastOffset = last + Vector3d.ZAxis * layerZ;
+                _targets.Add(CreateTarget(lastOffset, _att.PlungeSpeed, _att.PlungeZone));
 
                 var lastSafe = new Point3d(last.X, last.Y, safeZ);
-                Targets.Add(CreateTarget(lastSafe, _att.SafeSpeed, _att.SafeZone));
+                _targets.Add(CreateTarget(lastSafe, _att.SafeSpeed, _att.SafeZone));
 
-                SubPrograms.Add(Targets.Count);
+                SubPrograms.Add(_targets.Count);
             }
+
+            _targets.Add(HomeEnd());
+            SubPrograms.RemoveAt(SubPrograms.Count - 1);
         }
 
         Tool CreateTool()
         {
-            var refTool = _att.ReferenceTarget.Tool;
+            var refTool = _att.Tool;
             var tcp = refTool.Tcp;
             bool translate = tcp.Translate(-tcp.Normal * _att.EndMill.Length);
 
@@ -82,9 +87,32 @@ namespace Extensions.Model.Toolpaths.Milling
         {
             var plane = Plane.WorldXY;
             plane.Origin = position;
-            var frame = _att.ReferenceTarget.Frame;
+            var frame = _att.Frame;
             var target = new CartesianTarget(plane, null, Target.Motions.Linear, _tool, speed, zone, null, frame, null);
             return target;
+        }
+
+        Target HomeStart()
+        {
+            var command = new Group()
+                {
+                    new Message("Press play to start milling..."),
+                    new Stop()
+                };
+
+            var home = new JointTarget(_att.Home, _tool, _att.SafeSpeed, _att.SafeZone, command, _att.Frame);
+            return home;
+        }
+
+        Target HomeEnd()
+        {
+            var command = new Group()
+                {
+                    new Message("Se acabó."),
+                };
+
+            var home = new JointTarget(_att.Home, _tool, _att.SafeSpeed, _att.SafeZone, command, _att.Frame);
+            return home;
         }
     }
 }

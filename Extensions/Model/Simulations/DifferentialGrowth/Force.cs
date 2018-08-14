@@ -5,36 +5,30 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
 {
     public struct Force
     {
-        public Vector3d vector;
-        public double weight;
+        public Vector3d Vector;
+        public double Weight;
         private Object thisLock;
 
         public Force(Vector3d vector, double weight)
         {
-            this.thisLock = new Object();
-            this.vector = vector;
-            this.weight = weight;
+            thisLock = new Object();
+            Vector = vector;
+            Weight = weight;
         }
 
         public void Add(Vector3d vector, double weight)
         {
             lock (thisLock)
             {
-                this.vector += vector;
-                this.weight += weight;
+                Vector += vector;
+                Weight += weight;
             }
-        }
-
-        public void Add(Force other)
-        {
-            this.vector += other.vector;
-            this.weight += other.weight;
         }
 
         public void SetZero()
         {
-            vector = Vector3d.Zero;
-            weight = 0.0;
+            Vector = Vector3d.Zero;
+            Weight = 0.0;
         }
     }
 }

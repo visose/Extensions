@@ -18,8 +18,6 @@ namespace Extensions.Model.Toolpaths.Milling
 
     public class MillingAttributes
     {
-        public Target ReferenceTarget { get; set; }
-
         public EndMill EndMill { get; set; }
         public double StepOver { get; set; }
         public double StepDown { get; set; }
@@ -34,21 +32,22 @@ namespace Extensions.Model.Toolpaths.Milling
         public Zone PlungeZone { get; set; }
         public Zone CutZone { get; set; }
 
-        public MillingAttributes(Target referenceTarget, EndMill endMill, double stepOver, double stepDown, double safeZOffset, double safeSpeed, double plungeSpeed, double cutSpeed, double cutZone)
+        public Tool Tool { get; set; }
+        public Frame Frame { get; set; }
+        public double[] Home { get; set; }
+
+        public MillingAttributes Initialize()
         {
-            ReferenceTarget = referenceTarget;
-            EndMill = endMill;
-            StepOver = stepOver;
-            StepDown = stepDown;
-            SafeZOffset = safeZOffset;
+            SafeSpeed = SafeSpeed.CloneWithName<Speed>(nameof(SafeSpeed));
+            PlungeSpeed = PlungeSpeed.CloneWithName<Speed>(nameof(PlungeSpeed));
+            CutSpeed = CutSpeed.CloneWithName<Speed>(nameof(CutSpeed));
 
-            SafeSpeed = new Speed(name: "SafeSpeed", translation: safeSpeed);
-            PlungeSpeed = new Speed(name: "PlungeSpeed", translation: plungeSpeed);
-            CutSpeed = new Speed(name: "CutSpeed", translation: cutSpeed);
+            SafeZone = SafeZone.CloneWithName<Zone>(nameof(SafeZone));
+            PlungeZone = PlungeZone.CloneWithName<Zone>(nameof(PlungeZone));
+            CutZone = CutZone.CloneWithName<Zone>(nameof(CutZone));
 
-            SafeZone = new Zone(endMill.Diameter, "SafeZone");
-            PlungeZone = new Zone(0, "PlungeZone");
-            CutZone = new Zone(cutZone, "CutZone");
+            Frame = Frame.CloneWithName<Frame>(nameof(Frame));
+            return this;
         }
     }
 }

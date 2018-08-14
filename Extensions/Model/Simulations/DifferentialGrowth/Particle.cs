@@ -6,30 +6,38 @@ using Rhino.Geometry;
 using Extensions.Model.Spatial;
 using ClipperLib;
 using static Extensions.Model.Util;
+using System.Runtime.CompilerServices;
 
 namespace Extensions.Model.Simulations.DifferentialGrowth
 {
     public class Particle : IPositionable, IEquatable<Particle>
     {
         Point3d _p;
-        //Point3d _pPrev;
         Vector3d _v;
-        //Vector3d _vPrev;
-        public Force delta = new Force(Vector3d.Zero, 0);
+        public Force Delta = new Force(Vector3d.Zero, 0);
         public List<Force> deltas = new List<Force>();
-        public List<Particle> neighbours = new List<Particle>(2);
+        public Particle[] Neighbours = new Particle[2];
         DifferentialGrowth _simulation;
 
         public Stopwatch Watch = new Stopwatch();
 
-        public Point3d Position { get { return _p; } }
-        public Vector3d Velocity { get { return _v; } }
 
-        public Particle(Point3d p, DifferentialGrowth simulation, bool insert = true)
+        //public Point3d Position
+        //{
+        //    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //    get { ref return _p; }
+        //}
+
+        public int Index { get; }
+        public ref Point3d Position => ref _p;
+        public Vector3d Velocity => _v;
+
+        public Particle(Point3d p, DifferentialGrowth simulation)
         {
             _simulation = simulation;
             _p = p;
-            if (insert) simulation.Particles.Add(this);
+            Index = _simulation.Particles.Count;
+            _simulation.Particles.Add(this);
         }
 
         public void Forces()
@@ -49,23 +57,27 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
         void Collision(double weight)
         {
             var collided = _simulation.Search.GetClosests(this);
+            double radius = _simulation.Radius;
 
             foreach (Particle collider in collided)
             {
-                if (neighbours.Contains(collider)) continue;
+                if (Neighbours[0] == collider || Neighbours[1] == collider)
+                    continue;
+
+                //if (Neighbours.Contains(collider)) continue;
 
                 Vector3d vector = collider._p - _p;
                 double distance = vector.Length;
-                vector *= ((distance - _simulation.Radius * 2) / distance) * 0.5;
-                this.delta.Add(vector * weight, weight);
+                vector *= ((distance - radius) / distance) * 0.5 * weight;
+                Delta.Add(vector, weight);
+                collider.Delta.Add(-vector, weight);
             }
         }
 
-        void PullMesh(double weight, Point3d pullPoint)
+        void PullMesh(double weight, Point3d closest)
         {
-            var closest = pullPoint;
             Vector3d vector = closest - _p;
-            this.delta.Add(vector * weight, weight);
+            Delta.Add(vector * weight, weight);
         }
 
         void PushBoundary(double weight)
@@ -75,8 +87,8 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
             double distance = vector.Length;
             if (distance < _simulation.Radius * 2)
             {
-                vector *= ((distance - _simulation.Radius * 2) / distance) * 0.5;
-                this.delta.Add(vector * weight, weight);
+                vector *= ((distance - _simulation.Radius) / distance) * 0.5;
+                Delta.Add(vector * weight, weight);
             }
         }
 
@@ -91,14 +103,16 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
             /// <param name="P2">Start of the second line segment. This can be identical to P1 if the line segments are connected.</param>
             /// <param name="P3">End of the second line segment.</param>
             /// 
-            if (this.neighbours.Count != 2) return;
+
+            if (Neighbours[0] == null || Neighbours[1] == null) return;
+            //if (this.Neighbours.Length != 2) return;
 
             double restAngle = 0;
 
-            Point3d P0 = this.neighbours[0]._p;
+            Point3d P0 = this.Neighbours[0]._p;
             Point3d P1 = _p;
             Point3d P2 = _p;
-            Point3d P3 = this.neighbours[1]._p;
+            Point3d P3 = this.Neighbours[1]._p;
 
             Vector3d V01 = P1 - P0;
             Vector3d V23 = P3 - P2;
@@ -117,10 +131,10 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
             ShearA *= Sa;
             ShearB *= Sb;
 
-            this.neighbours[0].delta.Add(ShearA * weight, weight);
-            this.delta.Add(-ShearA * weight, weight);
-            this.delta.Add(ShearB * weight, weight);
-            this.neighbours[1].delta.Add(-ShearB * weight, weight);
+            this.Neighbours[0].Delta.Add(ShearA * weight, weight);
+            this.Delta.Add(-ShearA * weight, weight);
+            this.Delta.Add(ShearB * weight, weight);
+            this.Neighbours[1].Delta.Add(-ShearB * weight, weight);
         }
 
         void Pull(double weight)
@@ -131,21 +145,17 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
             {
                 var closest = _simulation.Polyline.ClosestPoint(_p);
                 Vector3d vector = closest - _p;
-                this.delta.Add(vector * weight, weight);
+                this.Delta.Add(vector * weight, weight);
             }
         }
 
         public void Move()
         {
-            foreach (var subDelta in deltas)
-                delta.Add(subDelta);
+            Delta.Vector /= Delta.Weight;
+            _v = Delta.Vector;
+            _p += _v;
 
-            delta.vector /= delta.weight;
-            _v = delta.vector;
-            _p = _p + 1.0 * _v;
-
-            delta.SetZero();
-            deltas.Clear();
+            Delta.SetZero();
         }
 
         bool IEquatable<Particle>.Equals(Particle other)

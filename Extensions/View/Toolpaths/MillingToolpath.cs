@@ -38,7 +38,7 @@ namespace Extensions.View
 
         void Outputs(GH_OutputParamManager pManager)
         {
-            pManager.AddParameter(new TargetParameter(), "Targets", "T", "List of robot targets.", GH_ParamAccess.list);
+            pManager.AddParameter(new ToolpathParameter(), "Targets", "T", "List of robot targets.", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Layer indices", "L", "Layer indices.", GH_ParamAccess.list);
         }
 
@@ -59,7 +59,7 @@ namespace Extensions.View
 
             var toolpath = new MillingToolpath(polylines, box.BoundingBox, attributes.Value);
 
-            DA.SetDataList(0, toolpath.Targets);
+            DA.SetData(0, toolpath);
             DA.SetDataList(1, toolpath.SubPrograms);
         }
     }

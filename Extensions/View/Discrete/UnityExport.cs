@@ -15,6 +15,7 @@ namespace Extensions.View
         {
             pManager.AddTextParameter("Block names", "B", "Block names.", GH_ParamAccess.list);
             pManager.AddTextParameter("Instances layer", "I", "Layer name where the instances are placed.", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Density", "D", "Density of the tiles (weight/volume).", GH_ParamAccess.item);
             pManager.AddNumberParameter("Angle limit", "Ja", "Maximum angle rotation for joints (0 for rigid joints).", GH_ParamAccess.item);
             pManager.AddNumberParameter("Break force", "Jf", "Break force (in newtons) for joints.", GH_ParamAccess.item);
             pManager.AddTextParameter("File name", "F", "XML export file name.", GH_ParamAccess.item);
@@ -28,15 +29,16 @@ namespace Extensions.View
         {
             var blockNames = new List<string>();
             string instancesLayer = null, fileName = null;
-            double angleLimit = 0, breakForce = 0;
+            double density = 0, angleLimit = 0, breakForce = 0;
 
-            if(!DA.GetDataList(0, blockNames)) return;
+            if (!DA.GetDataList(0, blockNames)) return;
             if (!DA.GetData(1, ref instancesLayer)) return;
-            if (!DA.GetData(2, ref angleLimit)) return;
-            if (!DA.GetData(3, ref breakForce)) return;
-            if (!DA.GetData(4, ref fileName)) return;
+            if (!DA.GetData(2, ref density)) return;
+            if (!DA.GetData(3, ref angleLimit)) return;
+            if (!DA.GetData(4, ref breakForce)) return;
+            if (!DA.GetData(5, ref fileName)) return;
 
-            Assembly.Export(blockNames, instancesLayer, angleLimit, breakForce, fileName, Rhino.RhinoDoc.ActiveDoc);
+            Assembly.Export(blockNames, instancesLayer, density, angleLimit, breakForce, fileName, Rhino.RhinoDoc.ActiveDoc);
         }
     }
 }

@@ -28,6 +28,7 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
                 _restLength = Math.Max(0, value);
             }
         }
+
         public void Update()
         {
             Vector = new Vector3d(End.Position - Start.Position);
@@ -40,8 +41,8 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
             End = end;
             _simulation = simulation;
 
-            start.neighbours.Add(end);
-            end.neighbours.Add(start);
+            start.Neighbours[1] = end;
+            end.Neighbours[0] = start;
             Update();
             _restLength = Length;
             simulation.Springs.Insert(i, this);
@@ -49,22 +50,18 @@ namespace Extensions.Model.Simulations.DifferentialGrowth
 
         public void Forces(double weight)
         {
-            Vector3d vector = this.Vector;
+            Vector3d vector = Vector;
             vector *= ((Length - _restLength) / Length) * 0.5;
-
-            lock (Start.deltas)
-                Start.deltas.Add(new Force(vector * weight, weight));
-
-            lock (End.deltas)
-                End.deltas.Add(new Force(-vector * weight, weight));
+            Start.Delta.Add(vector * weight, weight);
+            End.Delta.Add(-vector * weight, weight);
         }
 
         public void Split(int i)
         {
-            Start.neighbours.Remove(End);
-            End.neighbours.Remove(Start);
+            //  Start.Neighbours.Remove(End);
+            //  End.Neighbours.Remove(Start);
             _simulation.Springs.Remove(this);
-            var mid = new Particle((Start.Position + End.Position) / 2, _simulation);
+            var mid = new Particle((Start.Position + End.Position) * 0.5, _simulation);
             new Spring(mid, End, i, _simulation);
             new Spring(Start, mid, i, _simulation);
         }

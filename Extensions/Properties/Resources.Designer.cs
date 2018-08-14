@@ -183,6 +183,16 @@ namespace Extensions.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap LayersAddParam {
+            get {
+                object obj = ResourceManager.GetObject("LayersAddParam", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap LayersClean {
             get {
                 object obj = ResourceManager.GetObject("LayersClean", resourceCulture);
@@ -206,6 +216,16 @@ namespace Extensions.Properties {
         internal static System.Drawing.Bitmap LayersConfigParam {
             get {
                 object obj = ResourceManager.GetObject("LayersConfigParam", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap LayersDraw {
+            get {
+                object obj = ResourceManager.GetObject("LayersDraw", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

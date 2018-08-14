@@ -28,13 +28,13 @@ namespace Extensions.Model
             return new Vector3f((float)v.X, (float)v.Y, (float)v.Z);
         }
 
-        public static IEnumerable<Vector3d> GetNormals(this Polyline pl)
+        public static IEnumerable<Vector3d> GetNormals(this IList<Point3d> pl)
         {
             if (pl.Count < 3)
                 throw new ArgumentException("Polyline must have 3 or more vertices.");
 
             int last = pl.Count - 1;
-            bool isClosed = pl.IsClosed;
+            bool isClosed = pl[0].DistanceToSquared(pl[last]) < Tol;
             if (isClosed)
                 last--;
 

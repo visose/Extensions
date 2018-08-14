@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Diagnostics;
 using Rhino.Geometry;
 using Rhino.UI;
 using Extensions.Model.Geometry;
@@ -25,7 +24,6 @@ namespace Extensions.Model.Toolpaths
             const double fillSize = 400;
             const double shortenDist = 10;
 
-            var watch = new Stopwatch();
             string _text = null;
 
             Progress("Contouring");
@@ -69,7 +67,7 @@ namespace Extensions.Model.Toolpaths
                                   .Select(c => c.MaxBy(p => p.Length).First())
                                   .ToArray();
 
-                    Cache.Write<Curve>("contours", new PolylineCurve(outPolylines[0]));
+                    Cache.Write("contours", new PolylineCurve(outPolylines[0]));
                 }
                 else
                 {
@@ -213,13 +211,12 @@ namespace Extensions.Model.Toolpaths
 
             void Progress(string text)
             {
-                if (text != "Contouring") Rhino.RhinoApp.WriteLine($"{ _text}: {watch.ElapsedMilliseconds}");
+                if (text != "Contouring") Rhino.RhinoApp.WriteLine($"{ _text}");
                 StatusBar.HideProgressMeter();
                 if (text == "end") return;
                 _text = text;
                 StatusBar.ShowProgressMeter(0, 4, $"{text}...", true, true);
                 if (text != "Contouring") StatusBar.UpdateProgressMeter(1, true);
-                watch.Restart();
             }
         }
     }

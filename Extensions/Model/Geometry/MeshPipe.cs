@@ -14,7 +14,7 @@ namespace Extensions.Model.Geometry
             if (fillet > 0)
             {
                 polyline = Fillet(polyline, fillet);
-                polyline.ReduceSegments(0.01);
+                //polyline.ReduceSegments(0.01);
                 //polyline.CollapseShortSegments(0.1);
                 // polyline.MergeColinearSegments(PI * 0.01, true);
             }
@@ -25,9 +25,11 @@ namespace Extensions.Model.Geometry
         public static Mesh MeshPlanes(List<Plane> inPlanes, double width, double height, int segments = 24)
         {
             inPlanes = inPlanes.ToList();
-            if (inPlanes.Count < 3) return null;
+            if (inPlanes.Count < 2) return new Mesh();
 
-            bool isClosed = Abs(inPlanes[0].Origin.DistanceToSquared(inPlanes[inPlanes.Count - 1].Origin)) < Tol * Tol;
+            bool isClosed = inPlanes[0].Origin.DistanceToSquared(inPlanes[inPlanes.Count - 1].Origin) < UnitTol * UnitTol;
+            if (isClosed && inPlanes.Count == 2) return new Mesh();
+
             if (isClosed) inPlanes.RemoveAt(inPlanes.Count - 1);
             int last = inPlanes.Count - 1;
 
@@ -48,20 +50,40 @@ namespace Extensions.Model.Geometry
             for (int i = 0; i < inPlanes.Count; i++)
             {
                 Point3d p = inPlanes[i].Origin;
+                Vector3d vz = Vector3d.Zero;
+                Vector3d va = Vector3d.Zero;
+                Vector3d vb = Vector3d.Zero;
 
-                Vector3d va = p - (i == 0 ? inPlanes[last].Origin : inPlanes[i - 1].Origin);
-                Vector3d vb = (i == last ? inPlanes[0].Origin : inPlanes[i + 1].Origin) - p;
+                int prev = i - 1;
+                if (prev < 0) prev += last + 1;
+                va = p - inPlanes[prev].Origin;
+
+                int next = i + 1;
+                if (next > last) next -= (last + 1);
+                vb = inPlanes[next].Origin - p;
+
 
                 va.Unitize();
                 vb.Unitize();
 
-                Vector3d vz = va + vb;
+                vz = va + vb;
 
                 if (!isClosed)
                 {
-                    if (i == 0) vz = vb;
-                    if (i == inPlanes.Count - 1) vz = va;
+                    if (i == 0)
+                        vz = inPlanes[1].Origin - inPlanes[0].Origin;
+
+                    if (i == last)
+                        vz = inPlanes[last].Origin - inPlanes[last - 1].Origin;
                 }
+
+                if (vz.IsTiny())
+                {
+                    vz = va;
+                    //throw new Exception();
+                }
+
+                vz.Unitize();
 
                 Vector3d vy = inPlanes[i].Normal;
                 Vector3d vx = Vector3d.CrossProduct(-vz, vy);
@@ -72,7 +94,15 @@ namespace Extensions.Model.Geometry
                 if (isClosed || (i > 0 && i < last))
                 {
                     var angle = Vector3d.VectorAngle(-va, vb) * 0.5;
+                    if (angle < PI * 0.1) angle = PI * 0.1;
                     scale = 1 / Sin(angle);
+                }
+
+                bool isPlaneValid = plane.IsValid;
+
+                if (!isPlaneValid)
+                {
+                    throw new Exception();
                 }
 
                 planes.Add((plane, scale));
@@ -85,7 +115,7 @@ namespace Extensions.Model.Geometry
 
             foreach (var (plane, scale) in planes)
             {
-                var pl = new Polyline(segments + 1);
+                var pl = new List<Point3d>(segments + 1);
                 foreach (Point3d point in profile)
                 {
                     var scaledPoint = point;
@@ -123,9 +153,24 @@ namespace Extensions.Model.Geometry
             }
 
             var mesh = new Mesh();
-            mesh.Vertices.AddVertices(points);
-            mesh.Normals.AddRange(normals.ToArray());
             mesh.Faces.AddFaces(faces);
+            var pointsf = points.Select(p => new Point3f((float)p.X, (float)p.Y, (float)p.Z));
+            mesh.Vertices.AddVertices(pointsf);
+
+            for (int i = 0; i < points.Count; i++)
+            {
+                var vertex = points[i];
+                mesh.Vertices.SetVertex(i, vertex);
+            }
+            mesh.Normals.AddRange(normals.ToArray());
+            mesh.RebuildNormals();
+            mesh.Compact();
+            
+
+            var isValid = mesh.IsValid;
+
+            //if(!isValid)
+            //    throw new Exception();
 
             return mesh;
         }
@@ -211,7 +256,7 @@ namespace Extensions.Model.Geometry
 
                 points.AddRange(pl);
                 pl.Add(pl[0]);
-                var normal = pl.GetNormals().Select(n => n.ToVector3f()).ToArray();
+                var normal = pl.GetNormals().Select(n => n.ToVector3f());
 
                 normals.AddRange(normal);
             }

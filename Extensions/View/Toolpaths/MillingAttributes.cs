@@ -7,6 +7,7 @@ using Robots;
 using Robots.Grasshopper;
 using static Extensions.Model.Util;
 using Extensions.Model.Toolpaths.Milling;
+using Grasshopper.Kernel.Types;
 
 namespace Extensions.View
 {
@@ -37,10 +38,10 @@ namespace Extensions.View
             pManager.AddNumberParameter("Step over", "So", "Step over in mm.", GH_ParamAccess.item);
             pManager.AddNumberParameter("Step down", "Sd", "Step down in mm.", GH_ParamAccess.item);
             pManager.AddNumberParameter("Safe Z offset", "Z", "Vertical margin to add to plunges.", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Safe speed", "Ss", "Safe speed in mm/s.", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Plunge speed", "Ps", "Plunge speed in mm/s.", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Cut speed", "Cs", "Cut speed in mm/s.", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Cut zone", "Cz", "Cut zone in mm.", GH_ParamAccess.item);
+            pManager.AddParameter(new SpeedParameter(), "Plunge speed", "Ps", "Plunge speed.", GH_ParamAccess.item);
+            pManager.AddParameter(new SpeedParameter(), "Cut speed", "Cs", "Cut speed.", GH_ParamAccess.item);
+            pManager.AddParameter(new ZoneParameter(), "Plunge zone", "Pz", "Plunge speed.", GH_ParamAccess.item);
+            pManager.AddParameter(new ZoneParameter(), "Cut zone", "Ez", "Cut zone.", GH_ParamAccess.item);
         }
 
         void Outputs(GH_OutputParamManager pManager)
@@ -51,22 +52,38 @@ namespace Extensions.View
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            GH_Target target = null;
-            var values = new double[9];
+            int inputCount = 10;
+            var inputs = new IGH_Goo[inputCount];
 
-            if (!DA.GetData(0, ref target)) return;
+            for (int i = 0; i < inputCount; i++)
+            {
+                if (!DA.GetData(i, ref inputs[i])) return;
+            }
 
-            for (int i = 0; i < 9; i++)
-            if (!DA.GetData(i+1, ref values[i])) return;
-
+            var target = (inputs[0] as GH_Target).Value as JointTarget;
 
             var endMill = new EndMill()
             {
-                Diameter = values[0],
-                Length = values[1]
+                Diameter = (inputs[1] as GH_Number).Value,
+                Length = (inputs[2] as GH_Number).Value,
             };
 
-            var attributes = new MillingAttributes(target.Value, endMill, values[2], values[3], values[4], values[5], values[6], values[7],values[8]);
+            var attributes = new MillingAttributes()
+            {
+                EndMill = endMill,
+                StepOver = (inputs[3] as GH_Number).Value,
+                StepDown = (inputs[4] as GH_Number).Value,
+                SafeZOffset = (inputs[5] as GH_Number).Value,
+                SafeSpeed = target.Speed,
+                PlungeSpeed = (inputs[6] as GH_Speed).Value,
+                CutSpeed = (inputs[7] as GH_Speed).Value,
+                SafeZone = target.Zone,
+                PlungeZone = (inputs[8] as GH_Zone).Value,
+                CutZone = (inputs[9] as GH_Zone).Value,
+                Tool = target.Tool,
+                Frame = target.Frame,
+                Home = target.Joints
+            }.Initialize();
 
             DA.SetData(0, new GH_MillingAttributes(attributes));
         }
