@@ -50,7 +50,6 @@ namespace Extensions
             {
                 Rhino.RhinoApp.WriteLine("Extensions plugin: Some components that require the Robots plugin will not be loaded.");
             }
-
         }
 
         public override string Name => Assembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;

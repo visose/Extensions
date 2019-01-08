@@ -184,7 +184,7 @@ PERS num extrusionFactor:={_extrusionFactor: 0.000};
 VAR robtarget current;
 VAR num choice:=0;
 ";
-                string initCode = @"current:= CRobT();
+                string initCode = $@"current:= CRobT(\Tool:= {_att.Tool.Name} \WObj:= {_att.Frame.Name});
 EOffsSet current.extax;";
 
                 string testCode = $@"TPReadFK choice,""Choose mode"",stEmpty,stEmpty,stEmpty,""Program"",""Test"";

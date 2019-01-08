@@ -20,6 +20,7 @@ namespace Extensions.Model.Toolpaths.SpatialExtrusion
             var meshes = attributes.Environment.OfType<Mesh>()
                          .Select(m => (mesh: m, height: m.GetBoundingBox(true).Max.Z)).ToList();
 
+
             attributes.Environment.RemoveAll(g => g is Mesh);
 
             foreach (var polyline in polylines)
@@ -47,5 +48,7 @@ namespace Extensions.Model.Toolpaths.SpatialExtrusion
                 attributes.Environment.Add(polyline.ToNurbsCurve());
             }
         }
+
+      
     }
 }
