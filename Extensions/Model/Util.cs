@@ -12,6 +12,12 @@ namespace Extensions.Model
         public const double PI2 = PI * 2;
         public const double Tol = 0.001;
         public const double UnitTol = 1E-08;
+        public const double DegreeToRadian = PI / 180.0;
+
+        public static double ToRadians(this double degree)
+        {
+            return degree * DegreeToRadian;
+        }
 
         public static Polyline ToPolyline(this Curve curve)
         {

@@ -1,288 +1,71 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Costura.Fody.3.2.1\build\Costura.Fody.props" Condition="Exists('..\packages\Costura.Fody.3.2.1\build\Costura.Fody.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{66D4E86F-EC84-40C9-8E32-8CF8875C3FEB}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extensions</RootNamespace>
-    <AssemblyName>Extensions</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <TargetFramework>net471</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\AppData\Roaming\Grasshopper\Libraries\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>C:\Users\vicen\AppData\Roaming\Grasshopper\Libraries</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\AppData\Roaming\Grasshopper\Libraries\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisRuleSet>Extensions.ruleset</CodeAnalysisRuleSet>
-    <LangVersion>latest</LangVersion>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>C:\Users\vicen\AppData\Roaming\Grasshopper\Libraries</OutputPath>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Costura, Version=3.2.1.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
-      <HintPath>..\packages\Costura.Fody.3.2.1\lib\net40\Costura.dll</HintPath>
+    <PackageReference Include="Costura.Fody" Version="3.3.3" />
+    <PackageReference Include="Grasshopper" Version="6.13.19058.371" />
+    <PackageReference Include="morelinq" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="geometry3">
+      <HintPath>..\..\gsGCode\bin\Release\geometry3.dll</HintPath>
     </Reference>
-    <Reference Include="Eto, Version=2.5.0.0, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
-      <HintPath>..\packages\RhinoCommon.6.10.18308.14011\lib\net45\Eto.dll</HintPath>
-    </Reference>
-    <Reference Include="geometry3Sharp, Version=1.0.289.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\geometry3Sharp.1.0.289\lib\net45\geometry3Sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="GH_IO, Version=6.10.18308.14010, Culture=neutral, PublicKeyToken=6a29997d2e6b4f97, processorArchitecture=MSIL">
-      <HintPath>..\packages\Grasshopper.6.10.18308.14011\lib\net45\GH_IO.dll</HintPath>
-    </Reference>
-    <Reference Include="Grasshopper, Version=6.10.18308.14010, Culture=neutral, PublicKeyToken=dda4f5ec2cd80803, processorArchitecture=MSIL">
-      <HintPath>..\packages\Grasshopper.6.10.18308.14011\lib\net45\Grasshopper.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.ConcurrencyVisualizer.Markers">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\Extensions\4hhyuhoo.ghy\SDK\Managed\4.0\Microsoft.ConcurrencyVisualizer.Markers.dll</HintPath>
-    </Reference>
-    <Reference Include="MoreLinq, Version=3.0.0.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\morelinq.3.0.0\lib\net451\MoreLinq.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Rhino.UI, Version=6.10.18308.14010, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
-      <HintPath>..\packages\RhinoCommon.6.10.18308.14011\lib\net45\Rhino.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="RhinoCommon, Version=6.10.18308.14010, Culture=neutral, PublicKeyToken=552281e97c755530, processorArchitecture=MSIL">
-      <HintPath>..\packages\RhinoCommon.6.10.18308.14011\lib\net45\RhinoCommon.dll</HintPath>
+    <Reference Include="gsGCode">
+      <HintPath>..\..\gsGCode\bin\Release\gsGCode.dll</HintPath>
+      <Private>true</Private>
     </Reference>
     <Reference Include="Robots">
       <HintPath>..\..\..\..\AppData\Roaming\Grasshopper\Libraries\Robots.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
+      <Private>false</Private>
     </Reference>
-    <Reference Include="RobotsGH, Culture=neutral, processorArchitecture=MSIL">
+        <Reference Include="RobotsGH">
       <HintPath>..\..\..\..\AppData\Roaming\Grasshopper\Libraries\Robots.gha</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
+      <Private>false</Private>
     </Reference>
     <Reference Include="StraightSkeletonNet">
       <HintPath>Resources\StraightSkeletonNet.dll</HintPath>
+      <Private>true</Private>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Libraries\clipper.cs" />
-    <Compile Include="Libraries\SimplexNoise.cs" />
-    <Compile Include="Model\Discrete\Assembly.cs" />
-    <Compile Include="Model\Discrete\CurveSnap.cs" />
-    <Compile Include="Model\Discrete\VoxelTiles.cs" />
-    <Compile Include="Model\Document\Cache.cs" />
-    <Compile Include="Model\Document\Debug.cs" />
-    <Compile Include="Model\Document\DisplayGeometry.cs" />
-    <Compile Include="Model\Document\IO.cs" />
-    <Compile Include="Model\Geometry\BallPivot.cs" />
-    <Compile Include="Model\Geometry\PolygonFill.cs" />
-    <Compile Include="Model\Regions\Region.cs" />
-    <Compile Include="Model\Toolpaths\Column.cs" />
-    <Compile Include="Model\Geometry\MeshPipe.cs" />
-    <Compile Include="Model\Geometry\Remesher.cs" />
-    <Compile Include="Model\Geometry\Slicer.cs" />
-    <Compile Include="Model\Rendering\RenderExtensions.cs" />
-    <Compile Include="Model\Regions\StraightSkeleton.cs" />
-    <Compile Include="Model\Simulations\DifferentialGrowth\Force.cs" />
-    <Compile Include="Model\Simulations\DifferentialGrowth\Particle.cs" />
-    <Compile Include="Model\Simulations\DifferentialGrowth\DifferentialGrowth.cs" />
-    <Compile Include="Model\Simulations\DifferentialGrowth\Spring.cs" />
-    <Compile Include="Model\Spatial\BucketSearch.cs" />
-    <Compile Include="Model\Spatial\Octree.cs" />
-    <Compile Include="Model\Spatial\Primitives.cs" />
-    <Compile Include="Model\Toolpaths\Extrusion\ExtrusionVisualizer.cs" />
-    <Compile Include="Model\Toolpaths\Extrusion\ExtrusionAttributes.cs" />
-    <Compile Include="Model\Toolpaths\Extrusion\ExtrusionToolpath.cs" />
-    <Compile Include="Model\Toolpaths\Milling\MillingAttributes.cs" />
-    <Compile Include="Model\Toolpaths\Milling\MillingToolpath.cs" />
-    <Compile Include="Model\Toolpaths\SpatialExtrusion\SpatialAttributes.cs" />
-    <Compile Include="Model\Toolpaths\SpatialExtrusion\SpatialExtrusion.cs" />
-    <Compile Include="Model\Toolpaths\CSVConverter.cs" />
-    <Compile Include="Model\Toolpaths\SpatialExtrusion\Vertex.cs" />
-    <Compile Include="Model\Util.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
+    <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="View\Discrete\VoxelTiles.cs" />
-    <Compile Include="View\Discrete\CurveSnap.cs" />
-    <Compile Include="View\Document\DisplayGeometry.cs" />
-    <Compile Include="View\Document\Upload.cs" />
-    <Compile Include="View\Geometry\DifferentialGrowth.cs" />
-    <Compile Include="View\Discrete\UnityExport.cs" />
-    <Compile Include="View\Document\Export.cs" />
-    <Compile Include="View\Goo.cs" />
-    <Compile Include="View\Toolpaths\ExtrusionAttributes.cs" />
-    <Compile Include="View\Toolpaths\ExtrusionToolpathCustom.cs" />
-    <Compile Include="View\Toolpaths\ExtrusionVisualizer.cs" />
-    <Compile Include="View\Toolpaths\ExtrusionToolpath.cs" />
-    <Compile Include="View\Toolpaths\MillingToolpath.cs" />
-    <Compile Include="View\Toolpaths\MillingAttributes.cs" />
-    <Compile Include="View\Toolpaths\LayeredToolpath.cs" />
-    <Compile Include="View\Geometry\Remesher.cs" />
-    <Compile Include="View\Geometry\StraightSkeleton.cs" />
-    <Compile Include="View\Rendering\BitmapFromSolidColoredMeshes.cs" />
-    <Compile Include="View\Rendering\BitmapFromVertexColors.cs" />
-    <Compile Include="View\Rendering\MeshTextureCoords.cs" />
-    <Compile Include="View\Toolpaths\CSVConverter.cs" />
-    <Compile Include="View\Toolpaths\SpatialExtrusion.cs" />
-    <Compile Include="View\Util.cs" />
   </ItemGroup>
+
   <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Extensions.ruleset" />
-    <None Include="packages.config" />
-    <None Include="Resources\Icons\PaintBrush01.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\PaintBrush02.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Undo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Brick.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Cube.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Puzzle.png" />
-    <None Include="Resources\Icons\Wave.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Triangle.png" />
-    <None Include="Resources\Icons\DCLLogo.png" />
-    <None Include="FodyWeavers.xml" />
-    <None Include="Resources\Icons\fingerprint.png" />
-    <None Include="Resources\Icons\Spatial.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Virus.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Graph.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Virus2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\EyeDropper.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Grid.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Polyline.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Layers.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Save.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\CloudUpload.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\Eye.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\EyeParam.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\LayersSubtract.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\LayersAdd.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\LayersClean.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\LayersConfigParam.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Icons\LayersDraw.png" />
-    <None Include="Resources\Icons\LayersAddParam.png" />
-    <Content Include="Resources\Icons\LayersConfig.png" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="Copy &quot;$(TargetPath)&quot; &quot;$(TargetDir)$(ProjectName).gha&quot;&#xD;&#xA;Erase &quot;$(TargetPath)&quot;" />
   </Target>
-  <Target Name="AfterBuild">
+
+  <Target Name="PreventCopyLocal" AfterTargets="ResolveReferences">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Grasshopper'" />
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'RhinoCommon'" />
+    </ItemGroup>
   </Target>
-  -->
-  <PropertyGroup>
-    <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)$(ProjectName).gha"
-Erase "$(TargetPath)"</PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <FallbackCulture>en-US</FallbackCulture>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartProgram>C:\Program Files\Rhino WIP\System\Rhino.exe</StartProgram>
-    <StartArguments>
-    </StartArguments>
-    <StartAction>Program</StartAction>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisRuleSet>Extensions.ruleset</CodeAnalysisRuleSet>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <Import Project="..\packages\Fody.3.3.3\build\Fody.targets" Condition="Exists('..\packages\Fody.3.3.3\build\Fody.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.3.3.3\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.3.3.3\build\Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\Costura.Fody.3.2.1\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.3.2.1\build\Costura.Fody.props'))" />
-    <Error Condition="!Exists('..\packages\RhinoCommon.6.10.18308.14011\build\net45\RhinoCommon.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\RhinoCommon.6.10.18308.14011\build\net45\RhinoCommon.targets'))" />
-    <Error Condition="!Exists('..\packages\Grasshopper.6.10.18308.14011\build\net45\Grasshopper.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Grasshopper.6.10.18308.14011\build\net45\Grasshopper.targets'))" />
-  </Target>
-  <Import Project="..\packages\RhinoCommon.6.10.18308.14011\build\net45\RhinoCommon.targets" Condition="Exists('..\packages\RhinoCommon.6.10.18308.14011\build\net45\RhinoCommon.targets')" />
-  <Import Project="..\packages\Grasshopper.6.10.18308.14011\build\net45\Grasshopper.targets" Condition="Exists('..\packages\Grasshopper.6.10.18308.14011\build\net45\Grasshopper.targets')" />
+
 </Project>

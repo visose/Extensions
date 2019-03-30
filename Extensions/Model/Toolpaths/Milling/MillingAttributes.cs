@@ -6,15 +6,6 @@ using Robots.Commands;
 
 namespace Extensions.Model.Toolpaths.Milling
 {
-    public class EndMill
-    {
-        public enum Geometry { Flat, Ball }
-
-        public double Diameter { get; set; }
-        public double Length { get; set; }
-        public double CutLength { get; set; }
-        public Geometry Nose { get; set; }
-    }
 
     public class MillingAttributes
     {

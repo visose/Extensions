@@ -9,7 +9,7 @@ namespace Extensions.Model.Toolpaths
 {
     // pX,pY,pZ,nX,nY,nZ,F'
 
-    internal class CSVConverter
+    class CSVConverter
     {
         public List<Target> Targets { get; } = new List<Target>();
         public List<Polyline> ToolPath { get; } = new List<Polyline>();
@@ -99,7 +99,7 @@ namespace Extensions.Model.Toolpaths
                 var speed = parameterIndex.ContainsKey("speed") ? speeds[i] : referenceTarget.Speed;
                 var zone = parameterIndex.ContainsKey("zone") ? zones[i] : referenceTarget.Zone;
 
-                var target = new CartesianTarget(planes[i], null, Target.Motions.Joint, referenceTarget.Tool, speed, zone, null, referenceTarget.Frame);
+                var target = new CartesianTarget(planes[i], null, Motions.Joint, referenceTarget.Tool, speed, zone, null, referenceTarget.Frame);
                 Targets.Add(target);
             }
 

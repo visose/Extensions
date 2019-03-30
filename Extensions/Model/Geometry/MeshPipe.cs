@@ -165,7 +165,6 @@ namespace Extensions.Model.Geometry
             mesh.Normals.AddRange(normals.ToArray());
             mesh.RebuildNormals();
             mesh.Compact();
-            
 
             var isValid = mesh.IsValid;
 

@@ -170,7 +170,7 @@ namespace Extensions.Model.Toolpaths.Extrusion
                     command = externalCommand;
                 }
 
-                var target = new CartesianTarget(location, null, Target.Motions.Linear, tool, speed, zone, command, frame, new[] { totalDistance });
+                var target = new CartesianTarget(location, null, Motions.Linear, tool, speed, zone, command, frame, new[] { totalDistance });
                 target.ExternalCustom = externalCustom;
                 return target;
             }

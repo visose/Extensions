@@ -8,20 +8,13 @@ using Rhino.PlugIns;
 using Grasshopper.Kernel;
 using System.Linq;
 
-[assembly: AssemblyTitle("Extensions")]
 [assembly: AssemblyDescription("Assorted components for Grasshopper")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Design Computation Lab - UCL")]
-[assembly: AssemblyProduct("Extensions")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
 [assembly: Guid("66d4e86f-ec84-40c9-8e32-8cf8875c3feb")]
-
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
 
 [assembly: GH_Loading(GH_LoadingDemand.ForceDirect)]
 

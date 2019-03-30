@@ -232,6 +232,7 @@ namespace Extensions.View
             value = new GH_MillingAttributes();
             return GH_GetterResult.success;
         }
+
         protected override GH_GetterResult Prompt_Plural(ref List<GH_MillingAttributes> values)
         {
             values = new List<GH_MillingAttributes>();

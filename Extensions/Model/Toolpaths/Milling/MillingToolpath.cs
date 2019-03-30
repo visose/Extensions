@@ -23,7 +23,7 @@ namespace Extensions.Model.Toolpaths.Milling
         {
             _att = attributes;
             _bbox = box;
-            _tool = CreateTool();
+            _tool = _att.EndMill.MakeTool(_att.Tool);
             CreateTargets(paths);
         }
 
@@ -65,30 +65,12 @@ namespace Extensions.Model.Toolpaths.Milling
             SubPrograms.RemoveAt(SubPrograms.Count - 1);
         }
 
-        Tool CreateTool()
-        {
-            var refTool = _att.Tool;
-            var tcp = refTool.Tcp;
-            bool translate = tcp.Translate(-tcp.Normal * _att.EndMill.Length);
-
-            Mesh toolGeometry = refTool.Mesh.DuplicateMesh();
-            Cylinder endMillCylinder = new Cylinder(new Circle(tcp, _att.EndMill.Diameter * 0.5), _att.EndMill.Length);
-            Mesh endMillGeometry = Mesh.CreateFromCylinder(endMillCylinder, 1, 8);
-            toolGeometry.Append(endMillGeometry);
-
-            string name = $"{refTool.Name}_{_att.EndMill.Diameter:0}mm";
-
-            var tool = new Tool(tcp, name, refTool.Weight, refTool.Centroid, toolGeometry);
-            return tool;
-        }
-
-
-        Target CreateTarget(Point3d position, Speed speed, Zone zone = null)
+         Target CreateTarget(Point3d position, Speed speed, Zone zone = null)
         {
             var plane = Plane.WorldXY;
             plane.Origin = position;
             var frame = _att.Frame;
-            var target = new CartesianTarget(plane, null, Target.Motions.Linear, _tool, speed, zone, null, frame, null);
+            var target = new CartesianTarget(plane, null, Motions.Linear, _tool, speed, zone, null, frame, null);
             return target;
         }
 
