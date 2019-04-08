@@ -5,7 +5,7 @@ using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
 using Grasshopper.Kernel.Data;
 using Rhino.Geometry;
-using static Extensions.Model.Util;
+using Extensions.Model;
 
 namespace Extensions.View
 {

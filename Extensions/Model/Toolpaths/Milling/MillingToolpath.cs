@@ -9,7 +9,7 @@ using static Extensions.Model.Util;
 
 namespace Extensions.Model.Toolpaths.Milling
 {
-    class MillingToolpath : IToolpath
+    public class MillingToolpath : IToolpath
     {
         public IEnumerable<Target> Targets => _targets;
         public List<int> SubPrograms { get; set; } = new List<int>();
@@ -17,7 +17,7 @@ namespace Extensions.Model.Toolpaths.Milling
         readonly MillingAttributes _att;
         readonly Tool _tool;
         readonly BoundingBox _bbox;
-        readonly List<Target> _targets = new List<Target>();
+        List<Target> _targets = new List<Target>();
 
         public MillingToolpath(IList<Polyline> paths, BoundingBox box, MillingAttributes attributes)
         {
@@ -25,6 +25,13 @@ namespace Extensions.Model.Toolpaths.Milling
             _bbox = box;
             _tool = _att.EndMill.MakeTool(_att.Tool);
             CreateTargets(paths);
+        }
+
+        public IToolpath ShallowClone()
+        {
+            var clone = MemberwiseClone() as MillingToolpath;
+            clone._targets = _targets.ToList();
+            return clone;
         }
 
         void CreateTargets(IList<Polyline> paths)

@@ -10,7 +10,7 @@ using static System.Math;
 
 namespace Extensions.Model.Toolpaths
 {
-    class Column
+    public class Column
     {
         public Polyline[][] Layers { get; }
         public Mesh[][] Pipes { get; }

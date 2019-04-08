@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
-using Extensions;
+using Extensions.Model;
 using static Extensions.Model.Util;
 
 namespace Extensions.View

@@ -5,7 +5,7 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using Robots;
 using Robots.Grasshopper;
-using static Extensions.Model.Util;
+using Extensions.Model;
 using Extensions.Model.Toolpaths.SpatialExtrusion;
 
 namespace Extensions.View

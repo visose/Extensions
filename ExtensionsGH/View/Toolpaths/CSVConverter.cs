@@ -62,7 +62,7 @@ namespace Extensions.View
             DA.GetData(4, ref cuttingSpeed);
             DA.GetData(5, ref point);
 
-            var converter = new Extensions.Model.Toolpaths.CSVConverter(file, target.Value as CartesianTarget, mask, reverse, cuttingSpeed, point);
+            var converter = new Model.Toolpaths.CSVConverter(file, target.Value as CartesianTarget, mask, reverse, cuttingSpeed, point);
 
             DA.SetDataList(0, converter.Targets);
             DA.SetDataList(1, converter.ToolPath);

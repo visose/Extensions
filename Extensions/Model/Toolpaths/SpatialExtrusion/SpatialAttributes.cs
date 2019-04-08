@@ -6,7 +6,7 @@ using Robots.Commands;
 
 namespace Extensions.Model.Toolpaths.SpatialExtrusion
 {
-    internal class SpatialAttributes
+    public class SpatialAttributes
     {
         public double Diameter { get; set; }
         public double VerticalOffset { get; set; }

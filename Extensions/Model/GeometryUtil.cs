@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Rhino.Geometry;
 using static System.Math;
+using Extensions;
+using static Extensions.Model.Util;
 
 namespace Extensions.Model
 {
-    static class GeometryUtil
+    public static class GeometryUtil
     {
         public static Vector3d PolarToVector(double a, double b)
         {
@@ -38,6 +40,15 @@ namespace Extensions.Model
             plane.Rotate(alignAngle, plane.Normal);
 
             return plane;
+        }
+
+        public static Vector3d OrientToMesh(Point3d point, Mesh guide, Mesh surface = null)
+        {
+            var mp = surface == null ?
+                guide.ClosestMeshPoint(point, double.MaxValue) :
+                surface.ClosestMeshPoint(point, double.MaxValue);
+
+            return guide.NormalAt(mp);
         }
     }
 }

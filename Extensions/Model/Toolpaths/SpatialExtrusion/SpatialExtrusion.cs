@@ -5,7 +5,7 @@ using Robots;
 
 namespace Extensions.Model.Toolpaths.SpatialExtrusion
 {
-     class SpatialExtrusion
+     public class SpatialExtrusion
     {
         public List<Target> Targets { get; } = new List<Target>();
         public List<(Line segment, int type)> Display { get; } = new List<(Line segment, int type)>();
