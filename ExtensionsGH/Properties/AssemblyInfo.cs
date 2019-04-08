@@ -18,7 +18,7 @@ using System.Linq;
 
 [assembly: GH_Loading(GH_LoadingDemand.ForceDirect)]
 
-namespace Extensions
+namespace Extensions.View
 {
     public class ExtensionsInfo : GH_AssemblyInfo
     {
@@ -45,7 +45,7 @@ namespace Extensions
             }
         }
 
-        public override string Name => Assembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
+        public override string Name => "Extensions";
         public override Bitmap Icon => Properties.Resources.DCLLogo;
         public override string Description => Assembly.GetCustomAttribute<AssemblyDescriptionAttribute>().Description;
         public override Guid Id => new Guid("29035877-56b2-45cd-b65d-bf19a046d30b");

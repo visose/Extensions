@@ -9,21 +9,19 @@ using static Extensions.Model.Util;
 
 namespace Extensions.Model.Toolpaths.Extrusion
 {
-
     struct SimpleTarget
     {
         public Plane Location;
         public double Length;
     }
 
-
-    class ExternalExtrusionToolpath : IToolpath
+    public class ExternalExtrusionToolpath : IToolpath
     {
         public IEnumerable<Target> Targets => _targets;
         public List<int> SubPrograms { get; set; } = new List<int>();
 
         readonly ExtrusionAttributes _att;
-        readonly List<Target> _targets = new List<Target>();
+        List<Target> _targets = new List<Target>();
         readonly double _extrusionFactor;
         readonly double _suckBack;
         readonly double _startDistance;
@@ -80,7 +78,14 @@ namespace Extensions.Model.Toolpaths.Extrusion
             CreateTargets(paths);
         }
 
-        public List<SimpleTarget> ToTargets(Polyline path, Point3d robotPosition)
+        public IToolpath ShallowClone()
+        {
+            var clone = MemberwiseClone() as ExternalExtrusionToolpath;
+            clone._targets = _targets.ToList();
+            return clone;
+        }
+
+        List<SimpleTarget> ToTargets(Polyline path, Point3d robotPosition)
         {
             var targets = new List<SimpleTarget>(path.Count);
 
@@ -111,7 +116,7 @@ namespace Extensions.Model.Toolpaths.Extrusion
             return ((PI * (_att.BeadWidth * 0.5) * (_att.LayerHeight * 0.5)) * length);
         }
 
-        public void CreateTargets(List<List<SimpleTarget>> paths)
+        void CreateTargets(List<List<SimpleTarget>> paths)
         {
             double totalDistance = 0;
             var externalCustom = new[] { "motorValue" };

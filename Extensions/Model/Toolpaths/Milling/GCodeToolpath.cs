@@ -11,8 +11,8 @@ namespace Extensions.Model.Toolpaths.Milling
 {
     public class GCodeToolpath : IToolpath
     {
-        public IEnumerable<Target> Targets => _toolpath.Targets;
-        FiveAxisToRobots _toolpath;
+        public IEnumerable<Target> Targets { get; private set; }
+        public FiveAxisToRobots Toolpath { get; set; }
 
         public GCodeToolpath(string file, CartesianTarget referenceTarget, Vector3d alignment)
         {
@@ -21,24 +21,25 @@ namespace Extensions.Model.Toolpaths.Milling
             var parser = new GenericGCodeParser();
             var code = parser.Parse(reader);
 
-            _toolpath = new FiveAxisToRobots(referenceTarget, alignment, code);
+            Toolpath = new FiveAxisToRobots(referenceTarget, alignment, code);
+            Targets = Toolpath.Targets;
         }
 
-        public void Deconstruct(out IToolpath toolpath, out Tool tool, out List<int> rapidStarts, out List<string> ignored)
+        public IToolpath ShallowClone()
         {
-            toolpath = this;
-            tool = _toolpath.Tool;
-            rapidStarts = _toolpath.RapidStarts;
-            ignored = _toolpath.Ignored;
+            var toolpath = MemberwiseClone() as GCodeToolpath;
+            toolpath.Targets = Toolpath.Targets.ToList();
+            return toolpath;
         }
     }
 
-    class FiveAxisToRobots
+    public class FiveAxisToRobots
     {
-        public List<Target> Targets = new List<Target>();
-        public List<string> Ignored { get; set; } = new List<string>();
-        public List<int> RapidStarts { get; set; } = new List<int>() { 0 };
-        public Tool Tool { get; set; }
+        public List<Target> Targets { get; set; } = new List<Target>();
+        List<string> _ignored = new List<string>();
+        List<int> _RapidStarts = new List<int>() { 0 };
+        Tool _tool;
+        Frame _mcs;
 
         Dictionary<(GCodeLine.LType letter, int number), Action<GCodeLine>> _gCodeMap;
         Dictionary<double, Speed> _speeds = new Dictionary<double, Speed>();
@@ -46,10 +47,26 @@ namespace Extensions.Model.Toolpaths.Milling
         Vector3d _alignment;
         int _lastRapid = 0;
 
-        public FiveAxisToRobots(CartesianTarget refTarget, Vector3d alignment, GCodeFile file)
+        public void Deconstruct(out Tool tool, out Frame mcs, out List<int> rapidStarts, out List<string> ignored)
+        {
+            tool = _tool;
+            mcs = _mcs;
+            rapidStarts = _RapidStarts;
+            ignored = _ignored;
+        }
+
+        internal FiveAxisToRobots(CartesianTarget refTarget, Vector3d alignment, GCodeFile file)
         {
             _refTarget = refTarget;
             _alignment = alignment;
+
+            var constructionPlane = Rhino.RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.GetConstructionPlane().Plane;
+            constructionPlane.Origin = Point3d.Origin;
+            var workPlane = _refTarget.Frame.Plane;
+            var xform = Transform.PlaneToPlane(Plane.WorldXY, workPlane);
+            constructionPlane.Transform(xform);
+
+            _mcs = new Frame(plane: constructionPlane, name: "MCS");
 
             _gCodeMap = new Dictionary<(GCodeLine.LType letter, int number), Action<GCodeLine>>
             {
@@ -75,7 +92,7 @@ namespace Extensions.Model.Toolpaths.Milling
         void Ignore(GCodeLine line)
         {
             string message = $"{line.lineNumber}: {line.orig_string}";
-            Ignored.Add(message);
+            _ignored.Add(message);
         }
 
         void Move(GCodeLine line)
@@ -122,11 +139,11 @@ namespace Extensions.Model.Toolpaths.Milling
                 plane,
                 null,
                 Motions.Linear,
-                Tool,
+                _tool,
                 speed,
                 _refTarget.Zone,
                 Command.Default,
-                _refTarget.Frame,
+                _mcs,
                 null
                 );
 
@@ -140,7 +157,7 @@ namespace Extensions.Model.Toolpaths.Milling
             int i = line.lineNumber;
             if ((i > 0) && (i - _lastRapid > 1))
             {
-                RapidStarts.Add(i);
+                _RapidStarts.Add(i);
             }
 
             _lastRapid = i;
@@ -164,7 +181,7 @@ namespace Extensions.Model.Toolpaths.Milling
                 Diameter = diameter,
             };
 
-            Tool = endMill.MakeTool(_refTarget.Tool);
+            _tool = endMill.MakeTool(_refTarget.Tool);
         }
     }
 }

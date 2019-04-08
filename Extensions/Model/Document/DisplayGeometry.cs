@@ -12,7 +12,6 @@ using Rhino;
 
 namespace Extensions.Model.Document
 {
-
     public class DisplayGeometry
     {
         public GeometryBase Geometry { get; set; }

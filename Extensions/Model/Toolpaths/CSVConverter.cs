@@ -1,20 +1,20 @@
-﻿using System;
-using System.Linq;
-using System.IO;
-using System.Collections.Generic;
-using Rhino.Geometry;
+﻿using Rhino.Geometry;
 using Robots;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Extensions.Model.Toolpaths
 {
     // pX,pY,pZ,nX,nY,nZ,F'
 
-    class CSVConverter
+    public class CSVConverter
     {
         public List<Target> Targets { get; } = new List<Target>();
         public List<Polyline> ToolPath { get; } = new List<Polyline>();
 
-        string[] validParameters = { "type", "position", "normal", "xaxis", "speed", "zone" };
+        readonly string[] validParameters = { "type", "position", "normal", "xaxis", "speed", "zone" };
 
         public CSVConverter(string file, CartesianTarget referenceTarget, string mask, bool reverse, double cutSpeed = 0, Point3d? point = null)
         {

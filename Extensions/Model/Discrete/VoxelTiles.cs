@@ -1,20 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Extensions.Model.Spatial;
+using MoreLinq;
 using Rhino.Geometry;
 using Rhino.Geometry.Intersect;
-using MoreLinq;
-using Extensions.Model.Spatial;
-using static System.Math;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static Extensions.Model.Util;
+using static System.Math;
 
 namespace Extensions.Model.Discrete
 {
-    internal class VoxelTiles
+    public class VoxelTiles
     {
-        static Vector3d[] _faceNormals;
-        static Vector3d[] _edgeNormals;
-        static Vector3d[] _cornerNormals;
+        static readonly Vector3d[] _faceNormals;
+        static readonly Vector3d[] _edgeNormals;
+        static readonly Vector3d[] _cornerNormals;
 
         static VoxelTiles()
         {
@@ -55,9 +55,8 @@ namespace Extensions.Model.Discrete
         internal Vector3i Size;
         internal double VoxelSize;
         internal Point3d Corner;
-
-        int _count;
-        int[] _typesCount;
+        //readonly int _count;
+        readonly int[] _typesCount;
 
         internal VoxelTiles(Mesh boundary, double length, List<Curve> alignments, double alignmentDistance, List<GeometryBase> attractors, double attractorDistance, int[] typesCount)
         {
@@ -68,7 +67,7 @@ namespace Extensions.Model.Discrete
 
             var sizef = bbox.Diagonal / length;
             Size = new Vector3i((int)sizef.X, (int)sizef.Y, (int)sizef.Z);
-            _count = Size.X * Size.Y * Size.Z;
+            //_count = Size.X * Size.Y * Size.Z;
             sizef = new Vector3d(Size.X, Size.Y, Size.Z);
             Corner = bbox.Min + (bbox.Diagonal - sizef * length) * 0.5f;
 
@@ -172,9 +171,7 @@ namespace Extensions.Model.Discrete
                 var tangent = minCurve.TangentAt(minT);
                 var curvature = minCurve.CurvatureAt(minT);
                 var normal = Vector3d.CrossProduct(tangent, curvature);
-                var snapPlane = SnapPlane(voxel, normal, tangent);
-                voxel.Location = snapPlane.plane;
-                voxel.SnapType = snapPlane.snapType;
+                (voxel.Location, voxel.SnapType) = SnapPlane(voxel, normal, tangent);
             }
         }
 
@@ -276,7 +273,7 @@ namespace Extensions.Model.Discrete
         }
     }
 
-    internal class Voxel
+    public class Voxel
     {
         public Vector3i Index;
         public Plane Location;
@@ -284,13 +281,12 @@ namespace Extensions.Model.Discrete
         public int Type;
         public double AttractorDistance;
         public int SnapType;
+
         //public GeometryBase Geometry;
 
-        VoxelTiles _grid;
 
         public Voxel(Vector3i index, VoxelTiles grid)
         {
-            _grid = grid;
             Index = index;
             Location = Plane.WorldXY;
             Location.Origin = grid.Corner + new Vector3d(index.X + 0.5f, index.Y + 0.5f, index.Z + 0.5f) * grid.VoxelSize;

@@ -129,7 +129,7 @@ namespace Extensions.Model.Geometry
                 }
 
                 pl.Add(pl[0]);
-                var normal = pl.GetNormals().Select(n => n.ToVector3f()).ToArray();
+                var normal = pl.GetNormals().Select(n => (Vector3f)n).ToArray();
                 normals.AddRange(normal);
             }
 
@@ -255,7 +255,121 @@ namespace Extensions.Model.Geometry
 
                 points.AddRange(pl);
                 pl.Add(pl[0]);
-                var normal = pl.GetNormals().Select(n => n.ToVector3f());
+                var normal = pl.GetNormals().Select(n => (Vector3f)n);
+
+                normals.AddRange(normal);
+            }
+
+            var faces = new List<MeshFace>();
+            int count = isClosed ? vertexCount : vertexCount - segments;
+
+            for (int i = 0; i < count; i++)
+            {
+                int k = i + 1;
+                int j = (k % segments == 0) ? k - segments : k;
+
+                int sj = j + segments;
+                int si = i + segments;
+                if (i >= points.Count - segments)
+                {
+                    sj -= points.Count;
+                    si -= points.Count;
+                }
+
+                faces.Add(new MeshFace(i, j, sj, si));
+            }
+
+            var mesh = new Mesh();
+            mesh.Vertices.AddVertices(points);
+            mesh.Normals.AddRange(normals.ToArray());
+            mesh.Faces.AddFaces(faces);
+
+            return mesh;
+        }
+        public static Mesh MeshExtrusion3d(List<Plane> inPlanes, double width, double height, int segments = 12)
+        {
+            //if (width < height) throw new ArgumentException(" Width must be larger or equal to height.");
+            if (inPlanes.Count < 2) return new Mesh();
+            inPlanes = inPlanes.ToList();
+
+            bool isClosed = inPlanes[0].Origin.DistanceToSquared(inPlanes[inPlanes.Count - 1].Origin) < UnitTol * UnitTol;
+            if (isClosed && inPlanes.Count == 2) return new Mesh();
+
+            if (isClosed) inPlanes.RemoveAt(inPlanes.Count - 1);
+            int last = inPlanes.Count - 1;
+
+            segments *= 2;
+            width *= 0.5;
+            height *= 0.5;
+            var profile = new List<Point3d>(segments / 2);
+            double step = PI / ((segments / 2) - 1);
+
+            for (int i = 0; i < segments / 2; i++)
+            {
+                double angle = i * step - HalfPI;
+                var vertex = new Point3d(Cos(angle) * height, Sin(angle) * height, 0);
+                profile.Add(vertex);
+            }
+
+            var planes = new List<(Plane, double)>(inPlanes.Count);
+
+            for (int i = 0; i < inPlanes.Count; i++)
+            {
+                Point3d p = inPlanes[i].Origin;
+                Vector3d va = p - (i == 0 ? inPlanes[last].Origin : inPlanes[i - 1].Origin);
+                Vector3d vb = (i == last ? inPlanes[0].Origin : inPlanes[i + 1].Origin) - p;
+
+                va.Unitize();
+                vb.Unitize();
+
+                Vector3d vz = va + vb;
+
+                if (!isClosed)
+                {
+                    if (i == 0) vz = vb;
+                    if (i == inPlanes.Count - 1) vz = va;
+                }
+
+                Vector3d vy = inPlanes[i].Normal; //Vector3d.ZAxis;
+                Vector3d vx = Vector3d.CrossProduct(-vz, vy);
+                Point3d origin = p - (Vector3d.ZAxis * height);
+                var plane = new Plane(origin, vx, vy);
+                double scale = width;
+
+                if (isClosed || (i > 0 && i < last))
+                {
+                    var angle = Vector3d.VectorAngle(-va, vb) * 0.5;
+                    if (angle < PI * 0.25) angle = PI * 0.25;
+                    scale = width / Sin(angle);
+                }
+
+                planes.Add((plane, scale));
+            }
+
+            int vertexCount = planes.Count * segments;
+
+            var points = new List<Point3d>(vertexCount);
+            var normals = new List<Vector3f>(vertexCount);
+
+            foreach (var (plane, scale) in planes)
+            {
+                var pl = new Polyline(segments);
+
+                foreach (Point3d point in profile)
+                {
+                    var vertex = plane.PointAt(point.X + scale - height, point.Y);
+                    pl.Add(vertex);
+                }
+
+                foreach (Point3d point in profile)
+                {
+                    var vertex = plane.PointAt(-point.X - scale + height, -point.Y);
+                    pl.Add(vertex);
+                }
+
+                points.AddRange(pl);
+                pl.Add(pl[0]);
+                var normal = pl.GetNormals().Select(n => (Vector3f)n);
 
                 normals.AddRange(normal);
             }

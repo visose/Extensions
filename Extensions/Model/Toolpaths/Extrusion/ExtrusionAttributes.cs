@@ -6,7 +6,6 @@ using Robots.Commands;
 
 namespace Extensions.Model.Toolpaths.Extrusion
 {
-
     public class ExtrusionAttributes
     {
         public double NozzleDiameter { get; set; }
@@ -26,7 +25,6 @@ namespace Extensions.Model.Toolpaths.Extrusion
         public Tool Tool { get; set; }
         public Frame Frame { get; set; }
         public double[] Home { get; set; }
-
 
         public ExtrusionAttributes Initialize()
         {

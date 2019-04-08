@@ -40,6 +40,7 @@ namespace Extensions.View
         {
             pManager.AddParameter(new ToolpathParameter(), "Toolpath", "T", "Milling toolpath.", GH_ParamAccess.item);
             pManager.AddParameter(new ToolParameter(), "Spindle", "S", "Spindle with end mill.", GH_ParamAccess.item);
+            pManager.AddPlaneParameter("MCS", "P", "Plane of machine coordinate system.", GH_ParamAccess.item);
             pManager.AddIntegerParameter("Rapid", "R", "Starting index of rapid moves.", GH_ParamAccess.list);
             pManager.AddTextParameter("Ignored", "I", "Ignored instructions.", GH_ParamAccess.list);
         }
@@ -58,12 +59,14 @@ namespace Extensions.View
             if (point.HasValue)
                 alignment = (Vector3d)point.Value;
 
-            var (toolpath, tool, rapidStarts, ignored) = new Model.Toolpaths.Milling.GCodeToolpath(file, target.Value as CartesianTarget, alignment);
+            var toolpath = new Model.Toolpaths.Milling.GCodeToolpath(file, target.Value as CartesianTarget, alignment);
+            var (tool, mcs, rapidStarts, ignored) = toolpath.Toolpath;
 
             DA.SetData(0, toolpath);
             DA.SetData(1, tool);
-            DA.SetDataList(2, rapidStarts);
-            DA.SetDataList(3, ignored);
+            DA.SetData(2, mcs.Plane);
+            DA.SetDataList(3, rapidStarts);
+            DA.SetDataList(4, ignored);
         }
     }
 }

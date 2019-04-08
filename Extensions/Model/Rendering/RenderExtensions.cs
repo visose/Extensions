@@ -10,7 +10,7 @@ namespace Extensions
     public static class RenderExtensions
     {
         public static Mesh BitmapFromVertexColors(Mesh mesh, string file)
-        {          
+        {
             var path = Path.GetDirectoryName(file);
             if (!Directory.Exists(path)) throw new DirectoryNotFoundException($" Directory \"{path}\" not found.");
 

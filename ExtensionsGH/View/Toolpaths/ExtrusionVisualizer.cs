@@ -56,7 +56,7 @@ namespace Extensions.View
 
             if (_visualizer == null || _visualizer.Program != program.Value)
             {
-                _visualizer = new ExtrusionVisualizer(program.Value, attributes.Value, isWorld, segments);
+                _visualizer = new ExtrusionVisualizer(program.Value, attributes.Value.BeadWidth, attributes.Value.LayerHeight, attributes.Value.ExtrusionZone.Distance, isWorld, segments);
             }
 
             _visualizer.Update();

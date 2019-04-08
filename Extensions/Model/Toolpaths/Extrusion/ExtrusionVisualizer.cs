@@ -10,33 +10,33 @@ namespace Extensions.Model.Toolpaths.Extrusion
 {
     public class ExtrusionVisualizer
     {
-        Program _program;
-        ExtrusionAttributes _att;
+        public Program Program { get; }
         int _axis = 6;
         double _height;
         double _width;
+        double _zone;
         int _segments;
+        bool _is3d;
+        bool _isWorld;
         List<Contour> _contours;
-
-        public Program Program => _program;
         public IList<Mesh> ExtrudedContours { get; private set; }
 
-        public ExtrusionVisualizer(Program program, ExtrusionAttributes attributes, bool isWorld, int segments)
+        public ExtrusionVisualizer(Program program, double width, double height, double zone, bool isWorld, int segments, bool is3d = false)
         {
-            _att = attributes;
+            Program = program;
+            _height = width;
+            _width = height;
+            _zone = zone;
             _segments = segments;
+            _is3d = is3d;
+            _isWorld = isWorld;
 
-            _program = program;
-            _height = _att.LayerHeight;
-            _width = _att.BeadWidth;
-            segments = _segments;
-
-            CreateContours(_axis, isWorld);
+            CreateContours(_axis);
         }
 
         public void Update()
         {
-            double time = _program.CurrentSimulationTime;
+            double time = Program.CurrentSimulationTime;
 
             var extrudedContours = _contours.Where(x => x.Time.T1 <= time).Select(x => x.Mesh).ToList();
             var currentContour = _contours.Find(x => x.Time.T0 < time && x.Time.T1 > time);
@@ -63,42 +63,46 @@ namespace Extensions.Model.Toolpaths.Extrusion
                     planes.Add(currentContour.Planes[i + 1]);
                 }
 
-                planes.Add(_program.CurrentSimulationTarget.ProgramTargets[0].Plane);
-                //var mesh = Geometry.MeshPipe.MeshPlanes(planes, _width, _height, _segments);
-                var mesh = Geometry.MeshPipe.MeshFlatPolyline(new Polyline(planes.Select(p => p.Origin)), _width, _height, _att.ExtrusionZone.Distance, _segments);
+                var programTarget = Program.CurrentSimulationTarget.ProgramTargets[0];
+                var tcp = _isWorld ? programTarget.WorldPlane : programTarget.Plane;
+
+                planes.Add(tcp);
+                var mesh = CreateContourMesh(planes);
                 extrudedContours.Add(mesh);
             }
 
             ExtrudedContours = extrudedContours;
         }
 
-        class Contour
+        Mesh CreateContourMesh(List<Plane> planes)
         {
-            public Interval Time;
-            public List<Plane> Planes { get; set; }
-            public Mesh Mesh { get; set; }
-
-            public Contour()
+            if (_is3d)
             {
-                Planes = new List<Plane>();
+                return Geometry.MeshPipe.MeshExtrusion3d(planes, _width, _height, _segments);
+            }
+            else
+            {
+                var pl = new Polyline(planes.Select(p => p.Origin));
+                var mesh = Geometry.MeshPipe.MeshFlatPolyline(pl, _width, _height, _zone, _segments);
+                return mesh;
             }
         }
 
-        void CreateContours(int ex, bool isWorld)
+        void CreateContours(int ex)
         {
             _contours = new List<Contour>();
             Contour contour = null;
 
-            for (int i = 0; i < _program.Targets.Count; i++)
+            for (int i = 0; i < Program.Targets.Count; i++)
             {
-                var cellTarget = _program.Targets[i];
-                var nextTarget = i < _program.Targets.Count - 1 ? _program.Targets[i + 1] : cellTarget;
+                var cellTarget = Program.Targets[i];
+                var nextTarget = i < Program.Targets.Count - 1 ? Program.Targets[i + 1] : cellTarget;
 
                 var target = cellTarget.ProgramTargets[0];
-                var plane = isWorld ? target.WorldPlane : target.Plane;
+                var plane = _isWorld ? target.WorldPlane : target.Plane;
 
                 double current = target.Kinematics.Joints[ex];
-                double next = i < _program.Targets.Count - 1 ? nextTarget.ProgramTargets[0].Kinematics.Joints[ex] : current;
+                double next = i < Program.Targets.Count - 1 ? nextTarget.ProgramTargets[0].Kinematics.Joints[ex] : current;
 
                 bool isExtruding = next - current > UnitTol;
                 //bool isExtruding = next > 0.01;
@@ -125,9 +129,8 @@ namespace Extensions.Model.Toolpaths.Extrusion
 
                         if (contour.Planes.Count == 100)
                         {
-                            var pl = new Polyline(contour.Planes.Select(p => p.Origin));
-                            contour.Mesh = Geometry.MeshPipe.MeshFlatPolyline(pl, _width, _height, _att.ExtrusionZone.Distance, _segments);
-                            contour.Time.T1 = _program.Targets[i + 1].TotalTime;
+                            contour.Mesh = CreateContourMesh(contour.Planes);
+                            contour.Time.T1 = Program.Targets[i + 1].TotalTime;
 
                             _contours.Add(contour);
 
@@ -140,15 +143,20 @@ namespace Extensions.Model.Toolpaths.Extrusion
                 else if (contour != null)
                 {
                     contour.Planes.Add(plane);
-                    //contour.Mesh = Geometry.MeshPipe.MeshPlanes(contour.Planes, _width, _height, _segments);
-                    var pl = new Polyline(contour.Planes.Select(p => p.Origin));
-                    contour.Mesh = Geometry.MeshPipe.MeshFlatPolyline(pl, _width, _height, _att.ExtrusionZone.Distance, _segments);
-                    contour.Time.T1 = _program.Targets[i + 1].TotalTime;
+                    contour.Mesh = CreateContourMesh(contour.Planes);
+                    contour.Time.T1 = Program.Targets[i + 1].TotalTime;
 
                     _contours.Add(contour);
                     contour = null;
                 }
             }
+        }
+
+        class Contour
+        {
+            public Interval Time;
+            public List<Plane> Planes { get; set; } = new List<Plane>();
+            public Mesh Mesh { get; set; }
         }
     }
 }
