@@ -16,7 +16,7 @@ using System.Linq;
 [assembly: ComVisible(false)]
 [assembly: Guid("66d4e86f-ec84-40c9-8e32-8cf8875c3feb")]
 
-[assembly: GH_Loading(GH_LoadingDemand.ForceDirect)]
+//[assembly: GH_Loading(GH_LoadingDemand.ForceDirect)]
 
 namespace Extensions.View
 {

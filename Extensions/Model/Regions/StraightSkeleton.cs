@@ -21,11 +21,13 @@ namespace Extensions.Model.StraightSkeleton
             polygon.RemoveAt(polygon.Count - 1);
 
             var skeleton = SkeletonBuilder.Build(polygon);
+            //var shape = Polyline.CreateStarPolygon(new Circle(Point3d.Origin, 5), 3, 3);
 
             return skeleton.Edges.Select(e =>
                 {
                     var region = new Polyline(e.Polygon.Select(v => v.ToPoint3d()));
                     region.Add(region[0]);
+                  //  region.AddRange(shape);
                     return region;
                 }
             );

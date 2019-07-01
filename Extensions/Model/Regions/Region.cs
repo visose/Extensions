@@ -17,7 +17,7 @@ namespace Extensions.Model.Geometry
             var offset = new ClipperOffset();
             offset.AddPath(region, JoinType.jtRound, EndType.etClosedPolygon);
             PolyTree tree = new PolyTree();
-           
+
             offset.Execute(ref tree, distance / Tol);
 
             var height = polyline[0].Z;

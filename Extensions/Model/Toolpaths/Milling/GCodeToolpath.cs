@@ -9,9 +9,8 @@ using static Extensions.Model.GeometryUtil;
 
 namespace Extensions.Model.Toolpaths.Milling
 {
-    public class GCodeToolpath : IToolpath
+    public class GCodeToolpath : SimpleToolpath
     {
-        public IEnumerable<Target> Targets { get; private set; }
         public FiveAxisToRobots Toolpath { get; set; }
 
         public GCodeToolpath(string file, CartesianTarget referenceTarget, Vector3d alignment)
@@ -22,14 +21,7 @@ namespace Extensions.Model.Toolpaths.Milling
             var code = parser.Parse(reader);
 
             Toolpath = new FiveAxisToRobots(referenceTarget, alignment, code);
-            Targets = Toolpath.Targets;
-        }
-
-        public IToolpath ShallowClone()
-        {
-            var toolpath = MemberwiseClone() as GCodeToolpath;
-            toolpath.Targets = Toolpath.Targets.ToList();
-            return toolpath;
+            _targets = Toolpath.Targets;
         }
     }
 
@@ -76,6 +68,7 @@ namespace Extensions.Model.Toolpaths.Milling
              };
 
             Interpret(file);
+            _RapidStarts.Add(Targets.Count - 1);
         }
 
         void Interpret(GCodeFile file)

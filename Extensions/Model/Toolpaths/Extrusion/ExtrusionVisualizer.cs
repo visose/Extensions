@@ -12,8 +12,8 @@ namespace Extensions.Model.Toolpaths.Extrusion
     {
         public Program Program { get; }
         int _axis = 6;
-        double _height;
         double _width;
+        double _height;
         double _zone;
         int _segments;
         bool _is3d;
@@ -24,8 +24,8 @@ namespace Extensions.Model.Toolpaths.Extrusion
         public ExtrusionVisualizer(Program program, double width, double height, double zone, bool isWorld, int segments, bool is3d = false)
         {
             Program = program;
-            _height = width;
-            _width = height;
+            _width = width;
+            _height = height;
             _zone = zone;
             _segments = segments;
             _is3d = is3d;

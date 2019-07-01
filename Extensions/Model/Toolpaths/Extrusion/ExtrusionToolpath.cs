@@ -15,13 +15,11 @@ namespace Extensions.Model.Toolpaths.Extrusion
         public double Length;
     }
 
-    public class ExternalExtrusionToolpath : IToolpath
+    public class ExternalExtrusionToolpath : SimpleToolpath
     {
-        public IEnumerable<Target> Targets => _targets;
         public List<int> SubPrograms { get; set; } = new List<int>();
 
         readonly ExtrusionAttributes _att;
-        List<Target> _targets = new List<Target>();
         readonly double _extrusionFactor;
         readonly double _suckBack;
         readonly double _startDistance;
@@ -76,13 +74,6 @@ namespace Extensions.Model.Toolpaths.Extrusion
             }
 
             CreateTargets(paths);
-        }
-
-        public IToolpath ShallowClone()
-        {
-            var clone = MemberwiseClone() as ExternalExtrusionToolpath;
-            clone._targets = _targets.ToList();
-            return clone;
         }
 
         List<SimpleTarget> ToTargets(Polyline path, Point3d robotPosition)
