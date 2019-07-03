@@ -21,7 +21,7 @@ namespace Extensions.Model.Toolpaths.Extrusion
         List<Contour> _contours;
         public IList<Mesh> ExtrudedContours { get; private set; }
 
-        public ExtrusionVisualizer(Program program, double width, double height, double zone, bool isWorld, int segments, bool is3d = false)
+        public ExtrusionVisualizer(Program program, double width, double height, double zone, bool isWorld, int segments, bool is3d = false, bool reverse = false)
         {
             Program = program;
             _width = width;
@@ -31,7 +31,7 @@ namespace Extensions.Model.Toolpaths.Extrusion
             _is3d = is3d;
             _isWorld = isWorld;
 
-            CreateContours(_axis);
+            CreateContours(_axis, reverse);
         }
 
         public void Update()
@@ -88,7 +88,7 @@ namespace Extensions.Model.Toolpaths.Extrusion
             }
         }
 
-        void CreateContours(int ex)
+        void CreateContours(int ex, bool reverse)
         {
             _contours = new List<Contour>();
             Contour contour = null;
@@ -104,7 +104,9 @@ namespace Extensions.Model.Toolpaths.Extrusion
                 double current = target.Kinematics.Joints[ex];
                 double next = i < Program.Targets.Count - 1 ? nextTarget.ProgramTargets[0].Kinematics.Joints[ex] : current;
 
-                bool isExtruding = next - current > UnitTol;
+                double delta = reverse ? current - next : next - current;
+
+                bool isExtruding = delta > UnitTol;
                 //bool isExtruding = next > 0.01;
 
                 if (isExtruding)
