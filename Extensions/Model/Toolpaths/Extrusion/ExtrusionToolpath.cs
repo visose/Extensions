@@ -161,7 +161,7 @@ namespace Extensions.Model.Toolpaths.Extrusion
                 {
                     string sign = externalDistance < 0 ? "+" : "-";
                     string code = $"motorValue:=motorValue{sign}{Abs(externalDistance):0.000}*extrusionFactor;";
-                    var externalCommand = new Robots.Commands.Custom($"SetExternal{_targets.Count}", abbCode: code);
+                    var externalCommand = new Robots.Commands.Custom($"SetExternal{_targets.Count}", command: code);
                     externalCommand.RunBefore = true;
                     command = externalCommand;
                 }
@@ -194,9 +194,9 @@ WHILE choice = 5 DO
     MoveL Offs(current,0,0,0),{_att.ExtrusionSpeed.Name},{_att.ExtrusionZone.Name},{_att.Tool.Name} \WObj:= {_att.Frame.Name};
 ENDWHILE";
 
-                var initCommand = new Robots.Commands.Custom("Init", abbDeclaration: declaration, abbCode: initCode);
+                var initCommand = new Robots.Commands.Custom("Init", declaration: declaration, command: initCode);
                 initCommand.RunBefore = true;
-                var testCommand = new Robots.Commands.Custom("Test", abbCode: testCode);
+                var testCommand = new Robots.Commands.Custom("Test", command: testCode);
 
                 var command = new Group(new[] { initCommand, testCommand });
                 var home = new JointTarget(_att.Home, _att.Tool, _att.SafeSpeed, _att.SafeZone, command, _att.Frame, new[] { totalDistance });

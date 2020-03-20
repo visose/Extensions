@@ -24,12 +24,13 @@
 
   <ItemGroup>
     <Reference Include="Robots">
-      <HintPath>..\..\..\..\AppData\Roaming\Grasshopper\Libraries\Robots.dll</HintPath>
-      <Private>false</Private>
+      <HintPath>..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\Robots.dll</HintPath>
     </Reference>
-        <Reference Include="RobotsGH">
-      <HintPath>..\..\..\..\AppData\Roaming\Grasshopper\Libraries\Robots.gha</HintPath>
-      <Private>false</Private>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Robots">
+      <HintPath>C:\Users\vicen\AppData\Roaming\Grasshopper\Libraries\Robots.gha</HintPath>
     </Reference>
   </ItemGroup>
 

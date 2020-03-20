@@ -15,22 +15,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="geometry3Sharp" Version="1.0.324" />
     <PackageReference Include="Grasshopper" Version="6.11.18344.20091" />
     <PackageReference Include="morelinq" Version="3.1.0" />
     <PackageReference Include="RhinoCommon" Version="6.11.18344.20091" />
   </ItemGroup>
 
     <ItemGroup>
-    <Reference Include="geometry3">
-      <HintPath>..\..\gsGCode\bin\Release\geometry3.dll</HintPath>
-    </Reference>
     <Reference Include="gsGCode">
-      <HintPath>..\..\gsGCode\bin\Release\gsGCode.dll</HintPath>
-      <Private>true</Private>
+      <HintPath>..\..\..\Forks\gsGCode\bin\Debug\gsGCode.dll</HintPath>
     </Reference>
     <Reference Include="Robots">
-      <HintPath>..\..\..\..\AppData\Roaming\Grasshopper\Libraries\Robots.dll</HintPath>
-      <Private>false</Private>
+      <HintPath>..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\Robots.dll</HintPath>
     </Reference>
     <Reference Include="StraightSkeletonNet">
       <HintPath>Libraries\StraightSkeletonNet.dll</HintPath>
