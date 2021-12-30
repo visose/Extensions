@@ -1,0 +1,24 @@
+<Project>
+	
+	<PropertyGroup>
+		<Product>Extensions</Product>
+		<Version>1.0.0</Version>
+		<Description>Assorted components for Grasshopper.</Description>
+		<Authors>Extensions Authors</Authors>
+		<Copyright>Copyright (c) 2021 $(Authors)</Copyright>
+		<PackageProjectUrl>https://github.com/visose/extensions</PackageProjectUrl>
+		<PackageTags>Grasshopper;Extensions;Robots</PackageTags>
+		<IconUrl>https://github.com/visose/extensions/raw/master/build/icon.png</IconUrl>
+		<Company>$(Authors) - $(PackageProjectUrl)</Company>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<LangVersion>latest</LangVersion>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<ArtifactsDir>..\..\artifacts\</ArtifactsDir>
+		<OutputPath>$(ArtifactsDir)bin\$(MSBuildProjectName)</OutputPath>
+		<BaseIntermediateOutputPath>$(ArtifactsDir)obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+	</PropertyGroup>
+
+</Project>

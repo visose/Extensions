@@ -1,0 +1,25 @@
+Extensions uses third-party libraries or other resources that may be
+distributed under licenses different than the Extensions software.
+
+In the event that we accidentally failed to list a required notice, please
+bring it to our attention.
+
+Robots (MIT)
+* Copyright (с) 2015 Robots Authors
+* https://github.com/visose/robots/blob/master/LICENSE
+
+Clipper (BSL-1.0)
+* Copyright (c) 2010-2014 Angus Johnson
+* https://www.boost.org/LICENSE_1_0.txt
+
+Kendzi Math (BSD-3)
+* Copyright (c) 2014 Tomasz Kędziora
+* https://github.com/kendzi/kendzi-math/blob/master/LICENSE
+
+Geometry3Sharp (BSL-1.0)
+* Copyright (c) 2017 Ryan Schmidt
+* https://github.com/gradientspace/geometry3Sharp/blob/master/LICENSE
+
+gsGCode (MIT)
+* Copyright (c) 2017 Ryan Schmidt
+* https://github.com/gradientspace/gsGCode/blob/master/LICENSE
