@@ -1,3 +1,6 @@
+- version: 1.0.1
+  changes:
+  - Fix check for Robots plugin when loaded after Extensions.
 - version: 1.0.0
   changes:
   - Updated to work with the latest Robots plugin.

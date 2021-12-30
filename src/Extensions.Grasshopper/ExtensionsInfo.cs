@@ -11,24 +11,16 @@ public class ExtensionsInfo : GH_AssemblyInfo
 
     public ExtensionsInfo()
     {
-        var componentServer = Instances.ComponentServer;
-
-        if (componentServer.Libraries.Any(l => l.Name == "Robots"))
+        foreach (var folder in Folders.AssemblyFolders)
         {
-            IsRobotsInstalled = true;
-            return;
+            var files = Directory.EnumerateFiles(folder.Folder, "Robots.gha", SearchOption.TopDirectoryOnly);
+
+            if (files.Any())
+            {
+                IsRobotsInstalled = true;
+                break;
+            }
         }
-
-        componentServer.GHAFileLoaded += CheckLoadrobots;
-    }
-
-    void CheckLoadrobots(object sender, GH_GHALoadingEventArgs e)
-    {
-        if (e.Name != "Robots")
-            return;
-
-        IsRobotsInstalled = true;
-        Instances.ComponentServer.GHAFileLoaded -= CheckLoadrobots;
     }
 
     public override string Name => GetInfo<AssemblyProductAttribute>().Product;
