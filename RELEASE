@@ -1,0 +1,4 @@
+- version: 1.0.0
+  changes:
+  - Updated to work with the latest Robots plugin.
+  - Fixed checking for Robots plugin as package.

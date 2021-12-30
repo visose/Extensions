@@ -1,14 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28729.10
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtensionsGH", "ExtensionsGH\ExtensionsGH.csproj", "{66D4E86F-EC84-40C9-8E32-8CF8875C3FEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions.Grasshopper", "src\Extensions.Grasshopper\Extensions.Grasshopper.csproj", "{66D4E86F-EC84-40C9-8E32-8CF8875C3FEB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3725F498-9DF7-42FC-B0B6-B8575E92C52D} = {3725F498-9DF7-42FC-B0B6-B8575E92C52D}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions", "Extensions\Extensions.csproj", "{3725F498-9DF7-42FC-B0B6-B8575E92C52D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions", "src\Extensions\Extensions.csproj", "{3725F498-9DF7-42FC-B0B6-B8575E92C52D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions.Build", "build\Extensions.Build\Extensions.Build.csproj", "{BB6A795F-FF97-463B-B434-B5AF25321EA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +26,10 @@ Global
 		{3725F498-9DF7-42FC-B0B6-B8575E92C52D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3725F498-9DF7-42FC-B0B6-B8575E92C52D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3725F498-9DF7-42FC-B0B6-B8575E92C52D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB6A795F-FF97-463B-B434-B5AF25321EA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB6A795F-FF97-463B-B434-B5AF25321EA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB6A795F-FF97-463B-B434-B5AF25321EA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB6A795F-FF97-463B-B434-B5AF25321EA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

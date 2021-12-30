@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Extensions.Build": {
+      "commandName": "Project",
+      "commandLineArgs": "test build package",
+      "workingDirectory": "../../"
+    }
+  }
+}

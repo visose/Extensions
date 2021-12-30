@@ -1,0 +1,23 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      commands:
+        description: 'Commands'
+        required: true
+        default: 'test check build package publish release'
+
+jobs:
+  publish:
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: dotnet run --project "build/Extensions.Build/Extensions.Build.csproj" ${{ github.event.inputs.commands }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          YAK_TOKEN: ${{ secrets.YAK_TOKEN }}
