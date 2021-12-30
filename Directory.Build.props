@@ -2,7 +2,7 @@
 	
 	<PropertyGroup>
 		<Product>Extensions</Product>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<Description>Assorted components for Grasshopper.</Description>
 		<Authors>Extensions Authors</Authors>
 		<Copyright>Copyright (c) 2021 $(Authors)</Copyright>

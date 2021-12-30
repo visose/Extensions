@@ -17,6 +17,7 @@ public class ExtensionsInfo : GH_AssemblyInfo
 
             if (files.Any())
             {
+                Assembly.LoadFile(files.First());
                 IsRobotsInstalled = true;
                 break;
             }
