@@ -13,8 +13,8 @@
 		<Reference Include="Robots">
 			<HintPath>..\..\lib\Robots.dll</HintPath>
 		</Reference>
-		<Reference Include="Robots.Grasshopper">
-			<HintPath>..\..\lib\Robots.Grasshopper.dll</HintPath>
+		<Reference Include="Robots">
+			<HintPath>..\..\lib\Robots.gha</HintPath>
 		</Reference>
 	</ItemGroup>
 
