@@ -6,7 +6,7 @@ namespace Extensions.Grasshopper;
 public class StraightSkeleton : GH_Component
 {
     public StraightSkeleton() : base("Straight Skeleton", "StrSkel", "Returns the straight skeleton of a polygon.", "Extensions", "Geometry") { }
-    protected override System.Drawing.Bitmap Icon => Properties.Resources.Graph;
+    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Graph");
     public override Guid ComponentGuid => new Guid("{d529efd9-2fdd-4751-a6b4-307c8f82390b}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

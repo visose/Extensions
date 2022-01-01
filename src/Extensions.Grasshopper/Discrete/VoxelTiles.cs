@@ -7,7 +7,7 @@ namespace Extensions.Grasshopper;
 public class VoxelTiles : GH_Component
 {
     public VoxelTiles() : base("Voxel Tiles", "VoxelTiles", "Voxelizes a boundary shape and places discrete elements on each voxel based on guide curves and points.", "Extensions", "Discrete") { }
-    protected override System.Drawing.Bitmap Icon => Properties.Resources.Cube;
+    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Cube");
     public override Guid ComponentGuid => new Guid("{769FB3B8-6C88-4130-AA32-FB9D0D1BC6AA}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

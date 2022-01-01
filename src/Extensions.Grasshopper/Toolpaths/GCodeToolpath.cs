@@ -9,7 +9,7 @@ public class GCodeToolpath : GH_Component
 {
     public GCodeToolpath() : base("G-code Toolpath", "GPath", "Converts a G-code file to robot targets.", "Extensions", "Toolpaths") { }
     public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
-    protected override System.Drawing.Bitmap Icon => Properties.Resources.Fingerprint;
+    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Fingerprint");
     public override Guid ComponentGuid => new Guid("{862CF2F9-EF08-444C-88B5-459D365EB60A}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

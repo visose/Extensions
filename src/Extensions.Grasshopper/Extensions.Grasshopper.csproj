@@ -3,38 +3,34 @@
 	<PropertyGroup>
 		<TargetFramework>net48</TargetFramework>
 		<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
-		<AssemblyTitle>Extensions Grasshopper</AssemblyTitle>
+		<AssemblyTitle>$(Product) Grasshopper</AssemblyTitle>
+		<TargetExt>.gha</TargetExt>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Grasshopper" Version="7.13.21348.13001" />
-		<PackageReference Include="System.Resources.Extensions" Version="6.0.0" />
+		<PackageReference Include="Grasshopper" Version="7.13.21348.13001" />		
 		<ProjectReference Include="..\Extensions\Extensions.csproj" />
 		<Reference Include="Robots">
 			<HintPath>..\..\lib\Robots.dll</HintPath>
 		</Reference>
-		<Reference Include="Robots">
+		<Reference Include="Robots.Grasshopper">
 			<HintPath>..\..\lib\Robots.gha</HintPath>
 		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Properties\Resources.Designer.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Resources.resx</DependentUpon>
-		</Compile>
+		<EmbeddedResource Include="Assets\Embed\**\*" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<EmbeddedResource Update="Properties\Resources.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-	</ItemGroup>
+	<PropertyGroup Condition="$([MSBuild]::IsOSPlatform(Windows))">
+		<StartProgram>C:\Program Files\Rhino 7\System\Rhino.exe</StartProgram>
+		<StartArguments>/nosplash /runscript="-grasshopper window show _enter"</StartArguments>
+		<StartAction>Program</StartAction>
+	</PropertyGroup>
 
 	<Target Name="Rename" AfterTargets="AfterBuild">
-		<Move SourceFiles="$(TargetPath)" DestinationFiles="$(TargetDir)Extensions.gha" />
+		<Move SourceFiles="$(TargetPath)" DestinationFiles="$(TargetDir)$(Product)$(TargetExt)" />
 	</Target>
+	
 
 </Project>

@@ -8,7 +8,7 @@ public class OrientToolpath : GH_Component
 {
     public OrientToolpath() : base("Orient Toolpath", "GPath", "Orients a toolpath using a guide mesh and optional surface mesh.", "Extensions", "Toolpaths") { }
     public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
-    protected override System.Drawing.Bitmap Icon => Properties.Resources.Wave;
+    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Wave");
     public override Guid ComponentGuid => new Guid("{71B46D1D-C358-40F9-9726-FAB3F6E2AF0B}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

@@ -159,7 +159,7 @@ public class DisplayGeometryParameter : GH_PersistentParam<GH_DisplayGeometry>, 
 {
     public DisplayGeometryParameter() : base("Display Geometry", "DisGeo", "Display geometry.", "Extensions", "Parameters") { }
     public override GH_Exposure Exposure => GH_Exposure.primary;
-    protected override Bitmap Icon => Properties.Resources.EyeParam;
+    protected override Bitmap Icon => Util.GetIcon("EyeParam");
     public override Guid ComponentGuid => new Guid("{9F90313D-5776-471C-9922-29D4F59A70C4}");
 
     protected override GH_GetterResult Prompt_Singular(ref GH_DisplayGeometry value)
@@ -202,7 +202,7 @@ public class ExtrusionAttributesParameter : GH_PersistentParam<GH_ExtrusionAttri
 {
     public ExtrusionAttributesParameter() : base("Extrusion Attributes", "ExtrAtt", "Extrusion attributes.", "Extensions", "Parameters") { }
     public override GH_Exposure Exposure => GH_Exposure.primary;
-    protected override Bitmap Icon => Properties.Resources.LayersConfigParam;
+    protected override Bitmap Icon => Util.GetIcon("LayersConfigParam");
     public override Guid ComponentGuid => new Guid("{D63464DC-BBAB-4A88-923A-8D9381FB1D0B}");
 
     protected override GH_GetterResult Prompt_Singular(ref GH_ExtrusionAttributes value)
@@ -222,7 +222,7 @@ public class MillingAttributesParameter : GH_PersistentParam<GH_MillingAttribute
 {
     public MillingAttributesParameter() : base("Milling Attributes", "MillAtt", "Milling attributes.", "Extensions", "Parameters") { }
     public override GH_Exposure Exposure => GH_Exposure.primary;
-    protected override Bitmap Icon => Properties.Resources.LayersConfigParam;
+    protected override Bitmap Icon => Util.GetIcon("LayersConfigParam");
     public override Guid ComponentGuid => new Guid("{21255B77-9E3D-43BD-8FE5-9A77D4A4D575}");
     protected override GH_GetterResult Prompt_Singular(ref GH_MillingAttributes value)
     {
