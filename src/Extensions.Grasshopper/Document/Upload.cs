@@ -7,7 +7,7 @@ namespace Extensions.Grasshopper;
 public class Upload : GH_Component
 {
     public Upload() : base("Upload File", "Upload", "Upload a file to the web.", "Extensions", "Document") { }
-    protected override Bitmap Icon => Properties.Resources.CloudUpload;
+    protected override Bitmap Icon => Util.GetIcon("CloudUpload");
     public override Guid ComponentGuid => new Guid("{DCA98559-B42A-4FEB-9226-E182977D8228}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

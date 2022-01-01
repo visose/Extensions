@@ -7,7 +7,7 @@ namespace Extensions.Grasshopper;
 public class FlipMesh : GH_Component
 {
     public FlipMesh() : base("Flip mesh", "MeshFlip", "Flips the direction of a mesh.", "Extensions", "Geometry") { }
-    protected override System.Drawing.Bitmap Icon => Properties.Resources.Undo;
+    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Undo");
     public override Guid ComponentGuid => new Guid("{65433478-f2d7-4cd0-808f-b1d1834270c3}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

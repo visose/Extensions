@@ -9,7 +9,7 @@ namespace Extensions.Grasshopper;
 public class DifferentialGrowth : GH_Component
 {
     public DifferentialGrowth() : base("Differential Growth", "DiffGrowth", "Grows a polyline using a differential growth algorithm.", "Extensions", "Geometry") { }
-    protected override System.Drawing.Bitmap Icon => Properties.Resources.Virus;
+    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Virus");
     public override Guid ComponentGuid => new Guid("{64C4B469-E923-4B7E-B746-C2599F7ED0A0}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

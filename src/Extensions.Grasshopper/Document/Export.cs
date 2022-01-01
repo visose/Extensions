@@ -8,7 +8,7 @@ namespace Extensions.Grasshopper;
 public class Export : GH_Component
 {
     public Export() : base("Export Geometry", "Export", "Export Grasshopper geometry.", "Extensions", "Document") { }
-    protected override Bitmap Icon => Properties.Resources.Save;
+    protected override Bitmap Icon => Util.GetIcon("Save");
     public override Guid ComponentGuid => new Guid("{B1DF48A5-8BC1-4FB1-B284-7EA22725CABA}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

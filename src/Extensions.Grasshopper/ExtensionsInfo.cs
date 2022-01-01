@@ -26,7 +26,7 @@ public class ExtensionsInfo : GH_AssemblyInfo
 
     public override string Name => GetInfo<AssemblyProductAttribute>().Product;
     public override string AssemblyVersion => GetInfo<AssemblyInformationalVersionAttribute>().InformationalVersion;
-    public override Bitmap Icon => Properties.Resources.Cube;
+    public override Bitmap Icon => Util.GetIcon("Cube");
     public override string Description => GetInfo<AssemblyDescriptionAttribute>().Description;
     public override GH_LibraryLicense License => GH_LibraryLicense.opensource;
     public override string AuthorName => GetCompany()[0];

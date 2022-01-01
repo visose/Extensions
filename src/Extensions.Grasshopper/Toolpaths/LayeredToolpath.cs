@@ -6,7 +6,7 @@ namespace Extensions.Grasshopper;
 public class LayeredToolpath : GH_Component
 {
     public LayeredToolpath() : base("Layered Toolpath", "LayeredToolpath", "Creates a layered extrusion toolpath.", "Extensions", "Toolpaths") { }
-    protected override System.Drawing.Bitmap Icon => Properties.Resources.Layers;
+    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Layers");
     public override Guid ComponentGuid => new Guid("{82C1EFE1-97C3-438C-84F4-C23F92574373}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

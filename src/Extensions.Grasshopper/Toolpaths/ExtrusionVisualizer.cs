@@ -9,7 +9,7 @@ public class CreateExtrusionVisualizer : GH_Component
 {
     public CreateExtrusionVisualizer() : base("Extrusion Visualizer", "ExtView", "Display extruded toolpath.", "Extensions", "Toolpaths") { }
     public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
-    protected override System.Drawing.Bitmap Icon => Properties.Resources.LayersDraw;
+    protected override System.Drawing.Bitmap Icon => Util.GetIcon("LayersDraw");
     public override Guid ComponentGuid => new Guid("{B6FCD119-0805-4FFF-A8AA-F18A37C4FC2F}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

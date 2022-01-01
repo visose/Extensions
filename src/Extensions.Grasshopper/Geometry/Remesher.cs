@@ -7,7 +7,7 @@ namespace Extensions.Grasshopper;
 public class RemesherComponent : GH_Component
 {
     public RemesherComponent() : base("Remesher", "Remesher", "Triangular remeshing trying to keep edge lengths as equal as possible.", "Extensions", "Geometry") { }
-    protected override System.Drawing.Bitmap Icon => Properties.Resources.Triangle;
+    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Triangle");
     public override Guid ComponentGuid => new Guid("{55D4CA7D-D9C7-485A-BC7A-BFDA387D4163}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

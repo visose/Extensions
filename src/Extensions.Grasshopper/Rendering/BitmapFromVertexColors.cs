@@ -8,7 +8,7 @@ namespace Extensions.Grasshopper;
 public class BitMapFromVertexColors : GH_Component
 {
     public BitMapFromVertexColors() : base("Bitmap From Mesh", "BmpMesh", "Creates a bitmap from a mesh with multiple vertex colors and assigns the corresponding uv coordinates to the mesh.", "Extensions", "Rendering") { }
-    protected override System.Drawing.Bitmap Icon => Properties.Resources.PaintBrush01;
+    protected override System.Drawing.Bitmap Icon => Util.GetIcon("PaintBrush01");
     public override Guid ComponentGuid => new Guid("{7aedf2f4-75e2-48be-94c5-fe116caf8b26}");
 
 

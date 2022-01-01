@@ -7,7 +7,7 @@ namespace Extensions.Grasshopper;
 public class MeshTextureCoords : GH_Component
 {
     public MeshTextureCoords() : base("Texture Coordinates", "TexCoords", "Sets mesh texture coordinates.", "Extensions", "Rendering") { }
-    protected override System.Drawing.Bitmap Icon => Properties.Resources.EyeDropper;
+    protected override System.Drawing.Bitmap Icon => Util.GetIcon("EyeDropper");
     public override Guid ComponentGuid => new Guid("{297d173d-4eac-4a93-947c-fa8216e73cfa}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
