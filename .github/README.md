@@ -15,7 +15,7 @@
 </div>
 
 ## About
-Miscellaneous features in the form of Grasshopper components and as **[Rhino's](https://www.rhino3d.com/)** library that can be used by a .NET plugin or Grasshopper scripting component.
+Miscellaneous features in the form of Grasshopper components and as a **[Rhino](https://www.rhino3d.com/)** library that can be used by a .NET plugin or Grasshopper scripting component.
 
 ## Install
 - Install in **Rhino 7** using the `_PackageManager` command, search for `Extensions`.
