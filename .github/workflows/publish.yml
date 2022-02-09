@@ -9,7 +9,7 @@ on:
       commands:
         description: 'Commands'
         required: true
-        default: 'test check build package publish release'
+        default: 'debug'
 
 jobs:
   publish:

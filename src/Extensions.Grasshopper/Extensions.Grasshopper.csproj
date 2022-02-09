@@ -2,35 +2,24 @@
 
 	<PropertyGroup>
 		<TargetFramework>net48</TargetFramework>
-		<GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
 		<AssemblyTitle>$(Product) Grasshopper</AssemblyTitle>
-		<TargetExt>.gha</TargetExt>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Grasshopper" Version="7.13.21348.13001" />		
 		<ProjectReference Include="..\Extensions\Extensions.csproj" />
-		<Reference Include="Robots">
-			<HintPath>..\..\lib\Robots.dll</HintPath>
-		</Reference>
-		<Reference Include="Robots.Grasshopper">
-			<HintPath>..\..\lib\Robots.gha</HintPath>
-		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Include="Assets\Embed\**\*" />
 	</ItemGroup>
 
+	<Target Name="Rename" AfterTargets="AfterBuild">
+		<Move SourceFiles="$(TargetPath)" DestinationFiles="$(TargetDir)$(Product).gha" />
+	</Target>
+
 	<PropertyGroup Condition="$([MSBuild]::IsOSPlatform(Windows))">
 		<StartProgram>C:\Program Files\Rhino 7\System\Rhino.exe</StartProgram>
 		<StartArguments>/nosplash /runscript="-grasshopper window show _enter"</StartArguments>
 		<StartAction>Program</StartAction>
 	</PropertyGroup>
-
-	<Target Name="Rename" AfterTargets="AfterBuild">
-		<Move SourceFiles="$(TargetPath)" DestinationFiles="$(TargetDir)$(Product)$(TargetExt)" />
-	</Target>
-	
-
 </Project>

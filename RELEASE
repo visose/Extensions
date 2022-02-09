@@ -1,9 +1,16 @@
+- version: 1.0.3
+  changes:
+  - Fixed compatibility with early Rhino 7.0 service releases.
+  - Fixed should not appear as supported in Rhino 6 or lower.
+
 - version: 1.0.2
   changes:
-  - Update to work with Robots 1.0.4.
+  - Updated to work with Robots 1.0.4.
+
 - version: 1.0.1
   changes:
-  - Fix check for Robots plugin when loaded after Extensions.
+  - Fixed check for Robots plugin when loaded after Extensions.
+
 - version: 1.0.0
   changes:
   - Updated to work with the latest Robots plugin.
