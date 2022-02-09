@@ -2,13 +2,16 @@
 	
 	<PropertyGroup>
 		<Product>Extensions</Product>
-		<Version>1.0.2</Version>
-		<Description>Assorted components for Grasshopper.</Description>
+		<Version>1.0.3</Version>
 		<Authors>Extensions Authors</Authors>
-		<Copyright>Copyright (c) 2021 $(Authors)</Copyright>
-		<PackageProjectUrl>https://github.com/visose/extensions</PackageProjectUrl>
+		<Description>Assorted components for Grasshopper.</Description>
 		<PackageTags>Grasshopper;Extensions;Robots</PackageTags>
+		<PackageProjectUrl>https://github.com/visose/extensions</PackageProjectUrl>
 		<IconUrl>https://github.com/visose/extensions/raw/master/build/icon.png</IconUrl>
+		<ReleaseNotes>RELEASE</ReleaseNotes>
+		
+		<CurrentYear>$([System.DateTime]::Now.Year)</CurrentYear>
+		<Copyright>Copyright (c) 2017-$(CurrentYear) $(Authors)</Copyright>
 		<Company>$(Authors) - $(PackageProjectUrl)</Company>
 	</PropertyGroup>
 
