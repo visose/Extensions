@@ -1,4 +1,4 @@
-﻿using Rhino.Geometry;
+using Rhino.Geometry;
 using Robots;
 using Robots.Commands;
 using static System.Math;
@@ -142,7 +142,6 @@ public class ExternalExtrusionToolpath : SimpleToolpath
 
         _targets.Add(HomeEnd());
         SubPrograms.RemoveAt(SubPrograms.Count - 1);
-
 
         Target CreateTarget(Plane location, Speed speed, Zone zone, double externalDistance)
         {

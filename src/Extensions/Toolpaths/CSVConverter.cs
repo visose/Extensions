@@ -1,4 +1,4 @@
-﻿using Rhino.Geometry;
+using Rhino.Geometry;
 using Robots;
 
 namespace Extensions.Toolpaths;
@@ -56,7 +56,7 @@ public class CSVConverter
 
             if (point != null)
             {
-                Point3d localPoint = (Point3d)point;
+                var localPoint = (Point3d)point;
                 localPoint.Transform(Transform.PlaneToPlane(referenceTarget.Frame.Plane, Plane.WorldXY));
                 xaxis = localPoint - position;
             }
@@ -88,7 +88,6 @@ public class CSVConverter
 
         var distinctZones = zoneValues.Distinct().Select(z => new Zone(distance: z));
         var zones = zoneValues.Select(v => distinctZones.First(z => z.Distance == v)).ToList();
-
 
         for (int i = 0; i < planes.Count; i++)
         {

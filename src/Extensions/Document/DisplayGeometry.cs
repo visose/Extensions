@@ -26,14 +26,8 @@ public class DisplayGeometry
         {
             var layer = doc.Layers.FindName(Layer, RhinoMath.UnsetIntIndex);
 
-            if (layer == null)
-            {
-                att.LayerIndex = doc.Layers.Add(new Layer() { Name = Layer });
-            }
-            else
-            {
-                att.LayerIndex = layer.Index;
-            }
+            att.LayerIndex = layer == null
+                ? doc.Layers.Add(new Layer() { Name = Layer }) : layer.Index;
         }
 
         var geometry = Geometry;

@@ -72,11 +72,15 @@ public class VoxelTiles
         Voxels = new Voxel[Size.X, Size.Y, Size.Z];
 
         for (int z = 0; z < Size.Z; z++)
+        {
             for (int y = 0; y < Size.Y; y++)
+            {
                 for (int x = 0; x < Size.X; x++)
                 {
                     Voxels[x, y, z] = new Voxel(new Vector3i(x, y, z), this);
                 }
+            }
+        }
 
         // voxelize shape
         SetActiveVoxels(boundary);
@@ -262,11 +266,15 @@ public class VoxelTiles
     IEnumerable<Voxel> GetVoxels()
     {
         for (int z = 0; z < Size.Z; z++)
+        {
             for (int y = 0; y < Size.Y; y++)
+            {
                 for (int x = 0; x < Size.X; x++)
                 {
                     yield return Voxels[x, y, z];
                 }
+            }
+        }
     }
 }
 
@@ -280,7 +288,6 @@ public class Voxel
     public int SnapType;
 
     //public GeometryBase Geometry;
-
 
     public Voxel(Vector3i index, VoxelTiles grid)
     {

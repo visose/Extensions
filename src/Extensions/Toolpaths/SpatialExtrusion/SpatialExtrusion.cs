@@ -18,7 +18,6 @@ public class SpatialExtrusion
         var meshes = attributes.Environment.OfType<Mesh>()
                      .Select(m => (mesh: m, height: m.GetBoundingBox(true).Max.Z)).ToList();
 
-
         attributes.Environment.RemoveAll(g => g is Mesh);
 
         foreach (var polyline in polylines)
@@ -29,8 +28,10 @@ public class SpatialExtrusion
             bool hasToWait = meshesToAdd.Count > 0;
 
             for (int i = meshes.Count - 1; i >= 0; i--)
+            {
                 if (meshesToAdd.Contains(meshes[i].mesh))
                     meshes.RemoveAt(i);
+            }
 
             attributes.Environment.AddRange(meshesToAdd);
 
@@ -46,6 +47,4 @@ public class SpatialExtrusion
             attributes.Environment.Add(polyline.ToNurbsCurve());
         }
     }
-
-
 }

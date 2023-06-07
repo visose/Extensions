@@ -3,7 +3,6 @@ using Grasshopper.Kernel.Types;
 using Grasshopper.Kernel.Data;
 using Rhino.Geometry;
 
-
 namespace Extensions.Grasshopper;
 
 public class DifferentialGrowth : GH_Component
@@ -46,13 +45,11 @@ public class DifferentialGrowth : GH_Component
         {
             polyline = (region as Curve).ToPolyline();
         }
-        else if (region is Mesh)
-        {
-            mesh = (region as Mesh);
-        }
         else
         {
-            throw new Exception(" Region should be polyline or mesh.");
+            mesh = region is Mesh 
+                ? region as Mesh 
+                : throw new Exception(" Region should be polyline or mesh.");
         }
 
         var inPolylines = curves.Select(c => c.ToPolyline()).ToList();

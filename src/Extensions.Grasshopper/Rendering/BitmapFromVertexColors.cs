@@ -11,7 +11,6 @@ public class BitMapFromVertexColors : GH_Component
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("PaintBrush01");
     public override Guid ComponentGuid => new("{7aedf2f4-75e2-48be-94c5-fe116caf8b26}");
 
-
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
         pManager.AddMeshParameter("Mesh", "M", "Single mesh with render colors.", GH_ParamAccess.item);

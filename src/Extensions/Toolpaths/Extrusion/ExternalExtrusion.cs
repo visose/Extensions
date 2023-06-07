@@ -1,4 +1,4 @@
-﻿using Robots;
+using Robots;
 using static System.Math;
 
 namespace Extensions.Toolpaths.Extrusion;
@@ -59,7 +59,9 @@ motorValue:= 0;";
                 initCode = $"{indCode}\r\n{resetCode}";
             }
             else
+            {
                 initCode = resetCode;
+            }
 
             var command = new Robots.Commands.Custom("ResetExtruder", declaration: declaration, command: initCode)
             {

@@ -1,4 +1,4 @@
-﻿using Rhino.Geometry;
+using Rhino.Geometry;
 
 namespace Extensions.Spatial;
 
@@ -40,8 +40,10 @@ public class BucketSearchSparse2d<T> where T : IPositionable
 
         int count = 0;
         for (int i = -1; i < 2; i++)
+        {
             for (int j = -1; j < 2; j++)
                 keys[count++] = new Vector2i(center.X + i, center.Y + j);
+        }
 
         var elements = new List<T>();
 
@@ -104,9 +106,13 @@ public class BucketSearchSparse3d<T> where T : IPositionable
 
         int count = 0;
         for (int i = -1; i < 2; i++)
+        {
             for (int j = -1; j < 2; j++)
+            {
                 for (int k = -1; k < 2; k++)
                     keys[count++] = new Vector3i(center.X + i, center.Y + j, center.Z + k);
+            }
+        }
 
         var elements = new List<T>();
 
@@ -127,7 +133,6 @@ public class BucketSearchSparse3d<T> where T : IPositionable
         return elements;
     }
 }
-
 
 public class BucketSearchDense2d<T> where T : IPositionable
 {
@@ -154,11 +159,13 @@ public class BucketSearchDense2d<T> where T : IPositionable
     public void Populate(IEnumerable<T> elements)
     {
         for (int i = 0; i < _size.X; i++)
+        {
             for (int j = 0; j < _size.Y; j++)
             {
                 var bucket = _table[i][j];
                 bucket?.Clear();
             }
+        }
 
         foreach (var element in elements)
         {
@@ -190,8 +197,10 @@ public class BucketSearchDense2d<T> where T : IPositionable
 
         int count = 0;
         for (int i = -1; i < 2; i++)
+        {
             for (int j = -1; j < 2; j++)
                 keys[count++] = new Vector2i(center.X + i, center.Y + j);
+        }
 
         var elements = new List<T>();
 
@@ -248,12 +257,16 @@ public class BucketSearchDense3d<T> where T : IPositionable
         }
 
         for (int i = 0; i < _size.X; i++)
+        {
             for (int j = 0; j < _size.Y; j++)
+            {
                 for (int k = 0; k < _size.Z; k++)
                 {
                     var bucket = _table[i, j, k];
                     bucket?.Clear();
                 }
+            }
+        }
 
         foreach (var element in elements)
         {
@@ -291,9 +304,13 @@ public class BucketSearchDense3d<T> where T : IPositionable
 
         int count = 0;
         for (int i = -1; i < 2; i++)
+        {
             for (int j = -1; j < 2; j++)
+            {
                 for (int k = -1; k < 2; k++)
                     keys[count++] = new Vector3i(center.X + i, center.Y + j, center.Z + k);
+            }
+        }
 
         int itemCount = 0;
 

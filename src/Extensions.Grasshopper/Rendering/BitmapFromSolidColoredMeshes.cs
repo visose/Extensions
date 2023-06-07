@@ -3,7 +3,6 @@ using Grasshopper.Kernel;
 using Rhino.Display;
 using Rhino.Geometry;
 
-
 namespace Extensions.Grasshopper;
 
 public class BitmapFromSolidColoredMeshes : GH_Component

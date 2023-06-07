@@ -3,7 +3,6 @@ using Robots;
 using Robots.Commands;
 using static System.Math;
 
-
 namespace Extensions.Toolpaths.SpatialExtrusion;
 
 class Vertex
@@ -193,7 +192,6 @@ class Vertex
             approachTarget.Command = hasToWait ? new Stop() : null;
             targets.Add(approachTarget);
         }
-
 
         if (!_isDown && !_isSegmentSupported)
         {

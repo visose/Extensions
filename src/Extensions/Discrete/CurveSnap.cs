@@ -1,10 +1,10 @@
-﻿using Rhino.Geometry;
+using Rhino.Geometry;
 
 namespace Extensions.Discrete;
 
 public static class CurveSnap
 {
-    readonly static Sphere _unitSphere;
+    static readonly Sphere _unitSphere;
 
     static CurveSnap()
     {
@@ -33,7 +33,6 @@ public static class CurveSnap
         }
 
         return new Polyline(polyline);
-
 
         IList<Vector3f> SnapVectors()
         {

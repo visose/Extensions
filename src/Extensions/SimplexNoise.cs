@@ -1,4 +1,4 @@
-﻿using Rhino.Geometry;
+using Rhino.Geometry;
 
 namespace Extensions;
 
@@ -105,28 +105,40 @@ public static class SimplexNoise
         int gi3 = _perm[ii + 1 + _perm[jj + 1 + _perm[kk + 1]]] % 12;
         // Calculate the contribution from the four corners
         double t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;
-        if (t0 < 0) n0 = 0.0;
+        if (t0 < 0)
+        {
+            n0 = 0.0;
+        }
         else
         {
             t0 *= t0;
             n0 = t0 * t0 * Dot(_grad3[gi0], x0, y0, z0);
         }
         double t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1;
-        if (t1 < 0) n1 = 0.0;
+        if (t1 < 0)
+        {
+            n1 = 0.0;
+        }
         else
         {
             t1 *= t1;
             n1 = t1 * t1 * Dot(_grad3[gi1], x1, y1, z1);
         }
         double t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2;
-        if (t2 < 0) n2 = 0.0;
+        if (t2 < 0)
+        {
+            n2 = 0.0;
+        }
         else
         {
             t2 *= t2;
             n2 = t2 * t2 * Dot(_grad3[gi2], x2, y2, z2);
         }
         double t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;
-        if (t3 < 0) n3 = 0.0;
+        if (t3 < 0)
+        {
+            n3 = 0.0;
+        }
         else
         {
             t3 *= t3;

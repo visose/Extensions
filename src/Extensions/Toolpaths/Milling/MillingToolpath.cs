@@ -34,7 +34,6 @@ public class MillingToolpath : SimpleToolpath
             var firstSafe = new Point3d(first.X, first.Y, safeZ);
             _targets.Add(CreateTarget(firstSafe, _att.SafeSpeed, _att.SafeZone));
 
-
             var firstOffset = first + Vector3d.ZAxis * layerZ;
             _targets.Add(CreateTarget(firstOffset, _att.SafeSpeed, _att.SafeZone));
 

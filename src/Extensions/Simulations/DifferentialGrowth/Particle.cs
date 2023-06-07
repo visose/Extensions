@@ -17,7 +17,6 @@ public class Particle : IPositionable, IEquatable<Particle>
 
     public Stopwatch Watch = new();
 
-
     //public Point3d Position
     //{
     //    [MethodImpl(MethodImplOptions.AggressiveInlining)]

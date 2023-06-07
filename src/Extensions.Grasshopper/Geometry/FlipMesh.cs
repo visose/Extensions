@@ -1,7 +1,6 @@
 ﻿using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-
 namespace Extensions.Grasshopper;
 
 public class FlipMesh : GH_Component

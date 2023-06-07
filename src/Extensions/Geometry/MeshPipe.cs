@@ -1,4 +1,4 @@
-﻿using Rhino.Geometry;
+using Rhino.Geometry;
 using static System.Math;
 using static Extensions.Util;
 
@@ -59,7 +59,6 @@ static class MeshPipe
             if (next > last) next -= (last + 1);
             vb = inPlanes[next].Origin - p;
 
-
             va.Unitize();
             vb.Unitize();
 
@@ -83,7 +82,7 @@ static class MeshPipe
             vz.Unitize();
 
             Vector3d vy = inPlanes[i].Normal;
-            Vector3d vx = Vector3d.CrossProduct(-vz, vy);
+            var vx = Vector3d.CrossProduct(-vz, vy);
             Point3d origin = inPlanes[i].Origin - (inPlanes[i].Normal * height);
             var plane = new Plane(origin, vx, vy);
             double scale = 1;
@@ -214,7 +213,7 @@ static class MeshPipe
             }
 
             Vector3d vy = Vector3d.ZAxis;
-            Vector3d vx = Vector3d.CrossProduct(-vz, vy);
+            var vx = Vector3d.CrossProduct(-vz, vy);
             Point3d origin = p - (Vector3d.ZAxis * height);
             var plane = new Plane(origin, vx, vy);
             double scale = width;
@@ -328,7 +327,7 @@ static class MeshPipe
             }
 
             Vector3d vy = inPlanes[i].Normal; //Vector3d.ZAxis;
-            Vector3d vx = Vector3d.CrossProduct(-vz, vy);
+            var vx = Vector3d.CrossProduct(-vz, vy);
             Point3d origin = p - (Vector3d.ZAxis * height);
             var plane = new Plane(origin, vx, vy);
             double scale = width;
@@ -411,7 +410,6 @@ static class MeshPipe
         {
             polyline.RemoveAt(polyline.Count - 1);
         }
-
 
         var fillet = new Polyline(isClosed ? polyline.Count * 3 : (polyline.Count - 2) * 3 + 2);
 

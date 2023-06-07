@@ -1,27 +1,28 @@
 <Project>
-	
-	<PropertyGroup>
-		<Product>Extensions</Product>
-		<Version>1.0.4</Version>
-		<Authors>Extensions Authors</Authors>
-		<Description>Assorted components for Grasshopper.</Description>
-		<PackageTags>Grasshopper;Extensions;Robots</PackageTags>
-		<PackageProjectUrl>https://github.com/visose/extensions</PackageProjectUrl>
-		<IconUrl>https://github.com/visose/extensions/raw/master/build/icon.png</IconUrl>
-		<ReleaseNotes>RELEASE</ReleaseNotes>
-		
-		<CurrentYear>$([System.DateTime]::Now.Year)</CurrentYear>
-		<Copyright>Copyright (c) 2017-$(CurrentYear) $(Authors)</Copyright>
-		<Company>$(Authors) - $(PackageProjectUrl)</Company>
-	</PropertyGroup>
 
-	<PropertyGroup>
-		<LangVersion>latest</LangVersion>
-		<Nullable>disable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<ArtifactsDir>..\..\artifacts\</ArtifactsDir>
-		<OutputPath>$(ArtifactsDir)bin\$(MSBuildProjectName)</OutputPath>
-		<BaseIntermediateOutputPath>$(ArtifactsDir)obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
-	</PropertyGroup>
+  <PropertyGroup>
+    <Product>Extensions</Product>
+    <Version>1.0.4</Version>
+    <Authors>Extensions Authors</Authors>
+    <Description>Assorted components for Grasshopper.</Description>
+    <PackageTags>Grasshopper;Extensions;Robots</PackageTags>
+    <PackageProjectUrl>https://github.com/visose/extensions</PackageProjectUrl>
+    <IconUrl>https://github.com/visose/extensions/raw/master/build/icon.png</IconUrl>
+    <ReleaseNotes>RELEASE</ReleaseNotes>
+
+    <CurrentYear>$([System.DateTime]::Now.Year)</CurrentYear>
+    <Copyright>Copyright (c) 2017-$(CurrentYear) $(Authors)</Copyright>
+    <Company>$(Authors) - $(PackageProjectUrl)</Company>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootDir>$(MSBuildThisFileDirectory)</RootDir>
+    <ArtifactsDir>$(RootDir)artifacts\</ArtifactsDir>
+    <OutputPath>$(ArtifactsDir)bin\$(MSBuildProjectName)</OutputPath>
+    <BaseIntermediateOutputPath>$(ArtifactsDir)obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+  </PropertyGroup>
 
 </Project>

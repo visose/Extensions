@@ -1,7 +1,6 @@
 ﻿using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-
 namespace Extensions.Grasshopper;
 
 public class MeshTextureCoords : GH_Component

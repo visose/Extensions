@@ -47,7 +47,6 @@ public static class Remesh
         return mesh;
     }
 
-
     public static Mesh RemeshTest(Mesh inMesh, double fResScale = 1.0, int iterations = 50)
     {
         inMesh.Faces.ConvertQuadsToTriangles();

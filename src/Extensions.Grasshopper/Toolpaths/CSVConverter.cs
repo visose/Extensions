@@ -42,7 +42,6 @@ public class CSVConverter : GH_Component
         pManager.AddCurveParameter("ToolPath", "C", "Only the cutting paths.", GH_ParamAccess.list);
     }
 
-
     protected override void SolveInstance(IGH_DataAccess DA)
     {
         string file = null, mask = null;

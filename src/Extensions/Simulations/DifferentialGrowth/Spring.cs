@@ -11,16 +11,13 @@ public class Spring
     public Vector3d Vector;
     readonly DifferentialGrowth _simulation;
 
-    public Line Line { get { return new Line(Start.Position, End.Position); } }
-    public Point3d Mid { get { return new Point3d((Start.Position + End.Position) / 2); } }
+    public Line Line => new(Start.Position, End.Position);
+    public Point3d Mid => new((Start.Position + End.Position) / 2);
 
     public double RestLength
     {
-        get { return _restLength; }
-        set
-        {
-            _restLength = Math.Max(0, value);
-        }
+        get => _restLength;
+        set => _restLength = Math.Max(0, value);
     }
 
     public void Update()

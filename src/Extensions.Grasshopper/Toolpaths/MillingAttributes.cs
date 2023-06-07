@@ -44,7 +44,6 @@ public class CreateMillingAttributes : GH_Component
         pManager.AddParameter(new MillingAttributesParameter(), "Milling Attributes", "A", "Milling attributes.", GH_ParamAccess.item);
     }
 
-
     protected override void SolveInstance(IGH_DataAccess DA)
     {
         int inputCount = 10;
