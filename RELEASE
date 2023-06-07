@@ -1,3 +1,7 @@
+- version: 1.0.4
+  changes:
+  - Fixed compatibility with latest Robots version.
+
 - version: 1.0.3
   changes:
   - Fixed compatibility with early Rhino 7.0 service releases.

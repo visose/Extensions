@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Assets\Embed\**\*" />
+    <None Include="$(RootDir)build\icon.png" CopyToOutputDirectory="PreserveNewest" Visible="false" />
   </ItemGroup>
 
   <Target Name="Rename" AfterTargets="AfterBuild">

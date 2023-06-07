@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Extensions.Build": {
-      "commandName": "Project",
-      "commandLineArgs": "debug",
-      "workingDirectory": "../../"
-    }
-  }
-}

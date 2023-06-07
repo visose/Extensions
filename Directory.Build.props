@@ -7,7 +7,7 @@
     <Description>Assorted components for Grasshopper.</Description>
     <PackageTags>Grasshopper;Extensions;Robots</PackageTags>
     <PackageProjectUrl>https://github.com/visose/extensions</PackageProjectUrl>
-    <IconUrl>https://github.com/visose/extensions/raw/master/build/icon.png</IconUrl>
+    <Icon>icon.png</Icon>
     <ReleaseNotes>RELEASE</ReleaseNotes>
 
     <CurrentYear>$([System.DateTime]::Now.Year)</CurrentYear>
