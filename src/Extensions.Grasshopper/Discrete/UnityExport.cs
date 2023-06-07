@@ -7,7 +7,7 @@ public class UnityExport : GH_Component
 {
     public UnityExport() : base("Unity Export", "UnityExport", "Exports block instances to Unity 3D.", "Extensions", "Discrete") { }
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("Puzzle");
-    public override Guid ComponentGuid => new Guid("{09694580-A4BB-4CD8-B061-E158BC83478F}");
+    public override Guid ComponentGuid => new("{09694580-A4BB-4CD8-B061-E158BC83478F}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {

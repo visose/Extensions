@@ -32,10 +32,8 @@ public class Assembly
         };
 
         var serializer = new XmlSerializer(typeof(Assembly));
-        using (var writer = XmlWriter.Create(fileName))
-        {
-            serializer.Serialize(writer, assembly);
-        }
+        using var writer = XmlWriter.Create(fileName);
+        serializer.Serialize(writer, assembly);
     }
 }
 

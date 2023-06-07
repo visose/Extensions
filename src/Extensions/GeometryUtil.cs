@@ -7,10 +7,7 @@ public static class GeometryUtil
 {
     public static Vector3d PolarToVector(double a, double b)
     {
-        var c = a;
-        a = b;
-        b = c;
-
+        (b, a) = (a, b);
         var n = Vector3d.Zero;
         n.X = Sin(a) * Cos(b);
         n.Y = Sin(a) * Sin(b);

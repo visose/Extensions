@@ -85,8 +85,8 @@ public class Column
                 {
                     var polyline = inPolylines[i];
                     polyline = Shorten(polyline, shortenDist);
-                        //polyline = BallPivot.Create(polyline, width * 0.2); // simplfy
-                        outPolylines[i] = polyline;
+                    //polyline = BallPivot.Create(polyline, width * 0.2); // simplfy
+                    outPolylines[i] = polyline;
                 }
             });
 
@@ -115,8 +115,8 @@ public class Column
             {
                 for (int i = range.Item1; i < range.Item2; i++)
                 {
-                        //var pls = inPolylines[i].Select(p => p.ToPolyline(0.01, PI * 0.01, 1, double.MaxValue).ToPolyline());
-                        outMeshes[i] = inPolylines[i].Select(p => MeshPipe.MeshFlatPolyline(p, width, height, width * 0.5, 5)).ToArray();
+                    //var pls = inPolylines[i].Select(p => p.ToPolyline(0.01, PI * 0.01, 1, double.MaxValue).ToPolyline());
+                    outMeshes[i] = inPolylines[i].Select(p => MeshPipe.MeshFlatPolyline(p, width, height, width * 0.5, 5)).ToArray();
                 }
             });
 
@@ -131,10 +131,10 @@ public class Column
             {
                 for (int i = range.Item1; i < range.Item2; i++)
                 {
-                        // var pl = inPolylines[i];
-                        var outerSkin = inPolylines[i];
-                        //var outerSkin = Geometry.Region.Offset(pl, -offset);
-                        var innerSkin = Geometry.Region.Offset(outerSkin, -offset * 2);
+                    // var pl = inPolylines[i];
+                    var outerSkin = inPolylines[i];
+                    //var outerSkin = Geometry.Region.Offset(pl, -offset);
+                    var innerSkin = Geometry.Region.Offset(outerSkin, -offset * 2);
                     var outPolyline = new Polyline[] { outerSkin, innerSkin };
 
                     outPolylines[i] = outPolyline.Select(p => Clean(p, offset)).ToArray();
@@ -209,7 +209,7 @@ public class Column
 
         void Progress(string text)
         {
-            if (text != "Contouring") Rhino.RhinoApp.WriteLine($"{ _text}");
+            if (text != "Contouring") Rhino.RhinoApp.WriteLine($"{_text}");
             StatusBar.HideProgressMeter();
             if (text == "end") return;
             _text = text;

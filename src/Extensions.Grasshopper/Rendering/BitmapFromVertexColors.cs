@@ -9,7 +9,7 @@ public class BitMapFromVertexColors : GH_Component
 {
     public BitMapFromVertexColors() : base("Bitmap From Mesh", "BmpMesh", "Creates a bitmap from a mesh with multiple vertex colors and assigns the corresponding uv coordinates to the mesh.", "Extensions", "Rendering") { }
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("PaintBrush01");
-    public override Guid ComponentGuid => new Guid("{7aedf2f4-75e2-48be-94c5-fe116caf8b26}");
+    public override Guid ComponentGuid => new("{7aedf2f4-75e2-48be-94c5-fe116caf8b26}");
 
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
@@ -25,7 +25,7 @@ public class BitMapFromVertexColors : GH_Component
 
     protected override void SolveInstance(IGH_DataAccess DA)
     {
-        Mesh mesh = new Mesh();
+        Mesh mesh = new();
         string file = string.Empty;
         DA.GetData(0, ref mesh);
         DA.GetData(1, ref file);

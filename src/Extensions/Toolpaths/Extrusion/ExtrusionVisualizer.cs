@@ -42,8 +42,10 @@ public class ExtrusionVisualizer
             var pl = new Polyline(currentContour.Planes.Select(p => p.Origin));
             var currentLength = t * pl.Length;
 
-            var planes = new List<Plane>();
-            planes.Add(currentContour.Planes[0]);
+            var planes = new List<Plane>
+            {
+                currentContour.Planes[0]
+            };
 
             var lines = pl.GetSegments();
             double current = 0;

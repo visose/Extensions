@@ -11,7 +11,7 @@ public class CreateDisplayGeometry : GH_Component
 {
     public CreateDisplayGeometry() : base("Display Geometry", "DisGeo", "Attaches display attributes to geometry.", "Extensions", "Document") { }
     protected override Bitmap Icon => Util.GetIcon("Eye");
-    public override Guid ComponentGuid => new Guid("{07955694-55A9-4AC6-88B8-A0F37632634B}");
+    public override Guid ComponentGuid => new("{07955694-55A9-4AC6-88B8-A0F37632634B}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {

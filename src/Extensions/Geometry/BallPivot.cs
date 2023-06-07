@@ -86,7 +86,7 @@ internal class BallPivot
         Point second = _points.MinBy(p => p.Position.DistanceToSquared(_box.Max)).First();
         _start = second.Index;
 
-        Polyline pl = new Polyline() { second.Position };
+        Polyline pl = new() { second.Position };
 
         while (true)
         {

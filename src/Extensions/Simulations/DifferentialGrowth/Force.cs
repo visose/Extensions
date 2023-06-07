@@ -6,18 +6,18 @@ public struct Force
 {
     public Vector3d Vector;
     public double Weight;
-    private readonly Object thisLock;
+    private readonly object _thisLock;
 
     public Force(Vector3d vector, double weight)
     {
-        thisLock = new Object();
+        _thisLock = new();
         Vector = vector;
         Weight = weight;
     }
 
     public void Add(Vector3d vector, double weight)
     {
-        lock (thisLock)
+        lock (_thisLock)
         {
             Vector += vector;
             Weight += weight;

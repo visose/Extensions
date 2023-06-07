@@ -11,7 +11,7 @@ public class CreateExtrusionAttributes : GH_Component
     public CreateExtrusionAttributes() : base("Extrusion Attributes", "ExtAtt", "Extrusion attributes.", "Extensions", "Toolpaths") { }
     public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("LayersConfig");
-    public override Guid ComponentGuid => new Guid("{0D176FFA-75B1-484A-A6C7-273492F8F53E}");
+    public override Guid ComponentGuid => new("{0D176FFA-75B1-484A-A6C7-273492F8F53E}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {

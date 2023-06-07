@@ -10,7 +10,7 @@ public class BitmapFromSolidColoredMeshes : GH_Component
 {
     public BitmapFromSolidColoredMeshes() : base("Bitmap From Meshes", "BmpMeshes", "Creates a bitmap from solid colored meshes and assigns the corresponding uv coordinates to the meshes.", "Extensions", "Rendering") { }
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("PaintBrush02");
-    public override Guid ComponentGuid => new Guid("{db4d6bc7-9e3c-459b-8494-6fd92dc526ca}");
+    public override Guid ComponentGuid => new("{db4d6bc7-9e3c-459b-8494-6fd92dc526ca}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {

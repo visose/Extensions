@@ -20,7 +20,7 @@ public class DisplayGeometry
 
     public Guid Bake(RhinoDoc doc, ObjectAttributes att = null, bool flipYZ = false)
     {
-        if (att == null) att = doc.CreateDefaultAttributes();
+        att ??= doc.CreateDefaultAttributes();
 
         if (!string.IsNullOrEmpty(Layer))
         {
@@ -43,7 +43,7 @@ public class DisplayGeometry
             if (flipYZ)
                 geometry = (Geometry as Mesh).FlipYZ();
 
-            if (Material != null)
+            if (Material is not null)
             {
                 att.ColorSource = ObjectColorSource.ColorFromMaterial;
                 att.MaterialSource = ObjectMaterialSource.MaterialFromObject;
@@ -60,14 +60,14 @@ public class DisplayGeometry
 
                 var texture = Material.GetBitmapTexture(true);
 
-                if (texture != null)
-                    material.SetBitmapTexture(texture);
+                if (texture is not null)
+                    material.SetTexture(texture, TextureType.Diffuse);
 
                 var matIndex = doc.Materials.Add(material);
                 att.MaterialIndex = matIndex;
             }
         }
-        else if (Material != null)
+        else if (Material is not null)
         {
             att.ColorSource = ObjectColorSource.ColorFromObject;
             att.ObjectColor = Material.Diffuse;

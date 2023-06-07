@@ -25,12 +25,12 @@ public class FiveAxisToRobots
 {
     public List<Target> Targets { get; set; } = new List<Target>();
 
-    readonly List<string> _ignored = new List<string>();
-    readonly List<int> _RapidStarts = new List<int>() { 0 };
+    readonly List<string> _ignored = new();
+    readonly List<int> _rapidStarts = new() { 0 };
     Tool _tool;
     readonly Frame _mcs;
     readonly Dictionary<(GCodeLine.LType letter, int number), Action<GCodeLine>> _gCodeMap;
-    readonly Dictionary<double, Speed> _speeds = new Dictionary<double, Speed>();
+    readonly Dictionary<double, Speed> _speeds = new();
     readonly CartesianTarget _refTarget;
     Vector3d _alignment;
     int _lastRapid = 0;
@@ -39,7 +39,7 @@ public class FiveAxisToRobots
     {
         tool = _tool;
         mcs = _mcs;
-        rapidStarts = _RapidStarts;
+        rapidStarts = _rapidStarts;
         ignored = _ignored;
     }
 
@@ -64,7 +64,7 @@ public class FiveAxisToRobots
              };
 
         Interpret(file);
-        _RapidStarts.Add(Targets.Count - 1);
+        _rapidStarts.Add(Targets.Count - 1);
     }
 
     void Interpret(GCodeFile file)
@@ -146,7 +146,7 @@ public class FiveAxisToRobots
         int i = line.lineNumber;
         if ((i > 0) && (i - _lastRapid > 1))
         {
-            _RapidStarts.Add(i);
+            _rapidStarts.Add(i);
         }
 
         _lastRapid = i;

@@ -11,7 +11,7 @@ public class CreateExternalExtrusionToolpathCustom : GH_Component
     public CreateExternalExtrusionToolpathCustom() : base("Extrusion Toolpath Ex Custom", "ExtPathCustom", "Extrusion toolpath with external axis with custom plane and external value.", "Extensions", "Toolpaths") { }
     public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("LayersAdd");
-    public override Guid ComponentGuid => new Guid("{5219D611-92BF-42AA-95E5-AEA4115D360A}");
+    public override Guid ComponentGuid => new("{5219D611-92BF-42AA-95E5-AEA4115D360A}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {

@@ -85,14 +85,8 @@ public class GH_DisplayGeometry : GH_GeometricGoo<DisplayGeometry>, IGH_PreviewD
 
     public void DrawViewportWires(GH_PreviewWireArgs args)
     {
-        //if (Value.Geometry is Mesh)
-        //    args.Pipeline.DrawMeshWires(Value.Geometry as Mesh, Value.Color);
-
         if (Value.Geometry is Curve)
-        {
-            Color color = Value.Material == null ? args.Color : Value.Material.Diffuse;
             args.Pipeline.DrawCurve(Value.Geometry as Curve, Value.Material.Diffuse);
-        }
     }
 
     bool IGH_BakeAwareData.BakeGeometry(RhinoDoc doc, ObjectAttributes att, out Guid obj_guid)
@@ -120,8 +114,8 @@ public class GH_DisplayGeometry : GH_GeometricGoo<DisplayGeometry>, IGH_PreviewD
 
                 var texture = Value.Material.GetBitmapTexture(true);
 
-                if (texture != null)
-                    mat.SetBitmapTexture(texture);
+                if (texture is not null)
+                    mat.SetTexture(texture, TextureType.Diffuse);
 
                 renderMat = mat.RenderMaterial;
             }
@@ -160,7 +154,7 @@ public class DisplayGeometryParameter : GH_PersistentParam<GH_DisplayGeometry>, 
     public DisplayGeometryParameter() : base("Display Geometry", "DisGeo", "Display geometry.", "Extensions", "Parameters") { }
     public override GH_Exposure Exposure => GH_Exposure.primary;
     protected override Bitmap Icon => Util.GetIcon("EyeParam");
-    public override Guid ComponentGuid => new Guid("{9F90313D-5776-471C-9922-29D4F59A70C4}");
+    public override Guid ComponentGuid => new("{9F90313D-5776-471C-9922-29D4F59A70C4}");
 
     protected override GH_GetterResult Prompt_Singular(ref GH_DisplayGeometry value)
     {
@@ -190,7 +184,7 @@ public class DisplayGeometryParameter : GH_PersistentParam<GH_DisplayGeometry>, 
 
     public void BakeGeometry(RhinoDoc doc, ObjectAttributes att, List<Guid> obj_ids)
     {
-        foreach (IGH_BakeAwareData data in VolatileData.AllData(true))
+        foreach (var data in VolatileData.AllData(true).Cast<IGH_BakeAwareData>())
         {
             data.BakeGeometry(doc, att, out Guid id);
             obj_ids.Add(id);
@@ -203,7 +197,7 @@ public class ExtrusionAttributesParameter : GH_PersistentParam<GH_ExtrusionAttri
     public ExtrusionAttributesParameter() : base("Extrusion Attributes", "ExtrAtt", "Extrusion attributes.", "Extensions", "Parameters") { }
     public override GH_Exposure Exposure => GH_Exposure.primary;
     protected override Bitmap Icon => Util.GetIcon("LayersConfigParam");
-    public override Guid ComponentGuid => new Guid("{D63464DC-BBAB-4A88-923A-8D9381FB1D0B}");
+    public override Guid ComponentGuid => new("{D63464DC-BBAB-4A88-923A-8D9381FB1D0B}");
 
     protected override GH_GetterResult Prompt_Singular(ref GH_ExtrusionAttributes value)
     {
@@ -223,7 +217,7 @@ public class MillingAttributesParameter : GH_PersistentParam<GH_MillingAttribute
     public MillingAttributesParameter() : base("Milling Attributes", "MillAtt", "Milling attributes.", "Extensions", "Parameters") { }
     public override GH_Exposure Exposure => GH_Exposure.primary;
     protected override Bitmap Icon => Util.GetIcon("LayersConfigParam");
-    public override Guid ComponentGuid => new Guid("{21255B77-9E3D-43BD-8FE5-9A77D4A4D575}");
+    public override Guid ComponentGuid => new("{21255B77-9E3D-43BD-8FE5-9A77D4A4D575}");
     protected override GH_GetterResult Prompt_Singular(ref GH_MillingAttributes value)
     {
         value = new GH_MillingAttributes();

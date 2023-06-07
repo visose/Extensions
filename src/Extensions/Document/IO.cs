@@ -86,11 +86,9 @@ public static class IO
 
             RhinoApp.InvokeOnUiThread(new Action(() => StatusBar.HideProgressMeter()));
 
-            using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
-            {
-                Action text = () => Rhino.RhinoApp.WriteLine($"Web upload of file '{fileName}.html' complete, status: {response.StatusDescription}");
-                RhinoApp.InvokeOnUiThread(text);
-            }
+            using FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+            Action text = () => RhinoApp.WriteLine($"Web upload of file '{fileName}.html' complete, status: {response.StatusDescription}");
+            RhinoApp.InvokeOnUiThread(text);
         });
     }
 }

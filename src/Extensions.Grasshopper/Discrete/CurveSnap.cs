@@ -8,7 +8,7 @@ public class CurveSnap : GH_Component
 {
     public CurveSnap() : base("Curve Snap", "CrvSnap", "Snaps curves to discrete intervals and directions.", "Extensions", "Discrete") { }
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("Polyline");
-    public override Guid ComponentGuid => new Guid("{4F45F86C-6B7E-4327-9475-467CB82DAF13}");
+    public override Guid ComponentGuid => new("{4F45F86C-6B7E-4327-9475-467CB82DAF13}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {

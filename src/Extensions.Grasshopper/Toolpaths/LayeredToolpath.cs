@@ -7,7 +7,7 @@ public class LayeredToolpath : GH_Component
 {
     public LayeredToolpath() : base("Layered Toolpath", "LayeredToolpath", "Creates a layered extrusion toolpath.", "Extensions", "Toolpaths") { }
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("Layers");
-    public override Guid ComponentGuid => new Guid("{82C1EFE1-97C3-438C-84F4-C23F92574373}");
+    public override Guid ComponentGuid => new("{82C1EFE1-97C3-438C-84F4-C23F92574373}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
@@ -27,7 +27,7 @@ public class LayeredToolpath : GH_Component
 
     protected override void SolveInstance(IGH_DataAccess DA)
     {
-        Mesh mesh = new Mesh();
+        Mesh mesh = new();
         double diameter = 0, height = 0;
         Interval region = Interval.Unset;
 

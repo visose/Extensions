@@ -157,7 +157,7 @@ public class BucketSearchDense2d<T> where T : IPositionable
             for (int j = 0; j < _size.Y; j++)
             {
                 var bucket = _table[i][j];
-                if (bucket != null) bucket.Clear();
+                bucket?.Clear();
             }
 
         foreach (var element in elements)
@@ -252,7 +252,7 @@ public class BucketSearchDense3d<T> where T : IPositionable
                 for (int k = 0; k < _size.Z; k++)
                 {
                     var bucket = _table[i, j, k];
-                    if (bucket != null) bucket.Clear();
+                    bucket?.Clear();
                 }
 
         foreach (var element in elements)

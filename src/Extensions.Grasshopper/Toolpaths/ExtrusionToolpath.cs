@@ -10,7 +10,7 @@ public class CreateExternalExtrusionToolpath : GH_Component
     public CreateExternalExtrusionToolpath() : base("Extrusion Toolpath Ex", "ExtPath", "Extrusion toolpath with external axis.", "Extensions", "Toolpaths") { }
     public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("LayersAdd");
-    public override Guid ComponentGuid => new Guid("{08731061-8020-4204-8B69-198AC90BCE5E}");
+    public override Guid ComponentGuid => new("{08731061-8020-4204-8B69-198AC90BCE5E}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {

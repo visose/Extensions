@@ -10,12 +10,12 @@ public class CSVConverter
     public List<Target> Targets { get; } = new List<Target>();
     public List<Polyline> ToolPath { get; } = new List<Polyline>();
 
-    readonly string[] validParameters = { "type", "position", "normal", "xaxis", "speed", "zone" };
+    readonly string[] _validParameters = { "type", "position", "normal", "xaxis", "speed", "zone" };
 
     public CSVConverter(string file, CartesianTarget referenceTarget, string mask, bool reverse, double cutSpeed = 0, Point3d? point = null)
     {
         var splitMask = mask.Split(',').Select(p => p.Trim().ToLower());
-        if (!splitMask.All(p => validParameters.Contains(p))) throw new Exception(" Mask not valid.");
+        if (!splitMask.All(p => _validParameters.Contains(p))) throw new Exception(" Mask not valid.");
 
         var parameterIndex = splitMask.ToDictionary(p => p, p => -1);
 
@@ -47,7 +47,7 @@ public class CSVConverter
                 return n;
             }).ToArray();
 
-            Vector3d GetVector(int index) => new Vector3d(numbers[index], numbers[index + 1], numbers[index + 2]);
+            Vector3d GetVector(int index) => new(numbers[index], numbers[index + 1], numbers[index + 2]);
 
             var position = parameterIndex.TryGetValue("position", out int positionIndex) ? (Point3d)GetVector(positionIndex) : referenceTarget.Plane.Origin;
             var normal = parameterIndex.TryGetValue("normal", out int normalIndex) ? GetVector(normalIndex) : referenceTarget.Plane.Normal;

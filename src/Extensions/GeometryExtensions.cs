@@ -29,7 +29,6 @@ public static class GeometryExtensions
 
         for (int i = 0; i <= last; i++)
         {
-            Point3d p = pl[i];
             Point3d prev = i == 0 ? pl[last] : pl[i - 1];
             Point3d next = i == last ? pl[0] : pl[i + 1];
             Vector3d va = pl[i] - prev;
@@ -92,7 +91,7 @@ public static class GeometryExtensions
 
         for (int i = 0; i < count - 1; i++)
         {
-            Line seg = new Line(pl[i], pl[i + 1]);
+            Line seg = new(pl[i], pl[i + 1]);
             double d;
             double t;
 

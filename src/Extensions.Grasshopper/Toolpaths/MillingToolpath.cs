@@ -10,7 +10,7 @@ public class CreateMillingToolpath : GH_Component
     public CreateMillingToolpath() : base("Milling Toolpath", "MillPath", "Milling toolpath.", "Extensions", "Toolpaths") { }
     public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("LayersSubtract");
-    public override Guid ComponentGuid => new Guid("{49D4E0A2-DD27-4EA4-A887-5E9AF27ECF45}");
+    public override Guid ComponentGuid => new("{49D4E0A2-DD27-4EA4-A887-5E9AF27ECF45}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {

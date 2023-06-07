@@ -14,7 +14,7 @@ static class Region
         var region = polyline.ToRegion();
         var offset = new ClipperOffset();
         offset.AddPath(region, JoinType.jtRound, EndType.etClosedPolygon);
-        PolyTree tree = new PolyTree();
+        PolyTree tree = new();
 
         offset.Execute(ref tree, distance / Tol);
 
@@ -25,11 +25,11 @@ static class Region
 
     public static Polyline[] Intersection(IEnumerable<Polyline> a, IEnumerable<Polyline> b)
     {
-        Clipper clipper = new Clipper(Clipper.ioStrictlySimple);
+        Clipper clipper = new(Clipper.ioStrictlySimple);
         clipper.AddPaths(a.ToRegions(), PolyType.ptClip, true);
         clipper.AddPaths(b.ToRegions(), PolyType.ptSubject, true);
 
-        PolyTree tree = new PolyTree();
+        PolyTree tree = new();
         clipper.Execute(ClipType.ctIntersection, tree);
 
         double height = b.First()[0].Z;

@@ -4,7 +4,7 @@ namespace Extensions.Spatial;
 
 public class Octree<T> where T : IPositionable
 {
-    static readonly int capacity = 4;
+    static readonly int _capacity = 4;
     Box _box;
     readonly List<T> _elements;
     List<Octree<T>> _children;
@@ -35,7 +35,7 @@ public class Octree<T> where T : IPositionable
         if (!_box.Contains(element.Position))
             return false;
 
-        if (_elements.Count < capacity)
+        if (_elements.Count < _capacity)
         {
             _elements.Add(element);
             return true;
@@ -88,7 +88,7 @@ public class Octree<T> where T : IPositionable
 
     bool BoxSphereIntersection(Box box, Point3d center, double squareRadius)
     {
-        Point3d corner = new Point3d(box.X.T0, box.Y.T0, box.Z.T0);
+        Point3d corner = new(box.X.T0, box.Y.T0, box.Z.T0);
         double dmin = 0;
         double xLength = box.X.Length;
         double yLength = box.Y.Length;

@@ -16,13 +16,11 @@ class Vertex
     private Vertex _prev;
     private Vertex _post;
     private Vector3d _prevVector;
-    private Vector3d _postVector;
     private readonly List<Vertex> _vertices;
     private readonly SpatialAttributes _att;
     private bool _isSegmentSupported;
     private bool _isNodeSupported;
     private bool _isDown;
-    private Command _lastExtrusion;
 
     public Vertex(int index, Point3d point, List<Vertex> vertices, SpatialAttributes att)
     {
@@ -60,7 +58,6 @@ class Vertex
         if (_index < _vertices.Count - 1)
         {
             _post = _vertices[_index + 1];
-            _postVector = _post._point - _point;
         }
     }
 
@@ -109,7 +106,7 @@ class Vertex
         {
             Point3d closest = polyline.ClosestPoint(point);
             Vector3d vector = point - closest;
-            Vector3d horizontal = new Vector3d(vector.X, vector.Y, 0);
+            Vector3d horizontal = new(vector.X, vector.Y, 0);
             bool isSupported = (horizontal.Length < _att.Diameter * 0.5) && vector.Z >= 0 && vector.Z < _att.Diameter * 1.1;
             if (isSupported) return true;
         }
@@ -234,7 +231,6 @@ class Vertex
             targets.Add(approachTarget);
         }
 
-        _lastExtrusion = extrusion;
         return targets;
     }
 }

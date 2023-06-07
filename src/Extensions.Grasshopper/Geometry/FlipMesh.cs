@@ -8,7 +8,7 @@ public class FlipMesh : GH_Component
 {
     public FlipMesh() : base("Flip mesh", "MeshFlip", "Flips the direction of a mesh.", "Extensions", "Geometry") { }
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("Undo");
-    public override Guid ComponentGuid => new Guid("{65433478-f2d7-4cd0-808f-b1d1834270c3}");
+    public override Guid ComponentGuid => new("{65433478-f2d7-4cd0-808f-b1d1834270c3}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
@@ -22,7 +22,7 @@ public class FlipMesh : GH_Component
 
     protected override void SolveInstance(IGH_DataAccess DA)
     {
-        Mesh mesh = new Mesh();
+        Mesh mesh = new();
         DA.GetData(0, ref mesh);
 
         Mesh outMesh = mesh.DuplicateMesh();

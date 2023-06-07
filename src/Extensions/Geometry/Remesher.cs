@@ -14,7 +14,7 @@ public static class Remesh
             var vertex = mesh.Vertices[i];
             var normal = mesh.Normals[i];
 
-            NewVertexInfo ni = new NewVertexInfo()
+            NewVertexInfo ni = new()
             {
                 v = new g3.Vector3d(vertex.X, vertex.Z, vertex.Y),
                 n = new g3.Vector3f(normal.X, normal.Z, normal.Y)
@@ -56,18 +56,18 @@ public static class Remesh
         AxisAlignedBox3d bounds = mesh.CachedBounds;
 
         // construct mesh projection target
-        DMesh3 meshCopy = new DMesh3(mesh);
+        DMesh3 meshCopy = new(mesh);
         meshCopy.CheckValidity();
-        DMeshAABBTree3 tree = new DMeshAABBTree3(meshCopy);
+        DMeshAABBTree3 tree = new(meshCopy);
         tree.Build();
-        MeshProjectionTarget target = new MeshProjectionTarget()
+        MeshProjectionTarget target = new()
         {
             Mesh = meshCopy,
             Spatial = tree
         };
 
         // construct constraint set
-        MeshConstraints cons = new MeshConstraints();
+        MeshConstraints cons = new();
 
         //EdgeRefineFlags useFlags = EdgeRefineFlags.NoFlip | EdgeRefineFlags.NoCollapse;
         EdgeRefineFlags useFlags = EdgeRefineFlags.NoFlip;
@@ -86,7 +86,7 @@ public static class Remesh
             }
         }
 
-        Remesher r = new Remesher(mesh);
+        Remesher r = new(mesh);
         r.Precompute();
         r.SetExternalConstraints(cons);
         r.SetProjectionTarget(target);

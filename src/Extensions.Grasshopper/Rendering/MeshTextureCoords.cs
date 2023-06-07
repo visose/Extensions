@@ -8,7 +8,7 @@ public class MeshTextureCoords : GH_Component
 {
     public MeshTextureCoords() : base("Texture Coordinates", "TexCoords", "Sets mesh texture coordinates.", "Extensions", "Rendering") { }
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("EyeDropper");
-    public override Guid ComponentGuid => new Guid("{297d173d-4eac-4a93-947c-fa8216e73cfa}");
+    public override Guid ComponentGuid => new("{297d173d-4eac-4a93-947c-fa8216e73cfa}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
@@ -23,8 +23,8 @@ public class MeshTextureCoords : GH_Component
 
     protected override void SolveInstance(IGH_DataAccess DA)
     {
-        Mesh mesh = new Mesh();
-        var coords = new List<Point3d>();
+        Mesh mesh = new();
+        List<Point3d> coords = new();
         DA.GetData(0, ref mesh);
         DA.GetDataList(1, coords);
 

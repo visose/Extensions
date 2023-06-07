@@ -5,8 +5,6 @@ namespace Extensions.StraightSkeleton;
 
 public static class StraightSkeleton
 {
-    const double Tol = 0.001;
-
     public static IEnumerable<Polyline> GetStraightSkeleton(Polyline polyline)
     {
         if (!polyline.IsClosed)
@@ -21,8 +19,8 @@ public static class StraightSkeleton
             {
                 var region = new Polyline(e.Polygon.Select(v => v.ToPoint3d()));
                 region.Add(region[0]);
-                    //  region.AddRange(shape);
-                    return region;
+                //  region.AddRange(shape);
+                return region;
             }
         );
     }
@@ -106,7 +104,7 @@ public static class StraightSkeleton
             .Select(e => e.Line.ToNurbsCurve());
 
         var curve = Curve.JoinCurves(axes);
-        Polyline pl = new Polyline();
+        Polyline pl = new();
 
         if (curve.Length > 0)
         {

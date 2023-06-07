@@ -11,8 +11,9 @@ public class OrientToolpath
     public OrientToolpath(IToolpath toolpath, Mesh guide, Vector3d alignment, Mesh surface = null)
     {
         Toolpath = toolpath.ShallowClone();
-        var targets = Toolpath.Targets as IList<Target>;
-        if (targets == null) throw new ArgumentException(" Targets of toolpath should be a list.");
+
+        if (Toolpath.Targets is not IList<Target> targets)
+            throw new ArgumentException(" Targets of toolpath should be a list.");
 
         for (int i = 0; i < targets.Count; i++)
         {

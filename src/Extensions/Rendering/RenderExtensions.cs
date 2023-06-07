@@ -8,7 +8,9 @@ public static class RenderExtensions
     public static Mesh BitmapFromVertexColors(Mesh mesh, string file)
     {
         var path = Path.GetDirectoryName(file);
-        if (!Directory.Exists(path)) throw new DirectoryNotFoundException($" Directory \"{path}\" not found.");
+
+        if (!Directory.Exists(path))
+            throw new DirectoryNotFoundException($" Directory \"{path}\" not found.");
 
         mesh.Unweld(0, false);
         mesh.TextureCoordinates.Clear();
@@ -19,7 +21,7 @@ public static class RenderExtensions
         int size = (int)Math.Ceiling(Math.Sqrt(mesh.Faces.Count));
         float fSize = (float)size * 2;
 
-        Bitmap bitmap = new Bitmap(size * 2, size * 2);
+        Bitmap bitmap = new(size * 2, size * 2);
 
         for (int i = 0; i < mesh.Faces.Count; i++)
         {
@@ -66,7 +68,7 @@ public static class RenderExtensions
         int size = (int)Math.Ceiling(Math.Sqrt(count));
         float fSize = (float)size * 2;
 
-        Bitmap bitmap = new Bitmap(size * 2, size * 2);
+        Bitmap bitmap = new(size * 2, size * 2);
 
         int i = 0;
         foreach (var mesh in meshes)
@@ -76,7 +78,7 @@ public static class RenderExtensions
             float fx = (float)x;
             float fy = (float)y;
 
-            Point2f coord = new Point2f((fx + 0.5) / fSize, (fy + 0.5) / fSize);
+            Point2f coord = new((fx + 0.5) / fSize, (fy + 0.5) / fSize);
 
             mesh.TextureCoordinates.Clear();
             for (int j = 0; j < mesh.Vertices.Count; j++)

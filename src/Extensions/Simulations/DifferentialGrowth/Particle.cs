@@ -10,12 +10,12 @@ public class Particle : IPositionable, IEquatable<Particle>
 {
     Point3d _p;
     Vector3d _v;
-    public Force Delta = new Force(Vector3d.Zero, 0);
-    public List<Force> deltas = new List<Force>();
+    public Force Delta = new(Vector3d.Zero, 0);
+    public List<Force> deltas = new();
     public Particle[] Neighbours = new Particle[2];
     readonly DifferentialGrowth _simulation;
 
-    public Stopwatch Watch = new Stopwatch();
+    public Stopwatch Watch = new();
 
 
     //public Point3d Position
@@ -76,21 +76,19 @@ public class Particle : IPositionable, IEquatable<Particle>
         Delta.Add(vector * weight, weight);
     }
 
-    void PushBoundary(double weight)
-    {
-        var closest = _simulation.Boundary.ClosestPoint(_p);
-        Vector3d vector = closest - _p;
-        double distance = vector.Length;
-        if (distance < _simulation.Radius * 2)
-        {
-            vector *= ((distance - _simulation.Radius) / distance) * 0.5;
-            Delta.Add(vector * weight, weight);
-        }
-    }
-
+    //void PushBoundary(double weight)
+    //{
+    //    var closest = _simulation.Boundary.ClosestPoint(_p);
+    //    Vector3d vector = closest - _p;
+    //    double distance = vector.Length;
+    //    if (distance < _simulation.Radius * 2)
+    //    {
+    //        vector *= ((distance - _simulation.Radius) / distance) * 0.5;
+    //        Delta.Add(vector * weight, weight);
+    //    }
+    //}
 
     // Code lifted from https://github.com/Dan-Piker/K2Goals/blob/master/Angle.cs
-
     void KeepAngle(double weight)
     {
         /// <param name="RA">Rest Angle.</param>
@@ -105,10 +103,10 @@ public class Particle : IPositionable, IEquatable<Particle>
 
         double restAngle = 0;
 
-        Point3d P0 = this.Neighbours[0]._p;
+        Point3d P0 = Neighbours[0]._p;
         Point3d P1 = _p;
         Point3d P2 = _p;
-        Point3d P3 = this.Neighbours[1]._p;
+        Point3d P3 = Neighbours[1]._p;
 
         Vector3d V01 = P1 - P0;
         Vector3d V23 = P3 - P2;
@@ -127,10 +125,10 @@ public class Particle : IPositionable, IEquatable<Particle>
         ShearA *= Sa;
         ShearB *= Sb;
 
-        this.Neighbours[0].Delta.Add(ShearA * weight, weight);
-        this.Delta.Add(-ShearA * weight, weight);
-        this.Delta.Add(ShearB * weight, weight);
-        this.Neighbours[1].Delta.Add(-ShearB * weight, weight);
+        Neighbours[0].Delta.Add(ShearA * weight, weight);
+        Delta.Add(-ShearA * weight, weight);
+        Delta.Add(ShearB * weight, weight);
+        Neighbours[1].Delta.Add(-ShearB * weight, weight);
     }
 
     void Pull(double weight)
@@ -141,7 +139,7 @@ public class Particle : IPositionable, IEquatable<Particle>
         {
             var closest = _simulation.Polyline.ClosestPoint(_p);
             Vector3d vector = closest - _p;
-            this.Delta.Add(vector * weight, weight);
+            Delta.Add(vector * weight, weight);
         }
     }
 

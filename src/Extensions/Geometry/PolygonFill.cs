@@ -38,8 +38,8 @@ static class PolygonFill
         {
             for (int i = range.Item1; i < range.Item2; i++)
             {
-                    // var skinOffset = Region.Offset(contours[i], offset);
-                    var skinOffset = contours[i];
+                // var skinOffset = Region.Offset(contours[i], offset);
+                var skinOffset = contours[i];
                 if (!skinOffset.IsValid)
                 {
                     layers[i] = new Polyline[0];
@@ -47,8 +47,8 @@ static class PolygonFill
                 }
 
                 var squares = rectangles.SelectMany(r => Region.Intersection(Enumerable.Repeat(r, 1), Enumerable.Repeat(skinOffset, 1))).ToArray();
-                    //layers[i] = squares.Select(s => Region.Offset(s, offset)).Append(contours[i]).Where(p => p.IsValid).ToArray();
-                    layers[i] = squares;
+                //layers[i] = squares.Select(s => Region.Offset(s, offset)).Append(contours[i]).Where(p => p.IsValid).ToArray();
+                layers[i] = squares;
             }
         });
 

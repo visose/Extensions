@@ -8,8 +8,8 @@ namespace Extensions.Simulations.DifferentialGrowth;
 
 public class DifferentialGrowth
 {
-    internal List<Particle> Particles = new List<Particle>();
-    internal List<Spring> Springs = new List<Spring>();
+    internal List<Particle> Particles = new();
+    internal List<Spring> Springs = new();
     internal BucketSearchDense3d<Particle> Search;
     internal double Radius;
 
@@ -17,7 +17,7 @@ public class DifferentialGrowth
     public List<IntPoint> Region;
     public Mesh Mesh;
     public Polyline Polyline;
-    public List<List<Polyline>> AllPolylines = new List<List<Polyline>>();
+    public List<List<Polyline>> AllPolylines = new();
     public Polyline Boundary;
     readonly int _convergence;
 
@@ -166,11 +166,11 @@ public class DifferentialGrowth
     public List<Polyline> GetPolylines()
     {
         var polylines = new List<Polyline>();
-        Polyline pl = new Polyline
-            {
-                Springs[0].Start.Position,
-                Springs[0].End.Position
-            };
+        Polyline pl = new()
+        {
+            Springs[0].Start.Position,
+            Springs[0].End.Position
+        };
 
         for (int i = 1; i < Springs.Count; i++)
         {

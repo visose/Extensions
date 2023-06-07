@@ -39,12 +39,12 @@ public struct Vector3i : IEquatable<Vector3i>
         return !(a == b);
     }
 
-    public bool Equals(Vector3i other)
+    public readonly bool Equals(Vector3i other)
     {
         return this == other;
     }
 
-    public override bool Equals(object obj)
+    public override readonly bool Equals(object obj)
     {
         return this == (Vector3i)obj;
     }
@@ -93,12 +93,12 @@ public struct Vector2i : IEquatable<Vector2i>
         return !(a == b);
     }
 
-    public bool Equals(Vector2i other)
+    public readonly bool Equals(Vector2i other)
     {
         return this == other;
     }
 
-    public override bool Equals(object obj)
+    public override readonly bool Equals(object obj)
     {
         return this == (Vector2i)obj;
     }

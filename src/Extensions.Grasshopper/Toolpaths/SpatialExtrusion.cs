@@ -11,7 +11,7 @@ public class CreateSpatialExtrusion : GH_Component
     public CreateSpatialExtrusion() : base("Spatial Extrusion", "Spatial", "Create a spatial extrusion toolpath given a polyline. Requires the Robots plugin.", "Extensions", "Toolpaths") { }
     public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
     protected override System.Drawing.Bitmap Icon => Util.GetIcon("Spatial");
-    public override Guid ComponentGuid => new Guid("{79EE65B3-CB2F-4704-8B01-C7C9F379B7C4}");
+    public override Guid ComponentGuid => new("{79EE65B3-CB2F-4704-8B01-C7C9F379B7C4}");
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
@@ -55,7 +55,9 @@ public class CreateSpatialExtrusion : GH_Component
 
         GH_Target target = null;
         if (!DA.GetData(2, ref target)) return;
-        if (!(target.Value is CartesianTarget)) throw new Exception(" Target must be a cartesian target.");
+
+        if (target.Value is not CartesianTarget)
+            throw new Exception(" Target must be a cartesian target.");
 
         var speeds = new List<double>();
         if (!DA.GetDataList(3, speeds)) return;

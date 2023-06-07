@@ -2,7 +2,7 @@
 
 namespace Extensions;
 
-static class g3Util
+static class G3Util
 {
     public static Point3d ToRhinoPoint(this g3.Vector3d v)
     {

@@ -4,11 +4,11 @@ namespace Extensions;
 
 public static class SimplexNoise
 {
-    static readonly int[][] grad3 = new int[][]{new int[]{1,1,0},new int[]{-1,1,0},new int[]{1,-1,0},new int[]{-1,-1,0},
+    static readonly int[][] _grad3 = new int[][]{new int[]{1,1,0},new int[]{-1,1,0},new int[]{1,-1,0},new int[]{-1,-1,0},
       new int[]{1,0,1},new int[]{-1,0,1},new int[]{1,0,-1},new int[]{-1,0,-1},
       new int[]{0,1,1},new int[]{0,-1,1},new int[]{0,1,-1},new int[]{0,-1,-1}};
 
-    static readonly int[] p = new int[]{151,160,137,91,90,15,
+    static readonly int[] _p = new int[]{151,160,137,91,90,15,
       131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
       190, 6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
       88,237,149,56,87,174,20,125,136,171,168, 68,175,74,165,71,134,139,48,27,166,
@@ -22,30 +22,24 @@ public static class SimplexNoise
       49,192,214, 31,181,199,106,157,184, 84,204,176,115,121,50,45,127, 4,150,254,
       138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180};
     // To remove the need for index wrapping, double the permutation table length
-    static readonly int[] perm = Perm();
+    static readonly int[] _perm = Perm();
 
     static int[] Perm()
     {
         int[] perm = new int[512];
-        for (int i = 0; i < 512; i++) perm[i] = p[i & 255];
+        for (int i = 0; i < 512; i++) perm[i] = _p[i & 255];
         return perm;
     }
+
     // This method is a *lot* faster than using (int)Math.floor(x)
     static int FastFloor(double x)
     {
         return x > 0 ? (int)x : (int)x - 1;
     }
-    static double dot(int[] g, double x, double y)
-    {
-        return g[0] * x + g[1] * y;
-    }
-    static double dot(int[] g, double x, double y, double z)
+
+    static double Dot(int[] g, double x, double y, double z)
     {
         return g[0] * x + g[1] * y + g[2] * z;
-    }
-    static double dot(int[] g, double x, double y, double z, double w)
-    {
-        return g[0] * x + g[1] * y + g[2] * z + g[3] * w;
     }
 
     // 3D simplex noise
@@ -105,38 +99,38 @@ public static class SimplexNoise
         int ii = i & 255;
         int jj = j & 255;
         int kk = k & 255;
-        int gi0 = perm[ii + perm[jj + perm[kk]]] % 12;
-        int gi1 = perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]] % 12;
-        int gi2 = perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]] % 12;
-        int gi3 = perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]] % 12;
+        int gi0 = _perm[ii + _perm[jj + _perm[kk]]] % 12;
+        int gi1 = _perm[ii + i1 + _perm[jj + j1 + _perm[kk + k1]]] % 12;
+        int gi2 = _perm[ii + i2 + _perm[jj + j2 + _perm[kk + k2]]] % 12;
+        int gi3 = _perm[ii + 1 + _perm[jj + 1 + _perm[kk + 1]]] % 12;
         // Calculate the contribution from the four corners
         double t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;
         if (t0 < 0) n0 = 0.0;
         else
         {
             t0 *= t0;
-            n0 = t0 * t0 * dot(grad3[gi0], x0, y0, z0);
+            n0 = t0 * t0 * Dot(_grad3[gi0], x0, y0, z0);
         }
         double t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1;
         if (t1 < 0) n1 = 0.0;
         else
         {
             t1 *= t1;
-            n1 = t1 * t1 * dot(grad3[gi1], x1, y1, z1);
+            n1 = t1 * t1 * Dot(_grad3[gi1], x1, y1, z1);
         }
         double t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2;
         if (t2 < 0) n2 = 0.0;
         else
         {
             t2 *= t2;
-            n2 = t2 * t2 * dot(grad3[gi2], x2, y2, z2);
+            n2 = t2 * t2 * Dot(_grad3[gi2], x2, y2, z2);
         }
         double t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;
         if (t3 < 0) n3 = 0.0;
         else
         {
             t3 *= t3;
-            n3 = t3 * t3 * dot(grad3[gi3], x3, y3, z3);
+            n3 = t3 * t3 * Dot(_grad3[gi3], x3, y3, z3);
         }
         // Add contributions from each corner to get the final noise value.
         // The result is scaled to stay just inside [-1,1]
