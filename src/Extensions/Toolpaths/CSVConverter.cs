@@ -7,10 +7,10 @@ namespace Extensions.Toolpaths;
 
 public class CSVConverter
 {
-    public List<Target> Targets { get; } = new List<Target>();
-    public List<Polyline> ToolPath { get; } = new List<Polyline>();
+    public List<Target> Targets { get; } = [];
+    public List<Polyline> ToolPath { get; } = [];
 
-    readonly string[] _validParameters = { "type", "position", "normal", "xaxis", "speed", "zone" };
+    readonly string[] _validParameters = ["type", "position", "normal", "xaxis", "speed", "zone"];
 
     public CSVConverter(string file, CartesianTarget referenceTarget, string mask, bool reverse, double cutSpeed = 0, Point3d? point = null)
     {
@@ -110,7 +110,7 @@ public class CSVConverter
                 {
                     if (polyline == null)
                     {
-                        polyline = new Polyline();
+                        polyline = [];
                         ToolPath.Add(polyline);
                     }
 

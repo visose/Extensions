@@ -9,7 +9,7 @@ static class PolygonFill
     public static Polyline[][] Square(Polyline[] contours, double size, double offset)
     {
         if (contours.Length == 0)
-            return new Polyline[0][];
+            return [];
 
         var box = new BoundingBox(contours.SelectMany(p => p));
         box.Inflate(offset);
@@ -42,7 +42,7 @@ static class PolygonFill
                 var skinOffset = contours[i];
                 if (!skinOffset.IsValid)
                 {
-                    layers[i] = new Polyline[0];
+                    layers[i] = [];
                     continue;
                 }
 

@@ -164,7 +164,7 @@ public class DisplayGeometryParameter : GH_PersistentParam<GH_DisplayGeometry>, 
 
     protected override GH_GetterResult Prompt_Plural(ref List<GH_DisplayGeometry> values)
     {
-        values = new List<GH_DisplayGeometry>();
+        values = [];
         return GH_GetterResult.success;
     }
 
@@ -207,7 +207,7 @@ public class ExtrusionAttributesParameter : GH_PersistentParam<GH_ExtrusionAttri
 
     protected override GH_GetterResult Prompt_Plural(ref List<GH_ExtrusionAttributes> values)
     {
-        values = new List<GH_ExtrusionAttributes>();
+        values = [];
         return GH_GetterResult.success;
     }
 }
@@ -226,7 +226,7 @@ public class MillingAttributesParameter : GH_PersistentParam<GH_MillingAttribute
 
     protected override GH_GetterResult Prompt_Plural(ref List<GH_MillingAttributes> values)
     {
-        values = new List<GH_MillingAttributes>();
+        values = [];
         return GH_GetterResult.success;
     }
 }

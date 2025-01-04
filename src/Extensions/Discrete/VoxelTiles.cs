@@ -1,4 +1,4 @@
-﻿using Extensions.Spatial;
+using Extensions.Spatial;
 using MoreLinq;
 using Rhino.Geometry;
 using Rhino.Geometry.Intersect;
@@ -234,7 +234,7 @@ public class VoxelTiles
             }
         }
 
-        var xSnap = snaps.MinBy(s => s.distance).First();
+        var xSnap = snaps.Minima(s => s.distance).First();
 
         var subVectors = snapVectors[xSnap.snapType]
                             .Where(v => Abs(Vector3d.VectorAngle(xSnap.vector, v) - HalfPI) < HalfPI * 0.25);

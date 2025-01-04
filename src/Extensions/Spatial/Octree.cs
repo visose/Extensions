@@ -2,23 +2,17 @@
 
 namespace Extensions.Spatial;
 
-public class Octree<T> where T : IPositionable
+public class Octree<T>(Box box) where T : IPositionable
 {
     static readonly int _capacity = 4;
-    Box _box;
-    readonly List<T> _elements;
+    Box _box = box;
+    readonly List<T> _elements = [];
     List<Octree<T>> _children;
-
-    public Octree(Box box)
-    {
-        _elements = new List<T>();
-        _box = box;
-    }
 
     void Subdivide()
     {
-        _children = new List<Octree<T>>(8)
-            {
+        _children =
+            [
                 new Octree<T>(new Box(_box.Plane, new Interval(_box.X.T0, (_box.X.T0 + _box.X.T1) / 2), new Interval(_box.Y.T0, (_box.Y.T0 + _box.Y.T1) / 2), new Interval(_box.Z.T0, (_box.Z.T0 + _box.Z.T1) / 2))),
                 new Octree<T>(new Box(_box.Plane, new Interval(_box.X.T0, (_box.X.T0 + _box.X.T1) / 2), new Interval(_box.Y.T0, (_box.Y.T0 + _box.Y.T1) / 2), new Interval((_box.Z.T0 + _box.Z.T1) / 2, _box.Z.T1))),
                 new Octree<T>(new Box(_box.Plane, new Interval((_box.X.T0 + _box.X.T1) / 2, _box.X.T1), new Interval(_box.Y.T0, (_box.Y.T0 + _box.Y.T1) / 2), new Interval((_box.Z.T0 + _box.Z.T1) / 2, _box.Z.T1))),
@@ -27,7 +21,7 @@ public class Octree<T> where T : IPositionable
                 new Octree<T>(new Box(_box.Plane, new Interval(_box.X.T0, (_box.X.T0 + _box.X.T1) / 2), new Interval((_box.Y.T0 + _box.Y.T1) / 2, _box.Y.T1), new Interval((_box.Z.T0 + _box.Z.T1) / 2, _box.Z.T1))),
                 new Octree<T>(new Box(_box.Plane, new Interval((_box.X.T0 + _box.X.T1) / 2, _box.X.T1), new Interval((_box.Y.T0 + _box.Y.T1) / 2, _box.Y.T1), new Interval((_box.Z.T0 + _box.Z.T1) / 2, _box.Z.T1))),
                 new Octree<T>(new Box(_box.Plane, new Interval((_box.X.T0 + _box.X.T1) / 2, _box.X.T1), new Interval((_box.Y.T0 + _box.Y.T1) / 2, _box.Y.T1), new Interval(_box.Z.T0, (_box.Z.T0 + _box.Z.T1) / 2)))
-            };
+            ];
     }
 
     public bool Insert(T element)

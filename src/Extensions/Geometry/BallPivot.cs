@@ -1,4 +1,4 @@
-﻿using Rhino.Geometry;
+using Rhino.Geometry;
 using Extensions.Spatial;
 using MoreLinq;
 
@@ -25,7 +25,7 @@ internal class BallPivot
     BallPivot(IEnumerable<Polyline> contour, double radius)
     {
         contour = contour
-            .MaxBy(p => p.Length)
+            .Maxima(p => p.Length)
             .Select(FixDirection);
 
         var polylines = DivideCurves(contour, radius).ToArray();
@@ -33,7 +33,7 @@ internal class BallPivot
 
         if (!points.Any())
         {
-            Polyline = new Polyline();
+            Polyline = [];
             return;
         }
 
@@ -83,10 +83,10 @@ internal class BallPivot
     Polyline Pivot()
     {
         Point first = null;
-        Point second = _points.MinBy(p => p.Position.DistanceToSquared(_box.Max)).First();
+        Point second = _points.Minima(p => p.Position.DistanceToSquared(_box.Max)).First();
         _start = second.Index;
 
-        Polyline pl = new() { second.Position };
+        Polyline pl = [second.Position];
 
         while (true)
         {
@@ -118,7 +118,7 @@ internal class BallPivot
         Vector3d vector = a == null ? b.Normal : a.Position - b.Position;
 
         var next = closests
-            .MinBy(p => Vector3d.VectorAngle(vector, p.Position - b.Position, -Vector3d.ZAxis))
+            .Minima(p => Vector3d.VectorAngle(vector, p.Position - b.Position, -Vector3d.ZAxis))
             .First();
 
         return next;

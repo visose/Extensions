@@ -1,4 +1,4 @@
-﻿using Rhino.Geometry;
+using Rhino.Geometry;
 using MoreLinq;
 using static Extensions.Util;
 using ClipperLib;
@@ -9,7 +9,7 @@ static class Region
 {
     public static Polyline Offset(Polyline polyline, double distance)
     {
-        if (polyline.Count < 2) return new Polyline();
+        if (polyline.Count < 2) return [];
 
         var region = polyline.ToRegion();
         var offset = new ClipperOffset();
@@ -19,7 +19,7 @@ static class Region
         offset.Execute(ref tree, distance / Tol);
 
         var height = polyline[0].Z;
-        var first = tree.ToPolylines(height).MaxBy(p => p.Length).FirstOrDefault();
+        var first = tree.ToPolylines(height).Maxima(p => p.Length).FirstOrDefault();
         return first ?? new Polyline(0);
     }
 

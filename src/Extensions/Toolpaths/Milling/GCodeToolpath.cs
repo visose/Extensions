@@ -23,14 +23,14 @@ public class GCodeToolpath : SimpleToolpath
 
 public class FiveAxisToRobots
 {
-    public List<Target> Targets { get; set; } = new List<Target>();
+    public List<Target> Targets { get; set; } = [];
 
-    readonly List<string> _ignored = new();
-    readonly List<int> _rapidStarts = new() { 0 };
+    readonly List<string> _ignored = [];
+    readonly List<int> _rapidStarts = [0];
     Tool _tool;
     readonly Frame _mcs;
     readonly Dictionary<(GCodeLine.LType letter, int number), Action<GCodeLine>> _gCodeMap;
-    readonly Dictionary<double, Speed> _speeds = new();
+    readonly Dictionary<double, Speed> _speeds = [];
     readonly CartesianTarget _refTarget;
     Vector3d _alignment;
     int _lastRapid = 0;

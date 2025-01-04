@@ -1,4 +1,4 @@
-﻿using SkeletonNet;
+using SkeletonNet;
 using Rhino.Geometry;
 
 namespace Extensions.StraightSkeleton;
@@ -104,7 +104,7 @@ public static class StraightSkeleton
             .Select(e => e.Line.ToNurbsCurve());
 
         var curve = Curve.JoinCurves(axes);
-        Polyline pl = new();
+        Polyline pl = [];
 
         if (curve.Length > 0)
         {
@@ -125,7 +125,7 @@ public static class StraightSkeleton
                 }
             }
 
-            pl = new Polyline(new Point3d[] { maxLine.From, maxLine.To });
+            pl = new Polyline([maxLine.From, maxLine.To]);
         }
 
         return pl;

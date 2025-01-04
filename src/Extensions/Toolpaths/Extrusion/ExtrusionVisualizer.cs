@@ -86,7 +86,7 @@ public class ExtrusionVisualizer
 
     void CreateContours(int ex, bool reverse)
     {
-        _contours = new List<Contour>();
+        _contours = [];
         Contour contour = null;
 
         for (int i = 0; i < Program.Targets.Count; i++)
@@ -153,7 +153,7 @@ public class ExtrusionVisualizer
     class Contour
     {
         public Interval Time;
-        public List<Plane> Planes { get; set; } = new List<Plane>();
+        public List<Plane> Planes { get; set; } = [];
         public Mesh Mesh { get; set; }
     }
 }

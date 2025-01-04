@@ -47,8 +47,8 @@ public class DifferentialGrowth : GH_Component
         }
         else
         {
-            mesh = region is Mesh 
-                ? region as Mesh 
+            mesh = region is Mesh
+                ? region as Mesh
                 : throw new Exception(" Region should be polyline or mesh.");
         }
 

@@ -1,4 +1,4 @@
-﻿using Rhino.Geometry;
+using Rhino.Geometry;
 using Extensions.Spatial;
 using ClipperLib;
 using static Extensions.Util;
@@ -8,8 +8,8 @@ namespace Extensions.Simulations.DifferentialGrowth;
 
 public class DifferentialGrowth
 {
-    internal List<Particle> Particles = new();
-    internal List<Spring> Springs = new();
+    internal List<Particle> Particles = [];
+    internal List<Spring> Springs = [];
     internal BucketSearchDense3d<Particle> Search;
     internal double Radius;
 
@@ -17,7 +17,7 @@ public class DifferentialGrowth
     public List<IntPoint> Region;
     public Mesh Mesh;
     public Polyline Polyline;
-    public List<List<Polyline>> AllPolylines = new();
+    public List<List<Polyline>> AllPolylines = [];
     public Polyline Boundary;
     readonly int _convergence;
 
@@ -166,22 +166,22 @@ public class DifferentialGrowth
     public List<Polyline> GetPolylines()
     {
         var polylines = new List<Polyline>();
-        Polyline pl = new()
-        {
+        Polyline pl =
+        [
             Springs[0].Start.Position,
             Springs[0].End.Position
-        };
+        ];
 
         for (int i = 1; i < Springs.Count; i++)
         {
             if (Springs[i - 1].End != Springs[i].Start)
             {
                 polylines.Add(pl);
-                pl = new Polyline
-                    {
+                pl =
+                    [
                         Springs[i].Start.Position,
                         Springs[i].End.Position
-                    };
+                    ];
             }
             else
             {

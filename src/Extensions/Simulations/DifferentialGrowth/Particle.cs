@@ -11,7 +11,7 @@ public class Particle : IPositionable, IEquatable<Particle>
     Point3d _p;
     Vector3d _v;
     public Force Delta = new(Vector3d.Zero, 0);
-    public List<Force> deltas = new();
+    public List<Force> deltas = [];
     public Particle[] Neighbours = new Particle[2];
     readonly DifferentialGrowth _simulation;
 

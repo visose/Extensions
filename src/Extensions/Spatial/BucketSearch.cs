@@ -2,18 +2,11 @@ using Rhino.Geometry;
 
 namespace Extensions.Spatial;
 
-public class BucketSearchSparse2d<T> where T : IPositionable
+public class BucketSearchSparse2d<T>(double distance) where T : IPositionable
 {
-    readonly Dictionary<Vector2i, List<T>> _table;
-    readonly double _distanceSquared;
-    readonly double _factor;
-
-    public BucketSearchSparse2d(double distance)
-    {
-        _table = new Dictionary<Vector2i, List<T>>();
-        _distanceSquared = distance * distance;
-        _factor = 1.0 / distance;
-    }
+    readonly Dictionary<Vector2i, List<T>> _table = [];
+    readonly double _distanceSquared = distance * distance;
+    readonly double _factor = 1.0 / distance;
 
     public void Populate(IEnumerable<T> elements)
     {
@@ -25,7 +18,7 @@ public class BucketSearchSparse2d<T> where T : IPositionable
 
             if (!_table.TryGetValue(key, out List<T> bucket))
             {
-                bucket = new List<T>();
+                bucket = [];
                 _table.Add(key, bucket);
             }
 
@@ -65,18 +58,11 @@ public class BucketSearchSparse2d<T> where T : IPositionable
     }
 }
 
-public class BucketSearchSparse3d<T> where T : IPositionable
+public class BucketSearchSparse3d<T>(double distance) where T : IPositionable
 {
-    readonly Dictionary<Vector3i, List<T>> _table;
-    readonly double _distanceSquared;
-    readonly double _factor;
-
-    public BucketSearchSparse3d(double distance)
-    {
-        _table = new Dictionary<Vector3i, List<T>>();
-        _distanceSquared = distance * distance;
-        _factor = 1.0 / distance;
-    }
+    readonly Dictionary<Vector3i, List<T>> _table = [];
+    readonly double _distanceSquared = distance * distance;
+    readonly double _factor = 1.0 / distance;
 
     public void Populate(IEnumerable<T> elements)
     {
@@ -88,7 +74,7 @@ public class BucketSearchSparse3d<T> where T : IPositionable
 
             if (!_table.TryGetValue(key, out List<T> bucket))
             {
-                bucket = new List<T>();
+                bucket = [];
                 _table.Add(key, bucket);
             }
 
@@ -180,7 +166,7 @@ public class BucketSearchDense2d<T> where T : IPositionable
 
             if (bucket == null)
             {
-                bucket = new List<T>();
+                bucket = [];
                 _table[key.X][key.Y] = bucket;
             }
 
@@ -282,7 +268,7 @@ public class BucketSearchDense3d<T> where T : IPositionable
 
             if (bucket == null)
             {
-                bucket = new List<int>();
+                bucket = [];
                 _table[key.X, key.Y, key.Z] = bucket;
             }
 

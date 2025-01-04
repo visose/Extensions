@@ -5,18 +5,11 @@ using Rhino;
 
 namespace Extensions.Document;
 
-public class DisplayGeometry
+public class DisplayGeometry(GeometryBase geometry, DisplayMaterial material, string layer = "")
 {
-    public GeometryBase Geometry { get; set; }
-    public DisplayMaterial Material { get; set; }
-    public string Layer { get; set; }
-
-    public DisplayGeometry(GeometryBase geometry, DisplayMaterial material, string layer = "")
-    {
-        Geometry = geometry;
-        Material = material;
-        Layer = layer;
-    }
+    public GeometryBase Geometry { get; set; } = geometry;
+    public DisplayMaterial Material { get; set; } = material;
+    public string Layer { get; set; } = layer;
 
     public Guid Bake(RhinoDoc doc, ObjectAttributes att = null, bool flipYZ = false)
     {

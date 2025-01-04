@@ -21,7 +21,7 @@ static class MeshPipe
 
     public static Mesh MeshPlanes(List<Plane> inPlanes, double width, double height, int segments = 24)
     {
-        inPlanes = inPlanes.ToList();
+        inPlanes = [.. inPlanes];
         if (inPlanes.Count < 2) return new Mesh();
 
         bool isClosed = inPlanes[0].Origin.DistanceToSquared(inPlanes[inPlanes.Count - 1].Origin) < UnitTol * UnitTol;
@@ -158,7 +158,7 @@ static class MeshPipe
             var vertex = points[i];
             mesh.Vertices.SetVertex(i, vertex);
         }
-        mesh.Normals.AddRange(normals.ToArray());
+        mesh.Normals.AddRange([.. normals]);
         mesh.RebuildNormals();
         mesh.Compact();
 
@@ -277,7 +277,7 @@ static class MeshPipe
 
         var mesh = new Mesh();
         mesh.Vertices.AddVertices(points);
-        mesh.Normals.AddRange(normals.ToArray());
+        mesh.Normals.AddRange([.. normals]);
         mesh.Faces.AddFaces(faces);
 
         return mesh;
@@ -286,7 +286,7 @@ static class MeshPipe
     {
         //if (width < height) throw new ArgumentException(" Width must be larger or equal to height.");
         if (inPlanes.Count < 2) return new Mesh();
-        inPlanes = inPlanes.ToList();
+        inPlanes = [.. inPlanes];
 
         bool isClosed = inPlanes[0].Origin.DistanceToSquared(inPlanes[inPlanes.Count - 1].Origin) < UnitTol * UnitTol;
         if (isClosed && inPlanes.Count == 2) return new Mesh();
@@ -391,7 +391,7 @@ static class MeshPipe
 
         var mesh = new Mesh();
         mesh.Vertices.AddVertices(points);
-        mesh.Normals.AddRange(normals.ToArray());
+        mesh.Normals.AddRange([.. normals]);
         mesh.Faces.AddFaces(faces);
 
         return mesh;

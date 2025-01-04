@@ -63,7 +63,7 @@ motorValue:= 0;";
                 initCode = resetCode;
             }
 
-            var command = new Robots.Commands.Custom("ResetExtruder", declaration: declaration, command: initCode)
+            var command = new Robots.Commands.Custom("ResetExtruder", Manufacturers.ABB, initCode, declaration)
             {
                 RunBefore = true
             };
@@ -89,8 +89,8 @@ motorValue:= 0;";
                     externalDistance = target.External[0];
 
                 totalDistance += externalDistance;
-                current.External = new[] { totalDistance };
-                current.ExternalCustom = new[] { "motorValue" };
+                current.External = [totalDistance];
+                current.ExternalCustom = ["motorValue"];
 
                 if (i == 0)
                     current.AppendCommand(resetCommand);
@@ -100,7 +100,7 @@ motorValue:= 0;";
                     //if (!IsExtrusion(prev))
                     string sign = externalDistance < 0 ? "+" : "-";
                     string code = $"motorValue:=motorValue{sign}{Abs(externalDistance):0.000}*extrusionFactor;";
-                    var externalCommand = new Robots.Commands.Custom($"SetExternal{count++}", command: code)
+                    var externalCommand = new Robots.Commands.Custom($"SetExternal{count++}", Manufacturers.ABB, code)
                     {
                         RunBefore = true
                     };

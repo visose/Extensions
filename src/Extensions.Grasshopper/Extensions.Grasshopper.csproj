@@ -19,12 +19,12 @@
   </Target>
 
   <PropertyGroup Condition="$([MSBuild]::IsOSPlatform(Windows)) and $(Configuration) == 'Debug'">
-    <StartProgram>C:\Program Files\Rhino 7\System\Rhino.exe</StartProgram>
+    <StartProgram>C:\Program Files\Rhino 8\System\Rhino.exe</StartProgram>
     <StartArguments>/nosplash /runscript="-grasshopper window show _enter"</StartArguments>
     <StartAction>Program</StartAction>
 
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <PackageDir>$(AppData)\McNeel\Rhinoceros\packages\7.0\$(Product)</PackageDir>
+    <PackageDir>$(AppData)\McNeel\Rhinoceros\packages\8.0\$(Product)</PackageDir>
     <OutputPath>$(PackageDir)\$(Version)</OutputPath>
   </PropertyGroup>
 

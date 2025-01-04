@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Robots.Rhino" Version="1.6.5" ExcludeAssets="runtime" />
-    <PackageReference Include="morelinq" Version="3.4.2" />
+    <PackageReference Include="Robots.Rhino" Version="1.8.0" ExcludeAssets="runtime" />
+    <PackageReference Include="morelinq" Version="4.4.0" />
     <PackageReference Include="geometry3Sharp" Version="1.0.324" />
     <PackageReference Include="com.angusj.Clipper" Version="6.4.2" />
     <PackageReference Include="SkeletonNet" Version="1.0.0" />

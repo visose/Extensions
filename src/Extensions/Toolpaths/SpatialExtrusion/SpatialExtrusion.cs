@@ -5,8 +5,8 @@ namespace Extensions.Toolpaths.SpatialExtrusion;
 
 public class SpatialExtrusion
 {
-    public List<Target> Targets { get; } = new List<Target>();
-    public List<(Line segment, int type)> Display { get; } = new List<(Line segment, int type)>();
+    public List<Target> Targets { get; } = [];
+    public List<(Line segment, int type)> Display { get; } = [];
 
     public SpatialExtrusion(IEnumerable<Polyline> polylines, SpatialAttributes attributes)
     {

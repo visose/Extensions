@@ -1,4 +1,4 @@
-﻿using Rhino.Geometry;
+using Rhino.Geometry;
 using Robots;
 using Robots.Commands;
 
@@ -6,7 +6,7 @@ namespace Extensions.Toolpaths.Milling;
 
 public class MillingToolpath : SimpleToolpath
 {
-    public List<int> SubPrograms { get; set; } = new List<int>();
+    public List<int> SubPrograms { get; set; } = [];
 
     readonly MillingAttributes _att;
     readonly Tool _tool;

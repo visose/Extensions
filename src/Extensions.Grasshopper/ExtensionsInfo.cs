@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Drawing;
 using Grasshopper.Kernel;
 using Grasshopper;
@@ -17,7 +17,7 @@ public class ExtensionsInfo : GH_AssemblyInfo
 
             if (files.Any())
             {
-                Assembly.LoadFile(files.First());
+                Assembly.LoadFrom(files.First());
                 IsRobotsInstalled = true;
                 break;
             }
@@ -42,6 +42,6 @@ public class ExtensionsInfo : GH_AssemblyInfo
     string[] GetCompany()
     {
         var company = GetInfo<AssemblyCompanyAttribute>().Company;
-        return company.Split(new[] { " - " }, StringSplitOptions.None);
+        return company.Split([" - "], StringSplitOptions.None);
     }
 }

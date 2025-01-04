@@ -1,3 +1,8 @@
+- version: 1.0.5
+  changes:
+  - Fixed issue with CoreCLR.
+  - Fixed not specifying manufacturer for custom commands.
+
 - version: 1.0.4
   changes:
   - Fixed compatibility with latest Robots version.

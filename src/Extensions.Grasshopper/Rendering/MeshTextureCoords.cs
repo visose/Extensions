@@ -23,7 +23,7 @@ public class MeshTextureCoords : GH_Component
     protected override void SolveInstance(IGH_DataAccess DA)
     {
         Mesh mesh = new();
-        List<Point3d> coords = new();
+        List<Point3d> coords = [];
         DA.GetData(0, ref mesh);
         DA.GetDataList(1, coords);
 

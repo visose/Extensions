@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Rhino.Geometry;
 using Rhino.UI;
 using Extensions.Geometry;
@@ -62,7 +62,7 @@ public class Column
             if (contour is null)
             {
                 outPolylines = Slicer.Create(m, height, region)
-                              .Select(c => c.MaxBy(p => p.Length).First())
+                              .Select(c => c.Maxima(p => p.Length).First())
                               .ToArray();
 
                 Cache.Write("contours", new PolylineCurve(outPolylines[0]));

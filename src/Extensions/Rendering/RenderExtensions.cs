@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using Rhino.Geometry;
 
 namespace Extensions;
@@ -112,7 +112,7 @@ public static class RenderExtensions
         }
 
         mesh.ClearTextureData();
-        mesh.TextureCoordinates.AddRange(coords2f.ToArray());
+        mesh.TextureCoordinates.AddRange([.. coords2f]);
 
         return mesh;
     }

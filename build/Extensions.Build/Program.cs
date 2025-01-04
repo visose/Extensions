@@ -5,8 +5,8 @@ var app = App.Create(args);
 Props props = new("Directory.Build.props");
 Github github = new("visose", "Extensions");
 
-app.Add(new ICommand[]
-    {
+app.Add(
+    [
         new CheckVersion
         (
             props: props,
@@ -20,8 +20,8 @@ app.Add(new ICommand[]
         (
             props: props,
             sourceFolder: "artifacts/bin/Extensions.Grasshopper/net48",
-            files: new []
-            {
+            files:
+            [
                 "Extensions.gha",
                 "Extensions.dll",
                 "clipper_library.dll",
@@ -30,12 +30,12 @@ app.Add(new ICommand[]
                 "MoreLinq.dll",
                 "SkeletonNet.dll",
                 "icon.png"
-            },
-            tags: new []
-            {
+            ],
+            tags:
+            [
                 "rh7_0-any",
                 "rh8_0-any"
-            }
+            ]
         ),
         new Release
         (
@@ -44,6 +44,6 @@ app.Add(new ICommand[]
             notesFile: "RELEASE",
             message: "> This **release** can only be installed through the package manager in **Rhino 7** using the `_PackageManager` command.\n> Check the [readme](../../blob/master/.github/README.md) for more details."
         )
-    });
+    ]);
 
 await app.RunAsync();

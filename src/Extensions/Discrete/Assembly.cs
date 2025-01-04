@@ -169,27 +169,15 @@ public struct Vector3Export
 }
 
 [XmlType(TypeName = "Vector2")]
-public struct Vector2Export
+public struct Vector2Export(Point2f point)
 {
-    public float x, y;
-
-    public Vector2Export(Point2f point)
-    {
-        x = point.X;
-        y = point.Y;
-    }
+    public float x = point.X, y = point.Y;
 }
 
-public struct Pose
+public struct Pose(Plane plane)
 {
-    public Vector3Export position;
-    public QuaternionExport rotation;
-
-    public Pose(Plane plane)
-    {
-        position = new Vector3Export(plane.Origin);
-        rotation = new QuaternionExport(plane);
-    }
+    public Vector3Export position = new Vector3Export(plane.Origin);
+    public QuaternionExport rotation = new QuaternionExport(plane);
 }
 
 [XmlType(TypeName = "Quaternion")]

@@ -13,7 +13,7 @@ struct SimpleTarget
 
 public class ExternalExtrusionToolpath : SimpleToolpath
 {
-    public List<int> SubPrograms { get; set; } = new List<int>();
+    public List<int> SubPrograms { get; set; } = [];
 
     readonly ExtrusionAttributes _att;
     readonly double _extrusionFactor;
@@ -156,14 +156,14 @@ public class ExternalExtrusionToolpath : SimpleToolpath
             {
                 string sign = externalDistance < 0 ? "+" : "-";
                 string code = $"motorValue:=motorValue{sign}{Abs(externalDistance):0.000}*extrusionFactor;";
-                var externalCommand = new Robots.Commands.Custom($"SetExternal{_targets.Count}", command: code)
+                var externalCommand = new Robots.Commands.Custom($"SetExternal{_targets.Count}", Manufacturers.ABB, code)
                 {
                     RunBefore = true
                 };
                 command = externalCommand;
             }
 
-            var target = new CartesianTarget(location, null, Motions.Linear, tool, speed, zone, command, frame, new[] { totalDistance })
+            var target = new CartesianTarget(location, null, Motions.Linear, tool, speed, zone, command, frame, [totalDistance])
             {
                 ExternalCustom = externalCustom
             };
@@ -193,14 +193,14 @@ WHILE choice = 5 DO
     MoveL Offs(current,0,0,0),{_att.ExtrusionSpeed.Name},{_att.ExtrusionZone.Name},{_att.Tool.Name} \WObj:= {_att.Frame.Name};
 ENDWHILE";
 
-            var initCommand = new Robots.Commands.Custom("Init", declaration: declaration, command: initCode)
+            var initCommand = new Robots.Commands.Custom("Init", Manufacturers.ABB, initCode, declaration)
             {
                 RunBefore = true
             };
-            var testCommand = new Robots.Commands.Custom("Test", command: testCode);
+            var testCommand = new Robots.Commands.Custom("Test", Manufacturers.ABB, testCode);
 
-            var command = new Group(new[] { initCommand, testCommand });
-            var home = new JointTarget(_att.Home, _att.Tool, _att.SafeSpeed, _att.SafeZone, command, _att.Frame, new[] { totalDistance })
+            var command = new Group([initCommand, testCommand]);
+            var home = new JointTarget(_att.Home, _att.Tool, _att.SafeSpeed, _att.SafeZone, command, _att.Frame, [totalDistance])
             {
                 ExternalCustom = externalCustom
             };
@@ -214,7 +214,7 @@ ENDWHILE";
                 new Message("Se acabó."),
                 new Stop()
             };
-            var home = new JointTarget(_att.Home, _att.Tool, _att.SafeSpeed, _att.SafeZone, command, _att.Frame, new[] { totalDistance })
+            var home = new JointTarget(_att.Home, _att.Tool, _att.SafeSpeed, _att.SafeZone, command, _att.Frame, [totalDistance])
             {
                 ExternalCustom = externalCustom
             };
