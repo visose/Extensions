@@ -1,4 +1,4 @@
-﻿using Grasshopper.Kernel;
+using Grasshopper.Kernel;
 using Rhino.Geometry;
 using Robots;
 using Robots.Grasshopper;
@@ -29,6 +29,7 @@ public class GCodeToolpath : GH_Component
         pManager.AddTextParameter("File", "F", "GCode file.", GH_ParamAccess.item);
         pManager.AddParameter(new TargetParameter(), "Target", "T", "Created targets will use the parameters of this reference target if they're not supplied in the G-code file.", GH_ParamAccess.item);
         pManager.AddPointParameter("Point alignment", "P", "Aligns the X axis of the tagets to look towards this point (in world coordinate system). If not supplied it will use the X axis of the reference target.", GH_ParamAccess.item);
+        pManager.AddBooleanParameter("Add bit", "A", "Add drill bit to tool.", GH_ParamAccess.item);
         pManager[2].Optional = true;
     }
 
@@ -46,16 +47,18 @@ public class GCodeToolpath : GH_Component
         string file = null;
         GH_Target target = null;
         Point3d? point = null;
+        bool addBit = false;
 
         if (!DA.GetData(0, ref file)) return;
         if (!DA.GetData(1, ref target)) return;
         DA.GetData(2, ref point);
+        if (!DA.GetData(3, ref addBit)) return;
 
         var alignment = Vector3d.XAxis;
         if (point.HasValue)
             alignment = (Vector3d)point.Value;
 
-        var toolpath = new Toolpaths.Milling.GCodeToolpath(file, target.Value as CartesianTarget, alignment);
+        var toolpath = new Toolpaths.Milling.GCodeToolpath(file, target.Value as CartesianTarget, alignment, addBit);
         var (tool, mcs, rapidStarts, ignored) = toolpath.Toolpath;
 
         DA.SetData(0, toolpath);

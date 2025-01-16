@@ -1,4 +1,4 @@
-﻿using Rhino.Geometry;
+using Rhino.Geometry;
 using Robots;
 using gs;
 using static Extensions.GeometryUtil;
@@ -9,14 +9,14 @@ public class GCodeToolpath : SimpleToolpath
 {
     public FiveAxisToRobots Toolpath { get; set; }
 
-    public GCodeToolpath(string file, CartesianTarget referenceTarget, Vector3d alignment)
+    public GCodeToolpath(string file, CartesianTarget referenceTarget, Vector3d alignment, bool addBit)
     {
         using var reader = File.OpenText(file);
 
         var parser = new GenericGCodeParser();
         var code = parser.Parse(reader);
 
-        Toolpath = new FiveAxisToRobots(referenceTarget, alignment, code);
+        Toolpath = new FiveAxisToRobots(referenceTarget, alignment, code, addBit);
         _targets = Toolpath.Targets;
     }
 }
@@ -43,25 +43,33 @@ public class FiveAxisToRobots
         ignored = _ignored;
     }
 
-    internal FiveAxisToRobots(CartesianTarget refTarget, Vector3d alignment, GCodeFile file)
+    internal FiveAxisToRobots(CartesianTarget refTarget, Vector3d alignment, GCodeFile file, bool addBit)
     {
         _refTarget = refTarget;
         _alignment = alignment;
 
-        var constructionPlane = Rhino.RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.GetConstructionPlane().Plane;
-        constructionPlane.Origin = Point3d.Origin;
         var workPlane = _refTarget.Frame.Plane;
-        var xform = Transform.PlaneToPlane(Plane.WorldXY, workPlane);
-        constructionPlane.Transform(xform);
+        //var xform = Transform.PlaneToPlane(Plane.WorldXY, workPlane);
+        //var constructionPlane = Rhino.RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.GetConstructionPlane().Plane;
+        //constructionPlane.Origin = Point3d.Origin;
+        //constructionPlane.Transform(xform);
 
-        _mcs = new Frame(plane: constructionPlane, name: "MCS");
+        _mcs = new Frame(plane: workPlane, name: "MCS");
 
         _gCodeMap = new Dictionary<(GCodeLine.LType letter, int number), Action<GCodeLine>>
-            {
-                { (GCodeLine.LType.GCode, 0), RapidMove },
-                { (GCodeLine.LType.GCode, 1), LinearMove},
-                { (GCodeLine.LType.MCode, 6), ToolSet },
-             };
+        {
+            { (GCodeLine.LType.GCode, 0), RapidMove },
+            { (GCodeLine.LType.GCode, 1), LinearMove}
+        };
+
+        if (addBit)
+        {
+            _gCodeMap.Add((GCodeLine.LType.MCode, 6), ToolSet);
+        }
+        else
+        {
+            _tool = _refTarget.Tool;
+        }
 
         Interpret(file);
         _rapidStarts.Add(Targets.Count - 1);
