@@ -2,7 +2,7 @@ using Rhino.Geometry;
 
 namespace Extensions.Spatial;
 
-public class BucketSearchSparse2d<T>(double distance) where T : IPositionable
+class BucketSearchSparse2d<T>(double distance) where T : IPositionable
 {
     readonly Dictionary<Vector2i, List<T>> _table = [];
     readonly double _distanceSquared = distance * distance;
@@ -14,9 +14,9 @@ public class BucketSearchSparse2d<T>(double distance) where T : IPositionable
 
         foreach (var element in elements)
         {
-            var key = new Vector2i(element.Position, _factor);
+            Vector2i key = new(element.Position, _factor);
 
-            if (!_table.TryGetValue(key, out List<T> bucket))
+            if (!_table.TryGetValue(key, out List<T>? bucket))
             {
                 bucket = [];
                 _table.Add(key, bucket);
@@ -28,25 +28,27 @@ public class BucketSearchSparse2d<T>(double distance) where T : IPositionable
 
     public IEnumerable<T> GetClosests(T element)
     {
-        var center = new Vector2i(element.Position, _factor);
+        Vector2i center = new(element.Position, _factor);
         var keys = new Vector2i[9];
 
         int count = 0;
         for (int i = -1; i < 2; i++)
         {
             for (int j = -1; j < 2; j++)
-                keys[count++] = new Vector2i(center.X + i, center.Y + j);
+                keys[count++] = new(center.X + i, center.Y + j);
         }
 
-        var elements = new List<T>();
+        List<T> elements = [];
 
         foreach (var key in keys)
         {
-            if (!_table.TryGetValue(key, out List<T> value)) continue;
+            if (!_table.TryGetValue(key, out List<T>? value))
+                continue;
 
             foreach (var other in value)
             {
-                if (element.Equals(other)) continue;
+                if (element.Equals(other))
+                    continue;
 
                 double distance = (element.Position - other.Position).SquareLength;
                 if (distance <= _distanceSquared)
@@ -58,164 +60,10 @@ public class BucketSearchSparse2d<T>(double distance) where T : IPositionable
     }
 }
 
-public class BucketSearchSparse3d<T>(double distance) where T : IPositionable
+class BucketSearchDense3d<T> where T : IPositionable
 {
-    readonly Dictionary<Vector3i, List<T>> _table = [];
-    readonly double _distanceSquared = distance * distance;
-    readonly double _factor = 1.0 / distance;
-
-    public void Populate(IEnumerable<T> elements)
-    {
-        _table.Clear();
-
-        foreach (var element in elements)
-        {
-            var key = new Vector3i(element.Position, _factor);
-
-            if (!_table.TryGetValue(key, out List<T> bucket))
-            {
-                bucket = [];
-                _table.Add(key, bucket);
-            }
-
-            bucket.Add(element);
-        }
-    }
-
-    public IEnumerable<T> GetClosests(T element)
-    {
-        var position = element.Position;
-        var index = element.Index;
-
-        var center = new Vector3i(element.Position, _factor);
-        var keys = new Vector3i[27];
-
-        int count = 0;
-        for (int i = -1; i < 2; i++)
-        {
-            for (int j = -1; j < 2; j++)
-            {
-                for (int k = -1; k < 2; k++)
-                    keys[count++] = new Vector3i(center.X + i, center.Y + j, center.Z + k);
-            }
-        }
-
-        var elements = new List<T>();
-
-        foreach (var key in keys)
-        {
-            if (!_table.TryGetValue(key, out List<T> value)) continue;
-
-            foreach (var other in value)
-            {
-                if (other.Index >= index) continue;
-
-                double distance = (position - other.Position).SquareLength;
-                if (distance <= _distanceSquared)
-                    elements.Add(other);
-            }
-        }
-
-        return elements;
-    }
-}
-
-public class BucketSearchDense2d<T> where T : IPositionable
-{
-    readonly List<T>[][] _table;
-    readonly double _distanceSquared;
-    readonly double _factor;
-    Vector2i _start;
-    Vector2i _size;
-
-    public BucketSearchDense2d(BoundingBox box, double distance)
-    {
-        _distanceSquared = distance * distance;
-        _factor = 1.0 / distance;
-
-        _start = new Vector2i(box.Corner(true, true, true), _factor);
-        var end = new Vector2i(box.Corner(false, false, false), _factor);
-        _size = new Vector2i(end.X - _start.X + 1, end.Y - _start.Y + 1);
-
-        _table = new List<T>[_size.X][];
-        for (int i = 0; i < _size.X; i++)
-            _table[i] = new List<T>[_size.Y];
-    }
-
-    public void Populate(IEnumerable<T> elements)
-    {
-        for (int i = 0; i < _size.X; i++)
-        {
-            for (int j = 0; j < _size.Y; j++)
-            {
-                var bucket = _table[i][j];
-                bucket?.Clear();
-            }
-        }
-
-        foreach (var element in elements)
-        {
-            var key = new Vector2i(element.Position, _factor);
-            key.X -= _start.X;
-            key.Y -= _start.Y;
-
-            if (key.X < 0 || key.Y < 0) continue;
-            if (key.X >= _size.X || key.Y >= _size.Y) continue;
-
-            List<T> bucket = _table[key.X][key.Y];
-
-            if (bucket == null)
-            {
-                bucket = [];
-                _table[key.X][key.Y] = bucket;
-            }
-
-            bucket.Add(element);
-        }
-    }
-
-    public IEnumerable<T> GetClosests(T element)
-    {
-        var center = new Vector2i(element.Position, _factor);
-        center.X -= _start.X;
-        center.Y -= _start.Y;
-        var keys = new Vector2i[9];
-
-        int count = 0;
-        for (int i = -1; i < 2; i++)
-        {
-            for (int j = -1; j < 2; j++)
-                keys[count++] = new Vector2i(center.X + i, center.Y + j);
-        }
-
-        var elements = new List<T>();
-
-        foreach (var key in keys)
-        {
-            if (key.X < 0 || key.Y < 0) continue;
-            if (key.X >= _size.X || key.Y >= _size.Y) continue;
-
-            List<T> bucket = _table[key.X][key.Y];
-            if (bucket == null) continue;
-
-            foreach (var other in bucket)
-            {
-                if (element.Equals(other)) continue;
-
-                double distance = (element.Position - other.Position).SquareLength;
-                if (distance <= _distanceSquared)
-                    elements.Add(other);
-            }
-        }
-
-        return elements;
-    }
-}
-
-public class BucketSearchDense3d<T> where T : IPositionable
-{
-    readonly List<int>[,,] _table;
-    Element<T>[] _elements;
+    readonly List<int>?[,,] _table;
+    Element<T>[] _elements = [];
     readonly double _distanceSquared;
     readonly double _factor;
     Vector3i _start;
@@ -226,10 +74,10 @@ public class BucketSearchDense3d<T> where T : IPositionable
         _distanceSquared = distance * distance;
         _factor = 1.0 / distance;
 
-        _start = new Vector3i(box.Corner(true, true, true), _factor);
-        var end = new Vector3i(box.Corner(false, false, false), _factor);
-        _size = new Vector3i(end.X - _start.X + 1, end.Y - _start.Y + 1, end.Z - _start.Z + 1);
-        _table = new List<int>[_size.X, _size.Y, _size.Z];
+        _start = new(box.Corner(true, true, true), _factor);
+        Vector3i end = new(box.Corner(false, false, false), _factor);
+        _size = new(end.X - _start.X + 1, end.Y - _start.Y + 1, end.Z - _start.Z + 1);
+        _table = new List<int>?[_size.X, _size.Y, _size.Z];
     }
 
     public void Populate(IList<T> elements)
@@ -239,7 +87,7 @@ public class BucketSearchDense3d<T> where T : IPositionable
         for (int i = 0; i < elements.Count; i++)
         {
             var e = elements[i];
-            _elements[i] = new Element<T> { Index = e.Index, Position = e.Position, Value = e };
+            _elements[i] = new() { Index = e.Index, Position = e.Position, Value = e };
         }
 
         for (int i = 0; i < _size.X; i++)
@@ -256,15 +104,15 @@ public class BucketSearchDense3d<T> where T : IPositionable
 
         foreach (var element in elements)
         {
-            var key = new Vector3i(element.Position, _factor);
+            Vector3i key = new(element.Position, _factor);
             key.X -= _start.X;
             key.Y -= _start.Y;
             key.Z -= _start.Z;
 
-            if (key.X < 0 || key.Y < 0 || key.Z < 0) continue;
-            if (key.X >= _size.X || key.Y >= _size.Y || key.Z >= _size.Z) continue;
+            if (IsOutside(key))
+                continue;
 
-            List<int> bucket = _table[key.X, key.Y, key.Z];
+            List<int>? bucket = _table[key.X, key.Y, key.Z];
 
             if (bucket == null)
             {
@@ -281,7 +129,7 @@ public class BucketSearchDense3d<T> where T : IPositionable
         int index = element.Index;
         Point3d a = element.Position;
 
-        var center = new Vector3i(a, _factor);
+        Vector3i center = new(a, _factor);
         center.X -= _start.X;
         center.Y -= _start.Y;
         center.Z -= _start.Z;
@@ -294,7 +142,7 @@ public class BucketSearchDense3d<T> where T : IPositionable
             for (int j = -1; j < 2; j++)
             {
                 for (int k = -1; k < 2; k++)
-                    keys[count++] = new Vector3i(center.X + i, center.Y + j, center.Z + k);
+                    keys[count++] = new(center.X + i, center.Y + j, center.Z + k);
             }
         }
 
@@ -302,26 +150,30 @@ public class BucketSearchDense3d<T> where T : IPositionable
 
         foreach (var key in keys)
         {
-            if (key.X < 0 || key.Y < 0 || key.Z < 0) continue;
-            if (key.X >= _size.X || key.Y >= _size.Y || key.Z >= _size.Z) continue;
+            if (IsOutside(key))
+                continue;
+
             var bucket = _table[key.X, key.Y, key.Z];
             if (bucket != null)
                 itemCount += bucket.Count;
         }
 
-        var elements = new List<T>(itemCount);
+        List<T> elements = new(itemCount);
 
         foreach (var key in keys)
         {
-            if (key.X < 0 || key.Y < 0 || key.Z < 0) continue;
-            if (key.X >= _size.X || key.Y >= _size.Y || key.Z >= _size.Z) continue;
+            if (IsOutside(key))
+                continue;
 
-            List<int> bucket = _table[key.X, key.Y, key.Z];
-            if (bucket == null) continue;
+            List<int>? bucket = _table[key.X, key.Y, key.Z];
+
+            if (bucket == null)
+                continue;
 
             foreach (var otherIndex in bucket)
             {
-                if (otherIndex >= index) continue;
+                if (otherIndex >= index)
+                    continue;
                 var other = _elements[otherIndex];
 
                 Point3d b = other.Position;
@@ -338,6 +190,10 @@ public class BucketSearchDense3d<T> where T : IPositionable
 
         return elements;
     }
+
+    bool IsOutside(Vector3i key) =>
+        key.X < 0 || key.Y < 0 || key.Z < 0 ||
+        key.X >= _size.X || key.Y >= _size.Y || key.Z >= _size.Z;
 
     struct Element<Q>
     {

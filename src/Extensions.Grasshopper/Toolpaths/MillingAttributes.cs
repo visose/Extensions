@@ -1,84 +1,62 @@
-﻿using Grasshopper.Kernel;
 using Robots;
 using Robots.Grasshopper;
 using Extensions.Toolpaths.Milling;
-using Grasshopper.Kernel.Types;
 
 namespace Extensions.Grasshopper;
 
-public class CreateMillingAttributes : GH_Component
+public class CreateMillingAttributes() : RobotComponent(
+    "Milling Attributes",
+    "MillAtt",
+    "Creates milling toolpath settings.",
+    "Toolpaths",
+    "{F6A3EFA3-2CC5-4E17-BEE8-E8B9AA6648B5}",
+    "LayersConfig")
 {
-    public CreateMillingAttributes() : base("Milling Attributes", "MillAtt", "Milling attributes.", "Extensions", "Toolpaths") { }
-    public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
-    protected override System.Drawing.Bitmap Icon => Util.GetIcon("LayersConfig");
-    public override Guid ComponentGuid => new("{F6A3EFA3-2CC5-4E17-BEE8-E8B9AA6648B5}");
-
-    protected override void RegisterInputParams(GH_InputParamManager pManager)
+    protected override void RegisterRobotInputParams(GH_InputParamManager pManager)
     {
-        if (ExtensionsInfo.IsRobotsInstalled)
-            Inputs(pManager);
+        _ = pManager.AddParameter(new TargetParameter(), "Reference Target", "T", "Reference joint target.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("End Mill Diameter", "D", "End mill diameter.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("End Mill Length", "L", "End mill length.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("Step Over", "So", "Step over in mm.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("Step Down", "Sd", "Step down in mm.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("Safe Z Offset", "Z", "Vertical safety offset.", GH_ParamAccess.item);
+        _ = pManager.AddParameter(new SpeedParameter(), "Plunge Speed", "Ps", "Plunge speed.", GH_ParamAccess.item);
+        _ = pManager.AddParameter(new SpeedParameter(), "Cut Speed", "Cs", "Cut speed.", GH_ParamAccess.item);
+        _ = pManager.AddParameter(new ZoneParameter(), "Plunge Zone", "Pz", "Plunge zone.", GH_ParamAccess.item);
+        _ = pManager.AddParameter(new ZoneParameter(), "Cut Zone", "Cz", "Cut zone.", GH_ParamAccess.item);
     }
 
-    protected override void RegisterOutputParams(GH_OutputParamManager pManager)
+    protected override void RegisterRobotOutputParams(GH_OutputParamManager pManager)
     {
-        if (ExtensionsInfo.IsRobotsInstalled)
-            Outputs(pManager);
+        _ = pManager.AddParameter(new MillingAttributesParameter(), "Milling Attributes", "A", "Milling toolpath settings.", GH_ParamAccess.item);
     }
 
-    void Inputs(GH_InputParamManager pManager)
+    protected override void SolveComponent(IGH_DataAccess DA)
     {
-        pManager.AddParameter(new TargetParameter(), "Reference target", "T", "Create targets will inherit the tool and frame from this target.", GH_ParamAccess.item);
-        pManager.AddNumberParameter("End mill diameter", "D", "End mill diameter.", GH_ParamAccess.item);
-        pManager.AddNumberParameter("End mill length", "L", "End mill length.", GH_ParamAccess.item);
-        pManager.AddNumberParameter("Step over", "So", "Step over in mm.", GH_ParamAccess.item);
-        pManager.AddNumberParameter("Step down", "Sd", "Step down in mm.", GH_ParamAccess.item);
-        pManager.AddNumberParameter("Safe Z offset", "Z", "Vertical margin to add to plunges.", GH_ParamAccess.item);
-        pManager.AddParameter(new SpeedParameter(), "Plunge speed", "Ps", "Plunge speed.", GH_ParamAccess.item);
-        pManager.AddParameter(new SpeedParameter(), "Cut speed", "Cs", "Cut speed.", GH_ParamAccess.item);
-        pManager.AddParameter(new ZoneParameter(), "Plunge zone", "Pz", "Plunge speed.", GH_ParamAccess.item);
-        pManager.AddParameter(new ZoneParameter(), "Cut zone", "Ez", "Cut zone.", GH_ParamAccess.item);
-    }
+        var target = DA.Get<Target>(0) as JointTarget
+            ?? throw new ArgumentException("Reference target must be a joint target.");
 
-    void Outputs(GH_OutputParamManager pManager)
-    {
-        pManager.AddParameter(new MillingAttributesParameter(), "Milling Attributes", "A", "Milling attributes.", GH_ParamAccess.item);
-    }
-
-    protected override void SolveInstance(IGH_DataAccess DA)
-    {
-        int inputCount = 10;
-        var inputs = new IGH_Goo[inputCount];
-
-        for (int i = 0; i < inputCount; i++)
+        var attributes = new MillingAttributes
         {
-            if (!DA.GetData(i, ref inputs[i])) return;
-        }
-
-        var target = (inputs[0] as GH_Target).Value as JointTarget;
-
-        var endMill = new EndMill()
-        {
-            Diameter = (inputs[1] as GH_Number).Value,
-            Length = (inputs[2] as GH_Number).Value,
-        };
-
-        var attributes = new MillingAttributes()
-        {
-            EndMill = endMill,
-            StepOver = (inputs[3] as GH_Number).Value,
-            StepDown = (inputs[4] as GH_Number).Value,
-            SafeZOffset = (inputs[5] as GH_Number).Value,
+            EndMill = new()
+            {
+                Diameter = DA.Get<double>(1),
+                Length = DA.Get<double>(2)
+            },
+            StepOver = DA.Get<double>(3),
+            StepDown = DA.Get<double>(4),
+            SafeZOffset = DA.Get<double>(5),
             SafeSpeed = target.Speed,
-            PlungeSpeed = (inputs[6] as GH_Speed).Value,
-            CutSpeed = (inputs[7] as GH_Speed).Value,
+            PlungeSpeed = DA.Get<Speed>(6),
+            CutSpeed = DA.Get<Speed>(7),
             SafeZone = target.Zone,
-            PlungeZone = (inputs[8] as GH_Zone).Value,
-            CutZone = (inputs[9] as GH_Zone).Value,
+            PlungeZone = DA.Get<Zone>(8),
+            CutZone = DA.Get<Zone>(9),
             Tool = target.Tool,
             Frame = target.Frame,
             Home = target.Joints
         }.Initialize();
 
-        DA.SetData(0, new GH_MillingAttributes(attributes));
+        DA.SetData(0, attributes);
     }
 }

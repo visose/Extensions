@@ -1,23 +1,25 @@
 using Robots;
 using static System.Math;
+using CustomCommand = Robots.Commands.Custom;
 
 namespace Extensions.Toolpaths.Extrusion;
 
 public static class ExternalExtrusion
 {
-    static bool IsExtrusion(Target target)
+    static bool IsExtrusion(Target? target)
     {
-        if (target == null) return false;
-        if (target.External.Length == 0) return false;
-        if (target.External[0] == 0) return false;
-        return true;
+        return target switch
+        {
+            { External: [not 0.0, ..] } => true,
+            _ => false
+        };
     }
 
-    public static List<int> FirstLayerIndices(List<Target> targets)
+    public static IReadOnlyList<int> FirstLayerIndices(IReadOnlyList<Target> targets)
     {
-        var indices = new List<int>();
+        List<int> indices = [];
         int index = 0;
-        Target prev = null;
+        Target? prev = null;
 
         foreach (var target in targets)
         {
@@ -31,15 +33,14 @@ public static class ExternalExtrusion
         return indices;
     }
 
-    public static IToolpath AddExtruderCommands(IToolpath toolpath, double externalFactor, string indMechanism = null)
+    public static IToolpath AddExtruderCommands(IToolpath toolpath, double externalFactor, string? indMechanism = null)
     {
-        if (toolpath == null)
-            return toolpath;
+        ArgumentOutOfRangeException.ThrowIfZero(toolpath.Targets.Count, nameof(toolpath));
 
         var resetCommand = ResetCommand(toolpath.Targets.First());
 
         var outTargets = SetExternalWithVariable(toolpath.Targets);
-        return toolpath.ShallowClone(outTargets);
+        return new SimpleToolpath(outTargets);
 
         Command ResetCommand(Target refTarget)
         {
@@ -63,7 +64,7 @@ motorValue:= 0;";
                 initCode = resetCode;
             }
 
-            var command = new Robots.Commands.Custom("ResetExtruder", Manufacturers.ABB, initCode, declaration)
+            CustomCommand command = new("ResetExtruder", Manufacturers.ABB, initCode, declaration)
             {
                 RunBefore = true
             };
@@ -71,45 +72,40 @@ motorValue:= 0;";
             return command;
         }
 
-        List<Target> SetExternalWithVariable(IEnumerable<Target> inTargets)
+        List<Target> SetExternalWithVariable(IReadOnlyList<Target> inTargets)
         {
-            var outTargets = new List<Target>();
+            List<Target> outTargets = [];
 
             double totalDistance = 0;
             int count = 0;
             int i = 0;
-            Target prev;
 
             foreach (var target in inTargets)
             {
-                var current = target.ShallowClone();
                 double externalDistance = 0;
 
                 if (target.External.Length > 0)
                     externalDistance = target.External[0];
 
                 totalDistance += externalDistance;
-                current.External = [totalDistance];
-                current.ExternalCustom = ["motorValue"];
+                var current = target.WithExternal([totalDistance], ["motorValue"]);
 
                 if (i == 0)
-                    current.AppendCommand(resetCommand);
+                    current = current.AppendCommand(resetCommand);
 
                 if (externalDistance != 0)
                 {
-                    //if (!IsExtrusion(prev))
                     string sign = externalDistance < 0 ? "+" : "-";
                     string code = $"motorValue:=motorValue{sign}{Abs(externalDistance):0.000}*extrusionFactor;";
-                    var externalCommand = new Robots.Commands.Custom($"SetExternal{count++}", Manufacturers.ABB, code)
+                    CustomCommand externalCommand = new($"SetExternal{count++}", Manufacturers.ABB, code)
                     {
                         RunBefore = true
                     };
 
-                    current.AppendCommand(externalCommand);
+                    current = current.AppendCommand(externalCommand);
                 }
 
                 outTargets.Add(current);
-                prev = target;
                 i++;
             }
 

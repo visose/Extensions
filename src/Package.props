@@ -1,0 +1,26 @@
+<Project>
+
+  <PropertyGroup>
+    <Product>Extensions</Product>
+    <Version>2.0.0</Version>
+    <Authors>Extensions Authors</Authors>
+    <Description>Assorted components for Grasshopper in Rhino 8.</Description>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <PackageTags>Grasshopper;Extensions;Robots;Rhino</PackageTags>
+    <PackageProjectUrl>https://github.com/visose/extensions</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Icon>icon.png</Icon>
+    <ReleaseNotes>RELEASE</ReleaseNotes>
+
+    <CurrentYear>$([System.DateTime]::Now.Year)</CurrentYear>
+    <Copyright>Copyright (c) 2017-$(CurrentYear) $(Authors)</Copyright>
+    <Company>$(Authors) - $(PackageProjectUrl)</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/visose/extensions.git</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(RootDir).github\README.md" Pack="true" PackagePath="" Visible="false" />
+  </ItemGroup>
+
+</Project>

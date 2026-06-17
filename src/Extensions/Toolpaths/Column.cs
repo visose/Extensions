@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Rhino;
 using Rhino.Geometry;
 using Rhino.UI;
 using Extensions.Geometry;
@@ -22,7 +23,7 @@ public class Column
         const double fillSize = 400;
         const double shortenDist = 10;
 
-        string _text = null;
+        string? _text = null;
 
         Progress("Contouring");
         var contours = Contouring(mesh);
@@ -40,7 +41,8 @@ public class Column
         var pipes = Piping(toolpath);
 
         Progress("Skin");
-        var skin = new Mesh();
+        Mesh skin = new();
+
         for (int i = 0; i < pipes.Length; i++)
         {
             var pipe = pipes[i].Last();
@@ -50,8 +52,8 @@ public class Column
         Progress("end");
 
         Contours = contours;
-        Layers = toolpath;//new Polyline[0][];
-        Pipes = pipes; //new Mesh[0][];
+        Layers = toolpath;
+        Pipes = pipes;
         Skin = skin;
 
         Polyline[] Contouring(Mesh m)
@@ -69,7 +71,7 @@ public class Column
             }
             else
             {
-                outPolylines = Enumerable.Repeat(contour, 1).ToArray();
+                outPolylines = [contour];
             }
 
             return outPolylines;
@@ -85,7 +87,6 @@ public class Column
                 {
                     var polyline = inPolylines[i];
                     polyline = Shorten(polyline, shortenDist);
-                    //polyline = BallPivot.Create(polyline, width * 0.2); // simplfy
                     outPolylines[i] = polyline;
                 }
             });
@@ -96,7 +97,8 @@ public class Column
                 var maxDistSq = maxDist * maxDist;
                 var pivot = BallPivot.Create(contour, resolution);
 
-                var outCurve = new Polyline(contour.Where(p => pivot.ClosestPoint(p).DistanceToSquared(p) < maxDistSq));
+                Polyline outCurve = new(contour.Where(p => pivot.ClosestPoint(p).DistanceToSquared(p) < maxDistSq));
+
                 if (!outCurve.IsClosed)
                     outCurve.Add(outCurve[0]);
 
@@ -109,13 +111,14 @@ public class Column
         Mesh[][] Piping(Polyline[][] inPolylines)
         {
             var outMeshes = new Mesh[inPolylines.Length][];
-            if (inPolylines.Length == 0) return outMeshes;
+
+            if (inPolylines.Length == 0)
+                return outMeshes;
 
             Parallel.ForEach(Partitioner.Create(0, inPolylines.Length), range =>
             {
                 for (int i = range.Item1; i < range.Item2; i++)
                 {
-                    //var pls = inPolylines[i].Select(p => p.ToPolyline(0.01, PI * 0.01, 1, double.MaxValue).ToPolyline());
                     outMeshes[i] = inPolylines[i].Select(p => MeshPipe.MeshFlatPolyline(p, width, height, width * 0.5, 5)).ToArray();
                 }
             });
@@ -131,17 +134,14 @@ public class Column
             {
                 for (int i = range.Item1; i < range.Item2; i++)
                 {
-                    // var pl = inPolylines[i];
                     var outerSkin = inPolylines[i];
-                    //var outerSkin = Geometry.Region.Offset(pl, -offset);
                     var innerSkin = Geometry.Region.Offset(outerSkin, -offset * 2);
-                    var outPolyline = new Polyline[] { outerSkin, innerSkin };
+                    Polyline[] outPolyline = [outerSkin, innerSkin];
 
                     outPolylines[i] = outPolyline.Select(p => Clean(p, offset)).ToArray();
                 }
             });
 
-            //   Progress("Filling");
             var layers = PolygonFill.Square(outPolylines.Select(l => l[1]).ToArray(), fillSize, offset);
 
             for (int i = 0; i < inPolylines.Length; i++)
@@ -153,15 +153,9 @@ public class Column
 
             Polyline Clean(Polyline contour, double resolution)
             {
-                var clean = new Polyline(contour);
-                var removed = clean.ReduceSegments(resolution * 0.02);
-                removed = clean.CollapseShortSegments(2);
-                //var nurbs = Curve.CreateInterpolatedCurve(clean, 3);
-                //Document.Debug.Bake(nurbs, Color.Red);
-                //var curve = nurbs.ToArcsAndLines(resolution * 0.1, PI * 0.1, width * 0.5, double.MaxValue);
-                // Document.Debug.Bake(curve, Color.Blue);
-                //var pl = curve.ToPolyline(0.01, PI * 0.01, 0.1, double.MaxValue);
-                //Document.Debug.Bake(pl, Color.Green);
+                Polyline clean = new(contour);
+                clean.ReduceSegments(resolution * 0.02);
+                clean.CollapseShortSegments(2);
                 return clean;
             }
         }
@@ -173,8 +167,8 @@ public class Column
                 for (int i = range.Item1; i < range.Item2; i++)
                 {
                     var contour = Geometry.Region.Offset(polylines[i], -offset);
-                    var removed = contour.ReduceSegments(width * 0.02);
-                    removed = contour.CollapseShortSegments(2);
+                    contour.ReduceSegments(width * 0.02);
+                    contour.CollapseShortSegments(2);
                     polylines[i] = contour;
                 }
             });
@@ -209,12 +203,17 @@ public class Column
 
         void Progress(string text)
         {
-            if (text != "Contouring") Rhino.RhinoApp.WriteLine($"{_text}");
+            if (text != "Contouring")
+                RhinoApp.WriteLine($"{_text}");
             StatusBar.HideProgressMeter();
-            if (text == "end") return;
+
+            if (text == "end")
+                return;
+
             _text = text;
             StatusBar.ShowProgressMeter(0, 4, $"{text}...", true, true);
-            if (text != "Contouring") StatusBar.UpdateProgressMeter(1, true);
+            if (text != "Contouring")
+                StatusBar.UpdateProgressMeter(1, true);
         }
     }
 }

@@ -1,69 +1,52 @@
-﻿using Grasshopper.Kernel;
 using Robots;
 using Robots.Grasshopper;
 using Extensions.Toolpaths.Extrusion;
 
 namespace Extensions.Grasshopper;
 
-public class CreateExtrusionVisualizer : GH_Component
+public class CreateExtrusionVisualizer() : RobotComponent(
+    "Extrusion Visualizer",
+    "ExtView",
+    "Visualizes deposited extrusion material.",
+    "Toolpaths",
+    "{B6FCD119-0805-4FFF-A8AA-F18A37C4FC2F}",
+    "LayersDraw")
 {
-    public CreateExtrusionVisualizer() : base("Extrusion Visualizer", "ExtView", "Display extruded toolpath.", "Extensions", "Toolpaths") { }
-    public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
-    protected override System.Drawing.Bitmap Icon => Util.GetIcon("LayersDraw");
-    public override Guid ComponentGuid => new("{B6FCD119-0805-4FFF-A8AA-F18A37C4FC2F}");
+    ExtrusionVisualizer? _visualizer;
 
-    protected override void RegisterInputParams(GH_InputParamManager pManager)
+    protected override void RegisterRobotInputParams(GH_InputParamManager pManager)
     {
-        if (ExtensionsInfo.IsRobotsInstalled)
-            Inputs(pManager);
+        _ = pManager.AddParameter(new ProgramParameter(), "Program", "P", "Robot program.", GH_ParamAccess.item);
+        _ = pManager.AddParameter(new ExtrusionAttributesParameter(), "Extrusion Attributes", "A", "Extrusion toolpath settings.", GH_ParamAccess.item);
+        _ = pManager.AddBooleanParameter("World Coordinates", "W", "Display meshes in world coordinates.", GH_ParamAccess.item, false);
+        _ = pManager.AddIntegerParameter("Segments", "S", "Cross-section segment count.", GH_ParamAccess.item, 24);
     }
 
-    protected override void RegisterOutputParams(GH_OutputParamManager pManager)
+    protected override void RegisterRobotOutputParams(GH_OutputParamManager pManager)
     {
-        if (ExtensionsInfo.IsRobotsInstalled)
-            Outputs(pManager);
+        _ = pManager.AddMeshParameter("Meshes", "M", "Extrusion preview meshes.", GH_ParamAccess.list);
     }
 
-    void Inputs(GH_InputParamManager pManager)
+    protected override void SolveComponent(IGH_DataAccess DA)
     {
-        pManager.AddParameter(new ProgramParameter(), "Program", "P", "Robot program.", GH_ParamAccess.item);
-        pManager.AddParameter(new ExtrusionAttributesParameter(), "Extrusion attributes", "A", "Extrusion attributes.", GH_ParamAccess.item);
-        pManager.AddBooleanParameter("World Coord", "W", "Display in local or world coordinates.", GH_ParamAccess.item, false);
-        pManager.AddIntegerParameter("Segments", "S", "Number of segments per crossection.", GH_ParamAccess.item, 24);
-    }
+        var program = DA.Get<IProgram>(0) as Program
+            ?? throw new ArgumentException("Input program cannot have custom code.");
 
-    void Outputs(GH_OutputParamManager pManager)
-    {
-        pManager.AddMeshParameter("Meshes", "M", "Extruded toolpath.", GH_ParamAccess.list);
-    }
+        var attributes = DA.Get<ExtrusionAttributes>(1);
+        var segments = DA.Get<int>(3);
 
-    protected override void SolveInstance(IGH_DataAccess DA)
-    {
-        GH_Program program = null;
-        GH_ExtrusionAttributes attributes = null;
-        bool isWorld = false;
-        int segments = 0;
-
-        if (!DA.GetData(0, ref program)) return;
-        if (!DA.GetData(1, ref attributes)) return;
-        if (!DA.GetData(2, ref isWorld)) return;
-        if (!DA.GetData(3, ref segments)) return;
-
-        if (program?.Value is not Program p)
+        if (_visualizer is null || _visualizer.Program != program)
         {
-            AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Input program can't have custom code.");
-            return;
-        }
-
-        if (_visualizer == null || _visualizer.Program != p)
-        {
-            _visualizer = new ExtrusionVisualizer(p, attributes.Value.BeadWidth, attributes.Value.LayerHeight, attributes.Value.ExtrusionZone.Distance, segments);
+            _visualizer = new(
+                program,
+                attributes.BeadWidth,
+                attributes.LayerHeight,
+                attributes.ExtrusionZone.Distance,
+                segments);
         }
 
         _visualizer.Update();
 
         DA.SetDataList(0, _visualizer.ExtrudedContours);
     }
-
-    ExtrusionVisualizer _visualizer;
 }

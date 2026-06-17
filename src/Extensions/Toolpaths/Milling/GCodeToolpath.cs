@@ -5,25 +5,35 @@ using static Extensions.GeometryUtil;
 
 namespace Extensions.Toolpaths.Milling;
 
-public class GCodeToolpath : SimpleToolpath
+public class GCodeToolpath : IToolpath
 {
-    public FiveAxisToRobots Toolpath { get; set; }
+    readonly FiveAxisToRobots _toolpath;
+
+    public IReadOnlyList<Target> Targets => _toolpath.Targets;
 
     public GCodeToolpath(string file, CartesianTarget referenceTarget, Vector3d alignment, bool addBit)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(file);
+
         using var reader = File.OpenText(file);
 
-        var parser = new GenericGCodeParser();
+        GenericGCodeParser parser = new();
         var code = parser.Parse(reader);
 
-        Toolpath = new FiveAxisToRobots(referenceTarget, alignment, code, addBit);
-        _targets = Toolpath.Targets;
+        _toolpath = new(referenceTarget, alignment, code, addBit);
+    }
+
+    public void Deconstruct(out Tool tool, out Frame mcs, out IReadOnlyList<int> rapidStarts, out IReadOnlyList<string> ignored)
+    {
+        _toolpath.Deconstruct(out tool, out mcs, out rapidStarts, out ignored);
     }
 }
 
-public class FiveAxisToRobots
+class FiveAxisToRobots
 {
-    public List<Target> Targets { get; set; } = [];
+    readonly List<Target> _targets = [];
+
+    public IReadOnlyList<Target> Targets => _targets;
 
     readonly List<string> _ignored = [];
     readonly List<int> _rapidStarts = [0];
@@ -33,9 +43,9 @@ public class FiveAxisToRobots
     readonly Dictionary<double, Speed> _speeds = [];
     readonly CartesianTarget _refTarget;
     Vector3d _alignment;
-    int _lastRapid = 0;
+    int _lastRapidLine = 0;
 
-    public void Deconstruct(out Tool tool, out Frame mcs, out List<int> rapidStarts, out List<string> ignored)
+    public void Deconstruct(out Tool tool, out Frame mcs, out IReadOnlyList<int> rapidStarts, out IReadOnlyList<string> ignored)
     {
         tool = _tool;
         mcs = _mcs;
@@ -43,36 +53,32 @@ public class FiveAxisToRobots
         ignored = _ignored;
     }
 
-    internal FiveAxisToRobots(CartesianTarget refTarget, Vector3d alignment, GCodeFile file, bool addBit)
+    public FiveAxisToRobots(CartesianTarget refTarget, Vector3d alignment, GCodeFile file, bool addBit)
     {
         _refTarget = refTarget;
         _alignment = alignment;
 
         var workPlane = _refTarget.Frame.Plane;
-        //var xform = Transform.PlaneToPlane(Plane.WorldXY, workPlane);
-        //var constructionPlane = Rhino.RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.GetConstructionPlane().Plane;
-        //constructionPlane.Origin = Point3d.Origin;
-        //constructionPlane.Transform(xform);
+        _mcs = new(plane: workPlane, name: "MCS");
 
-        _mcs = new Frame(plane: workPlane, name: "MCS");
-
-        _gCodeMap = new Dictionary<(GCodeLine.LType letter, int number), Action<GCodeLine>>
+        _gCodeMap = new()
         {
             { (GCodeLine.LType.GCode, 0), RapidMove },
             { (GCodeLine.LType.GCode, 1), LinearMove}
         };
 
+        _tool = _refTarget.Tool;
+
         if (addBit)
         {
             _gCodeMap.Add((GCodeLine.LType.MCode, 6), ToolSet);
         }
-        else
-        {
-            _tool = _refTarget.Tool;
-        }
 
         Interpret(file);
-        _rapidStarts.Add(Targets.Count - 1);
+        ArgumentOutOfRangeException.ThrowIfZero(_targets.Count, nameof(file));
+        var lastTarget = _targets.Count - 1;
+        if (_rapidStarts[^1] != lastTarget)
+            _rapidStarts.Add(lastTarget);
     }
 
     void Interpret(GCodeFile file)
@@ -92,7 +98,7 @@ public class FiveAxisToRobots
         _ignored.Add(message);
     }
 
-    void Move(GCodeLine line)
+    bool Move(GCodeLine line)
     {
         var parameters = new[] { "X", "Y", "Z", "A", "B", "F" };
         var v = new double[6];
@@ -102,11 +108,11 @@ public class FiveAxisToRobots
             if (!GCodeUtil.TryFindParamNum(line.parameters, parameters[i], ref v[i]))
             {
                 Ignore(line);
-                return;
+                return false;
             }
         }
 
-        var p = new Point3d(v[0], v[1], v[2]);
+        Point3d p = new(v[0], v[1], v[2]);
 
         var a = v[3].ToRadians();
         var b = v[4].ToRadians();
@@ -116,7 +122,7 @@ public class FiveAxisToRobots
 
         Speed speed;
 
-        if (Targets.Count == 0)
+        if (_targets.Count == 0)
         {
             speed = _refTarget.Speed;
         }
@@ -124,15 +130,27 @@ public class FiveAxisToRobots
         {
             var feed = v[5];
 
-            if (!_speeds.TryGetValue(feed, out speed))
+            if (!_speeds.TryGetValue(feed, out Speed? cachedSpeed))
             {
-                speed = _refTarget.Speed.CloneWithName<Speed>($"Feed{_speeds.Count:000}");
-                speed.TranslationSpeed = feed / 60.0;
+                var referenceSpeed = _refTarget.Speed;
+                speed = new(
+                    translation: feed / 60.0,
+                    rotationSpeed: referenceSpeed.RotationSpeed,
+                    translationExternal: referenceSpeed.TranslationExternal,
+                    rotationExternal: referenceSpeed.RotationExternal,
+                    name: $"Feed{_speeds.Count:000}",
+                    translationAccel: referenceSpeed.TranslationAccel,
+                    axisAccel: referenceSpeed.AxisAccel,
+                    time: referenceSpeed.Time);
                 _speeds.Add(feed, speed);
+            }
+            else
+            {
+                speed = cachedSpeed;
             }
         }
 
-        var target = new CartesianTarget(
+        CartesianTarget target = new(
             plane,
             null,
             Motions.Linear,
@@ -144,25 +162,29 @@ public class FiveAxisToRobots
             null
             );
 
-        Targets.Add(target);
+        _targets.Add(target);
+        return true;
     }
 
     void RapidMove(GCodeLine line)
     {
-        Move(line);
+        if (!Move(line))
+            return;
 
-        int i = line.lineNumber;
-        if ((i > 0) && (i - _lastRapid > 1))
+        int lineNumber = line.lineNumber;
+        int targetIndex = _targets.Count - 1;
+
+        if (targetIndex > 0 && lineNumber > 0 && lineNumber - _lastRapidLine > 1)
         {
-            _rapidStarts.Add(i);
+            _rapidStarts.Add(targetIndex);
         }
 
-        _lastRapid = i;
+        _lastRapidLine = lineNumber;
     }
 
     void LinearMove(GCodeLine line)
     {
-        Move(line);
+        _ = Move(line);
     }
 
     void ToolSet(GCodeLine line)
@@ -172,7 +194,7 @@ public class FiveAxisToRobots
         GCodeUtil.TryFindParamNum(line.parameters, "L", ref length);
         GCodeUtil.TryFindParamNum(line.parameters, "D", ref diameter);
 
-        var endMill = new EndMill()
+        EndMill endMill = new()
         {
             Length = length,
             Diameter = diameter,

@@ -8,7 +8,7 @@ public static class CurveSnap
 
     static CurveSnap()
     {
-        _unitSphere = new Sphere(Point3d.Origin, 1);
+        _unitSphere = new(Point3d.Origin, 1);
     }
 
     public enum SnapType { Equirectangular, Icosahedral, Quadrangular }
@@ -32,7 +32,7 @@ public static class CurveSnap
             polyline[i + 1] = next;
         }
 
-        return new Polyline(polyline);
+        return new(polyline);
 
         IList<Vector3f> SnapVectors()
         {

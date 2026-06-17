@@ -1,51 +1,62 @@
 using Rhino.Geometry;
+using Clipper2Lib;
+using Extensions.Geometry;
 using Extensions.Spatial;
-using ClipperLib;
-using static Extensions.Util;
 using System.Collections.Concurrent;
 
 namespace Extensions.Simulations.DifferentialGrowth;
 
-public class DifferentialGrowth
+public sealed class DifferentialGrowth
 {
-    internal List<Particle> Particles = [];
-    internal List<Spring> Springs = [];
-    internal BucketSearchDense3d<Particle> Search;
-    internal double Radius;
-
-    public double Growth;
-    public List<IntPoint> Region;
-    public Mesh Mesh;
-    public Polyline Polyline;
-    public List<List<Polyline>> AllPolylines = [];
-    public Polyline Boundary;
+    readonly List<List<Polyline>> _allPolylines = [];
     readonly int _convergence;
 
-    public DifferentialGrowth(IEnumerable<Polyline> polylines, double radius, int convergence, int maxIterations, Polyline region = null, Mesh mesh = null)
+    internal List<Particle> Particles { get; } = [];
+    internal List<Spring> Springs { get; } = [];
+    internal BucketSearchDense3d<Particle> Search { get; }
+    internal double Radius { get; }
+    internal double Growth { get; }
+    internal Path64? Region { get; }
+    internal Mesh? Mesh { get; }
+    internal Polyline? Polyline { get; }
+
+    public IReadOnlyList<IReadOnlyList<Polyline>> AllPolylines => _allPolylines;
+
+    public DifferentialGrowth(IReadOnlyList<Polyline> polylines, double radius, int convergence, int maxIterations, Polyline? region = null, Mesh? mesh = null)
     {
-        Region = region?.Select(p => new IntPoint(p.X / Tol, p.Y / Tol)).ToList();
+        ArgumentOutOfRangeException.ThrowIfZero(polylines.Count, nameof(polylines));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(radius, nameof(radius));
+        ArgumentOutOfRangeException.ThrowIfNegative(convergence, nameof(convergence));
+        ArgumentOutOfRangeException.ThrowIfNegative(maxIterations, nameof(maxIterations));
+
+        var box = (region, mesh) switch
+        {
+            ({ } polyline, _) => polyline.BoundingBox,
+            (_, { } targetMesh) => targetMesh.GetBoundingBox(true),
+            _ => throw new ArgumentException("Either a planar region or a mesh is required.", nameof(region))
+        };
+
+        Region = region?.ToRegion();
         Polyline = region;
         Mesh = mesh;
         Radius = radius;
         Growth = radius * 0.5;
         _convergence = convergence;
-        Boundary = mesh?.GetNakedEdges().First();
 
-        var box = Polyline != null ? Polyline.BoundingBox : mesh.GetBoundingBox(true);
-
-        Search = new BucketSearchDense3d<Particle>(box, radius);
+        Search = new(box, radius);
 
         foreach (var polyline in polylines)
         {
-            if (polyline == null) continue;
-            var startPl = new Particle(polyline[0], this);
+            ArgumentOutOfRangeException.ThrowIfLessThan(polyline.Count, 2, nameof(polylines));
 
-            int j = polyline.IsClosed ? -2 : -1;
+            Particle startPl = new(polyline[0], this);
 
-            for (int i = 1; i < polyline.Count + j; i++)
+            int endIndex = polyline.IsClosed ? polyline.Count - 1 : polyline.Count;
+
+            for (int i = 1; i < endIndex; i++)
             {
                 var start = Particles[Particles.Count - 1];
-                var end = new Particle(polyline[i], this);
+                Particle end = new(polyline[i], this);
                 new Spring(start, end, Springs.Count, this);
             }
 
@@ -55,16 +66,21 @@ public class DifferentialGrowth
             }
         }
 
-        AllPolylines.Add(GetPolylines());
+        ArgumentOutOfRangeException.ThrowIfZero(Springs.Count, nameof(polylines));
+
+        _allPolylines.Add(GetPolylines());
         double lastLength = double.MaxValue;
         int count = 0;
 
         for (count = 0; count < maxIterations; ++count)
         {
             Update();
-            AllPolylines.Add(GetPolylines());
+            _allPolylines.Add(GetPolylines());
             double length = GetLengthSquared();
-            if (Math.Abs(lastLength - length) < 1) break;
+
+            if (Math.Abs(lastLength - length) < 1)
+                break;
+
             lastLength = length;
         }
     }
@@ -106,7 +122,7 @@ public class DifferentialGrowth
             if (Mesh != null)
             {
                 var particlesCount = Particles.Count;
-                var points = new List<Point3d>(particlesCount);
+                List<Point3d> points = new(particlesCount);
                 var pullPoints = new Point3d[particlesCount];
 
                 for (int i = 0; i < particlesCount; i++)
@@ -121,8 +137,6 @@ public class DifferentialGrowth
                     for (int i = range.Item1; i < range.Item2; i++)
                         pullPoints[i] = subPulled[count++];
                 });
-
-                // var pullPoints = Mesh.PullPointsToMesh(points);
 
                 Parallel.ForEach(Partitioner.Create(0, particlesCount), range =>
                 {
@@ -158,14 +172,15 @@ public class DifferentialGrowth
             });
 
             totVel = 0;
+
             foreach (var particle in Particles)
                 totVel += particle.Velocity.SquareLength;
         } while (totVel > 0.001 && iterations-- > 0);
     }
 
-    public List<Polyline> GetPolylines()
+    List<Polyline> GetPolylines()
     {
-        var polylines = new List<Polyline>();
+        List<Polyline> polylines = [];
         Polyline pl =
         [
             Springs[0].Start.Position,
@@ -192,7 +207,7 @@ public class DifferentialGrowth
         return polylines;
     }
 
-    public double GetLengthSquared()
+    double GetLengthSquared()
     {
         return Springs.Sum(s => s.Vector.SquareLength);
     }

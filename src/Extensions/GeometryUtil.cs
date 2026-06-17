@@ -3,7 +3,7 @@ using static System.Math;
 
 namespace Extensions;
 
-public static class GeometryUtil
+static class GeometryUtil
 {
     public static Vector3d PolarToVector(double a, double b)
     {
@@ -25,18 +25,17 @@ public static class GeometryUtil
             alignment.Rotate(Util.HalfPI, normal);
         }
 
-        var plane = new Plane(position, normal);
+        Plane plane = new(position, normal);
         var alignAngle = Vector3d.VectorAngle(plane.XAxis, alignment, plane);
         plane.Rotate(alignAngle, plane.Normal);
 
         return plane;
     }
 
-    public static Vector3d OrientToMesh(Point3d point, Mesh guide, Mesh surface = null)
+    public static Vector3d OrientToMesh(Point3d point, Mesh guide, Mesh? surface = null)
     {
-        var mp = surface == null ?
-            guide.ClosestMeshPoint(point, double.MaxValue) :
-            surface.ClosestMeshPoint(point, double.MaxValue);
+        var mp = (surface ?? guide).ClosestMeshPoint(point, double.MaxValue)
+            ?? throw new ArgumentException("Point could not be projected onto the mesh.", nameof(point));
 
         return guide.NormalAt(mp);
     }

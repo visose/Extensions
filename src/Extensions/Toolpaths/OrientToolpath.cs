@@ -6,28 +6,30 @@ namespace Extensions.Toolpaths;
 
 public class OrientToolpath
 {
-    public IToolpath Toolpath { get; set; }
+    public IToolpath Toolpath { get; }
 
-    public OrientToolpath(IToolpath toolpath, Mesh guide, Vector3d alignment, Mesh surface = null)
+    public OrientToolpath(IToolpath toolpath, Mesh guide, Vector3d alignment, Mesh? surface = null)
     {
-        Toolpath = toolpath.ShallowClone();
+        var targets = new Target[toolpath.Targets.Count];
 
-        if (Toolpath.Targets is not IList<Target> targets)
-            throw new ArgumentException(" Targets of toolpath should be a list.");
-
-        for (int i = 0; i < targets.Count; i++)
+        for (int i = 0; i < toolpath.Targets.Count; i++)
         {
-            var target = targets[i];
+            var target = toolpath.Targets[i];
 
-            if (target is CartesianTarget)
+            if (target is CartesianTarget cartesian)
             {
-                var copyTarget = target.ShallowClone() as CartesianTarget;
-                var plane = copyTarget.Plane;
+                var plane = cartesian.Plane;
                 var normal = OrientToMesh(plane.Origin, guide, surface);
                 var newPlane = AlignedPlane(plane.Origin, normal, alignment);
-                copyTarget.Plane = newPlane;
-                targets[i] = copyTarget;
+                targets[i] = cartesian.WithPlane(newPlane);
+            }
+            else
+            {
+                targets[i] = target;
             }
         }
+
+        SimpleToolpath result = new(targets);
+        Toolpath = result;
     }
 }

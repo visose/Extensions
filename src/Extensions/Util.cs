@@ -2,7 +2,7 @@
 
 namespace Extensions;
 
-public static class Util
+static class Util
 {
     public const double HalfPI = PI * 0.5;
     public const double PI2 = PI * 2;
@@ -10,9 +10,12 @@ public static class Util
     public const double UnitTol = 1E-08;
     public const double DegreeToRadian = PI / 180.0;
 
-    public static double ToRadians(this double degree)
+    extension(double degree)
     {
-        return degree * DegreeToRadian;
+        public double ToRadians()
+        {
+            return degree * DegreeToRadian;
+        }
     }
 
     public static double GetWidth(double diameter, double height)

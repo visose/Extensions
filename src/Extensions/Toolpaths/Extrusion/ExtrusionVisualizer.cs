@@ -14,8 +14,8 @@ public class ExtrusionVisualizer
     readonly double _zone;
     readonly int _segments;
     readonly bool _is3d;
-    List<Contour> _contours;
-    public IList<Mesh> ExtrudedContours { get; private set; }
+    List<Contour> _contours = [];
+    public IReadOnlyList<Mesh> ExtrudedContours { get; private set; } = [];
 
     public ExtrusionVisualizer(Program program, double width, double height, double zone, int segments, bool is3d = false, bool reverse = false)
     {
@@ -39,7 +39,7 @@ public class ExtrusionVisualizer
         if (currentContour != null)
         {
             double t = currentContour.Time.NormalizedParameterAt(time);
-            var pl = new Polyline(currentContour.Planes.Select(p => p.Origin));
+            Polyline pl = new(currentContour.Planes.Select(p => p.Origin));
             var currentLength = t * pl.Length;
 
             var planes = new List<Plane>
@@ -78,7 +78,7 @@ public class ExtrusionVisualizer
         }
         else
         {
-            var pl = new Polyline(planes.Select(p => p.Origin));
+            Polyline pl = new(planes.Select(p => p.Origin));
             var mesh = Geometry.MeshPipe.MeshFlatPolyline(pl, _width, _height, _zone, _segments);
             return mesh;
         }
@@ -87,7 +87,7 @@ public class ExtrusionVisualizer
     void CreateContours(int ex, bool reverse)
     {
         _contours = [];
-        Contour contour = null;
+        Contour? contour = null;
 
         for (int i = 0; i < Program.Targets.Count; i++)
         {
@@ -103,13 +103,12 @@ public class ExtrusionVisualizer
             double delta = reverse ? current - next : next - current;
 
             bool isExtruding = delta > UnitTol;
-            //bool isExtruding = next > 0.01;
 
             if (isExtruding)
             {
                 if (contour == null)
                 {
-                    contour = new Contour();
+                    contour = new();
                     contour.Time.T0 = cellTarget.TotalTime;
                 }
 
@@ -132,7 +131,7 @@ public class ExtrusionVisualizer
 
                         _contours.Add(contour);
 
-                        contour = new Contour();
+                        contour = new();
                         contour.Planes.Add(plane);
                         contour.Time.T0 = cellTarget.TotalTime;
                     }
@@ -154,6 +153,6 @@ public class ExtrusionVisualizer
     {
         public Interval Time;
         public List<Plane> Planes { get; set; } = [];
-        public Mesh Mesh { get; set; }
+        public Mesh Mesh { get; set; } = new();
     }
 }

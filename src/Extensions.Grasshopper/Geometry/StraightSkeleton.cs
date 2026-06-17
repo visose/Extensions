@@ -1,36 +1,29 @@
-﻿using Grasshopper.Kernel;
 using Rhino.Geometry;
+using StraightSkeletonCore = Extensions.StraightSkeleton.StraightSkeleton;
 
 namespace Extensions.Grasshopper;
 
-public class StraightSkeleton : GH_Component
+public class StraightSkeleton() : Component(
+    "Straight Skeleton",
+    "StrSkel",
+    "Computes the straight skeleton of a polygon.",
+    "Geometry",
+    "{d529efd9-2fdd-4751-a6b4-307c8f82390b}",
+    "Graph")
 {
-    public StraightSkeleton() : base("Straight Skeleton", "StrSkel", "Returns the straight skeleton of a polygon.", "Extensions", "Geometry") { }
-    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Graph");
-    public override Guid ComponentGuid => new("{d529efd9-2fdd-4751-a6b4-307c8f82390b}");
-
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-        pManager.AddCurveParameter("Polygon", "P", "Polygon to create the straight skeleton.", GH_ParamAccess.item);
+        _ = pManager.AddCurveParameter("Polygon", "P", "Closed polygon.", GH_ParamAccess.item);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-        pManager.AddCurveParameter("Regions", "R", "Closed regions of the straight skeleton.", GH_ParamAccess.list);
-        //  pManager.AddCurveParameter("Axis", "A", "Attempt to get a medial axis.", GH_ParamAccess.item);
+        _ = pManager.AddCurveParameter("Regions", "R", "Straight skeleton regions.", GH_ParamAccess.list);
     }
 
-    protected override void SolveInstance(IGH_DataAccess DA)
+    protected override void SolveComponent(IGH_DataAccess DA)
     {
-        Curve curve = null;
-        DA.GetData(0, ref curve);
-        Polyline polyline = curve.ToPolyline();
-
-        var regions = Extensions.StraightSkeleton.StraightSkeleton.GetStraightSkeleton(polyline);
-        var regionCurves = regions.Select(e => e.ToNurbsCurve());
-        // var axis = Model.StraightSkeleton.StraightSkeleton.GetAxis(regions, polyline);
-
-        DA.SetDataList(0, regionCurves);
-        //DA.SetData(1, new PolylineCurve(axis));
+        var regions = StraightSkeletonCore.GetStraightSkeleton(DA.Get<Curve>(0).ToPolyline());
+        DA.SetDataList(0, regions.Select(static region => region.ToNurbsCurve()));
     }
 }

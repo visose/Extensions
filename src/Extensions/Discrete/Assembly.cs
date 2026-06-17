@@ -8,19 +8,25 @@ namespace Extensions.Discrete;
 
 public class Assembly
 {
-    public List<Tile> Tiles { get; set; }
-    public List<Instance> Instances { get; set; }
+    public List<Tile> Tiles { get; set; } = [];
+    public List<Instance> Instances { get; set; } = [];
     public float AngleLimit { get; set; }
     public float BreakForce { get; set; }
 
-    private Assembly() { }
+    Assembly() { }
 
-    public static void Export(List<string> blockNames, string instanceLayerName, double density, double angleLimit, double breakForce, string fileName, RhinoDoc doc)
+    public static void Export(IReadOnlyList<string> blockNames, string instanceLayerName, double density, double angleLimit, double breakForce, string fileName, RhinoDoc doc)
     {
-        var definitions = blockNames.Select(n => doc.InstanceDefinitions.First(i => i.Name == n));
-        var instanceLayer = doc.Layers.FindName(instanceLayerName);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(density, nameof(density));
 
-        var assembly = new Assembly()
+        var definitions = blockNames
+            .Select(name => doc.InstanceDefinitions.FirstOrDefault(definition => definition.Name == name)
+                ?? throw new ArgumentException($"Block '{name}' was not found.", nameof(blockNames)))
+            .ToArray();
+        var instanceLayer = doc.Layers.FindName(instanceLayerName)
+            ?? throw new ArgumentException($"Layer '{instanceLayerName}' was not found.", nameof(instanceLayerName));
+
+        Assembly assembly = new()
         {
             Tiles = definitions.Select(d => new Tile(d, density, doc)).ToList(),
             Instances = definitions
@@ -31,7 +37,7 @@ public class Assembly
             BreakForce = (float)breakForce
         };
 
-        var serializer = new XmlSerializer(typeof(Assembly));
+        XmlSerializer serializer = new(typeof(Assembly));
         using var writer = XmlWriter.Create(fileName);
         serializer.Serialize(writer, assembly);
     }
@@ -42,11 +48,11 @@ public class Tile
     public int Index { get; set; }
     public float Mass { get; set; }
     public Vector3Export Centroid { get; set; }
-    public List<MeshExport> Renderers { get; set; }
-    public List<MeshExport> Colliders { get; set; }
-    public List<Vector3Export> Faces { get; set; }
+    public List<MeshExport> Renderers { get; set; } = [];
+    public List<MeshExport> Colliders { get; set; } = [];
+    public List<Vector3Export> Faces { get; set; } = [];
 
-    private Tile() { }
+    Tile() { }
 
     public Tile(InstanceDefinition definition, double density, RhinoDoc doc)
     {
@@ -54,20 +60,24 @@ public class Tile
 
         var geometry = definition.GetObjects();
 
-        int renderIndex = doc.Layers.FindName("Render").Index;
+        int renderIndex = doc.Layers.FindName("Render")?.Index
+            ?? throw new InvalidOperationException("Layer 'Render' was not found.");
 
         var renderMeshes = geometry
                   .Where(g => g.Attributes.LayerIndex == renderIndex)
-                  .Select(g => g.Geometry as Mesh)
+                  .Select(g => g.Geometry)
+                  .OfType<Mesh>()
                   .ToList();
 
         Renderers = renderMeshes.Select(m => new MeshExport(m)).ToList();
 
-        int collisionsIndex = doc.Layers.FindName("Collision").Index;
+        int collisionsIndex = doc.Layers.FindName("Collision")?.Index
+            ?? throw new InvalidOperationException("Layer 'Collision' was not found.");
 
         var meshColliders = geometry
              .Where(g => g.Attributes.LayerIndex == collisionsIndex)
-             .Select(g => g.Geometry as Mesh)
+             .Select(g => g.Geometry)
+             .OfType<Mesh>()
              .ToList();
 
         Colliders = meshColliders
@@ -80,36 +90,29 @@ public class Tile
 
         foreach (var mesh in meshColliders)
         {
-            var prop = VolumeMassProperties.Compute(mesh);
+            var prop = VolumeMassProperties.Compute(mesh)
+                ?? throw new InvalidOperationException("Could not compute mass properties for collision mesh.");
+
             double elementMass = prop.Volume * density;
             centroid += prop.Centroid * elementMass;
             mass += elementMass;
         }
 
+        ArgumentOutOfRangeException.ThrowIfZero(mass, nameof(mass));
+
         centroid /= mass;
-        Centroid = new Vector3Export(centroid);
+        Centroid = new(centroid);
         Mass = (float)mass;
 
-        int facesIndex = doc.Layers.FindName("Faces").Index;
-
-        //Faces = geometry
-        //         .Where(g => g.Attributes.LayerIndex == facesIndex)
-        //         .Select(g =>
-        //          {
-        //              Curve curve = g.Geometry as Curve;
-        //              curve.TryGetPolyline(out Polyline pl);
-        //              var plane = new Plane(pl[1], pl[2], pl[0]);
-        //              plane.Origin = (pl[0] * 0.5 + pl[2] * 0.5);
-        //              return new Orient(plane);
-        //          }).ToList();
+        int facesIndex = doc.Layers.FindName("Faces")?.Index
+            ?? throw new InvalidOperationException("Layer 'Faces' was not found.");
 
         Faces = geometry
                  .Where(g => g.Attributes.LayerIndex == facesIndex)
-                 .Select(g =>
-                  {
-                      var point = g.Geometry as Point;
-                      return new Vector3Export(point.Location);
-                  }).ToList();
+                 .Select(g => g.Geometry)
+                 .OfType<Point>()
+                 .Select(point => new Vector3Export(point.Location))
+                 .ToList();
     }
 }
 
@@ -118,7 +121,7 @@ public class Instance
     public int DefinitionIndex;
     public Pose Pose;
 
-    private Instance() { }
+    Instance() { }
 
     public Instance(int definitionIndex, Transform transform)
     {
@@ -126,25 +129,26 @@ public class Instance
 
         var plane = Plane.WorldXY;
         plane.Transform(transform);
-        Pose = new Pose(plane);
+        Pose = new(plane);
     }
 }
 
 public class MeshExport
 {
-    public List<Vector3Export> Vertices { get; set; }
-    public List<Vector2Export> TextureCoordinates { get; set; }
-    public List<int> Faces { get; set; }
+    public List<Vector3Export> Vertices { get; set; } = [];
+    public List<Vector2Export> TextureCoordinates { get; set; } = [];
+    public List<int> Faces { get; set; } = [];
 
-    private MeshExport() { }
+    MeshExport() { }
 
     public MeshExport(Mesh mesh)
     {
-        mesh.Faces.ConvertQuadsToTriangles();
+        var exportMesh = mesh.DuplicateMesh();
+        exportMesh.Faces.ConvertQuadsToTriangles();
 
-        Vertices = mesh.Vertices.Select(p => new Vector3Export(p)).ToList();
-        TextureCoordinates = mesh.TextureCoordinates.Select(p => new Vector2Export(p)).ToList();
-        Faces = mesh.Faces.SelectMany(f => new int[] { f.C, f.B, f.A }).ToList();
+        Vertices = exportMesh.Vertices.Select(p => new Vector3Export(p)).ToList();
+        TextureCoordinates = exportMesh.TextureCoordinates.Select(p => new Vector2Export(p)).ToList();
+        Faces = exportMesh.Faces.SelectMany(f => new int[] { f.C, f.B, f.A }).ToList();
     }
 }
 
@@ -176,8 +180,8 @@ public struct Vector2Export(Point2f point)
 
 public struct Pose(Plane plane)
 {
-    public Vector3Export position = new Vector3Export(plane.Origin);
-    public QuaternionExport rotation = new QuaternionExport(plane);
+    public Vector3Export position = new(plane.Origin);
+    public QuaternionExport rotation = new(plane);
 }
 
 [XmlType(TypeName = "Quaternion")]

@@ -9,6 +9,7 @@ static class Util
         var icon = $"Extensions.Grasshopper.Assets.Embed.{name}.png";
         var assembly = typeof(ExtensionsInfo).Assembly;
         using var stream = assembly.GetManifestResourceStream(icon);
-        return new Bitmap(stream);
+        ArgumentNullException.ThrowIfNull(stream, icon);
+        return new(stream);
     }
 }

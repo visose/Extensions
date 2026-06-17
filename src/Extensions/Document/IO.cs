@@ -8,16 +8,16 @@ public static class IO
 {
     public enum ExportType { HTML, FBX };
 
-    public static string Export(List<DisplayGeometry> geometries, ExportType exportType, string folder, string fileName)
+    public static string Export(IReadOnlyList<DisplayGeometry> geometries, ExportType exportType, string folder, string fileName)
     {
         var doc = RhinoDoc.ActiveDoc;
-        var guids = new List<Guid>(geometries.Count);
+        List<Guid> guids = new(geometries.Count);
 
         bool flipYZ = exportType == ExportType.FBX;
 
         foreach (var geometry in geometries)
         {
-            guids.Add(geometry.Bake(doc, null, flipYZ));
+            guids.Add(geometry.Bake(doc, doc.CreateDefaultAttributes(), flipYZ));
         }
 
         doc.Objects.UnselectAll(false);
@@ -46,7 +46,7 @@ public static class IO
         return filePath;
     }
 
-    static Task _uploadTask;
+    static Task? _uploadTask;
 
     public static void FtpUpload(string localFilePath, string url, string user, string password)
     {
@@ -63,9 +63,12 @@ public static class IO
             var fileName = Path.GetFileName(localFilePath);
             string webFilePath = $"{url}/{fileName}";
 
+#pragma warning disable SYSLIB0014
             var request = (FtpWebRequest)WebRequest.Create(webFilePath);
+#pragma warning restore SYSLIB0014
             request.Method = WebRequestMethods.Ftp.UploadFile;
-            request.Credentials = new NetworkCredential(user, password);
+            NetworkCredential credentials = new(user, password);
+            request.Credentials = credentials;
 
             using (var inputStream = File.OpenRead(localFilePath))
             using (var outputStream = request.GetRequestStream())
@@ -80,7 +83,7 @@ public static class IO
                     var progress = totalReadBytesCount * 100.0 / inputStream.Length;
 
                     Action upload = () => StatusBar.UpdateProgressMeter((int)progress, true);
-                    Rhino.RhinoApp.InvokeOnUiThread(upload);
+                    RhinoApp.InvokeOnUiThread(upload);
                 }
             }
 

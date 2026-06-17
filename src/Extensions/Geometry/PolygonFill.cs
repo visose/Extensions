@@ -11,7 +11,7 @@ static class PolygonFill
         if (contours.Length == 0)
             return [];
 
-        var box = new BoundingBox(contours.SelectMany(p => p));
+        BoundingBox box = new(contours.SelectMany(p => p));
         box.Inflate(offset);
 
         int countX = (int)Ceiling(box.Diagonal.X / size);
@@ -20,13 +20,13 @@ static class PolygonFill
         double stepX = box.Diagonal.X / countX;
         double stepY = box.Diagonal.Y / countY;
 
-        var rectangles = new List<Polyline>(countX * countY);
+        List<Polyline> rectangles = new(countX * countY);
 
         for (double x = box.Min.X; x < box.Max.X; x += stepX)
         {
             for (double y = box.Min.Y; y < box.Max.Y; y += stepY)
             {
-                var rect = new Rectangle3d(Plane.WorldXY, new Point3d(x + offset, y + offset, 0), new Point3d(x + stepX - offset, y + stepY - offset, 0));
+                Rectangle3d rect = new(Plane.WorldXY, new Point3d(x + offset, y + offset, 0), new Point3d(x + stepX - offset, y + stepY - offset, 0));
                 rectangles.Add(rect.ToPolyline());
             }
         }
@@ -38,7 +38,6 @@ static class PolygonFill
         {
             for (int i = range.Item1; i < range.Item2; i++)
             {
-                // var skinOffset = Region.Offset(contours[i], offset);
                 var skinOffset = contours[i];
                 if (!skinOffset.IsValid)
                 {
@@ -46,8 +45,7 @@ static class PolygonFill
                     continue;
                 }
 
-                var squares = rectangles.SelectMany(r => Region.Intersection(Enumerable.Repeat(r, 1), Enumerable.Repeat(skinOffset, 1))).ToArray();
-                //layers[i] = squares.Select(s => Region.Offset(s, offset)).Append(contours[i]).Where(p => p.IsValid).ToArray();
+                var squares = rectangles.SelectMany(r => Region.Intersection([r], [skinOffset])).ToArray();
                 layers[i] = squares;
             }
         });

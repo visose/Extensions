@@ -5,13 +5,13 @@ using Rhino;
 
 namespace Extensions.Document;
 
-public class DisplayGeometry(GeometryBase geometry, DisplayMaterial material, string layer = "")
+public class DisplayGeometry(GeometryBase geometry, DisplayMaterial? material, string layer = "")
 {
-    public GeometryBase Geometry { get; set; } = geometry;
-    public DisplayMaterial Material { get; set; } = material;
-    public string Layer { get; set; } = layer;
+    public GeometryBase Geometry { get; } = geometry;
+    public DisplayMaterial? Material { get; } = material;
+    public string Layer { get; } = layer;
 
-    public Guid Bake(RhinoDoc doc, ObjectAttributes att = null, bool flipYZ = false)
+    public Guid Bake(RhinoDoc doc, ObjectAttributes? att = null, bool flipYZ = false)
     {
         att ??= doc.CreateDefaultAttributes();
 
@@ -25,10 +25,10 @@ public class DisplayGeometry(GeometryBase geometry, DisplayMaterial material, st
 
         var geometry = Geometry;
 
-        if (Geometry is Mesh)
+        if (Geometry is Mesh mesh)
         {
             if (flipYZ)
-                geometry = (Geometry as Mesh).FlipYZ();
+                geometry = mesh.FlipYZ();
 
             if (Material is not null)
             {
@@ -36,7 +36,8 @@ public class DisplayGeometry(GeometryBase geometry, DisplayMaterial material, st
                 att.MaterialSource = ObjectMaterialSource.MaterialFromObject;
 
                 double transparency = Material.Transparency;
-                if (flipYZ) transparency = 1 - transparency;
+                if (flipYZ)
+                    transparency = 1 - transparency;
 
                 var material = new Material
                 {
@@ -65,7 +66,7 @@ public class DisplayGeometry(GeometryBase geometry, DisplayMaterial material, st
 
     public DisplayGeometry Duplicate()
     {
-        return new DisplayGeometry(Geometry.Duplicate(), new DisplayMaterial(Material), Layer);
+        return new(Geometry.Duplicate(), Material is null ? null : new(Material), Layer);
     }
 
     public DisplayGeometry Transform(Transform xform)
@@ -75,5 +76,5 @@ public class DisplayGeometry(GeometryBase geometry, DisplayMaterial material, st
         return copy;
     }
 
-    public override string ToString() => $"Display Geometry ({Geometry.ObjectType}, {Material?.Diffuse.Name ?? "Default"}, {Layer ?? "Active"})";
+    public override string ToString() => $"Display Geometry ({Geometry.ObjectType}, {Material?.Diffuse.Name ?? "Default"}, {(string.IsNullOrEmpty(Layer) ? "Active" : Layer)})";
 }

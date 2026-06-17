@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="build/Extensions.Build/Extensions.Build.csproj" />
+  <Project Path="src/Extensions.Grasshopper/Extensions.Grasshopper.csproj">
+    <BuildDependency Project="src/Extensions/Extensions.csproj" />
+  </Project>
+  <Project Path="src/Extensions/Extensions.csproj" />
+</Solution>

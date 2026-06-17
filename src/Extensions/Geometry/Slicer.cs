@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Rhino.Geometry;
+using Rhino.Geometry.Intersect;
 using static System.Math;
 
 namespace Extensions.Geometry;
@@ -8,7 +9,7 @@ class Slicer
 {
     public static Polyline[][] Create(Mesh mesh, double height, Interval modelRegion)
     {
-        var slicer = new Slicer(mesh, height, modelRegion);
+        Slicer slicer = new(mesh, height, modelRegion);
         slicer.Slice();
         return slicer.Contours;
     }
@@ -17,9 +18,9 @@ class Slicer
     readonly double _height;
     Interval _modelRegion;
 
-    Polyline[][] Contours { get; set; }
+    Polyline[][] Contours { get; set; } = [];
 
-    private Slicer(Mesh mesh, double height, Interval modelRegion)
+    Slicer(Mesh mesh, double height, Interval modelRegion)
     {
         _mesh = mesh;
         _height = height;
@@ -35,7 +36,8 @@ class Slicer
 
         var processors = Environment.ProcessorCount;
         var chunk = (int)Ceiling(subPlanes.Count / (double)processors);
-        if (chunk == 0) chunk = 1;
+        if (chunk == 0)
+            chunk = 1;
         var partitions = Partitioner.Create(0, subPlanes.Count, chunk);
 
         Contours = new Polyline[subPlanes.Count][];
@@ -44,7 +46,7 @@ class Slicer
         {
             var loopPlanes = subPlanes.GetRange(range.Item1, range.Item2 - range.Item1);
 
-            var layers = Rhino.Geometry.Intersect.Intersection.MeshPlane(_mesh, loopPlanes)
+            var layers = Intersection.MeshPlane(_mesh, loopPlanes)
                                .GroupBy(p => (int)Round(p[0].Z / _height))
                                .Select(p => p.ToArray())
                                .ToArray();

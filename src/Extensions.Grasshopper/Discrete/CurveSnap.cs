@@ -1,23 +1,24 @@
-﻿using Grasshopper.Kernel;
-using Rhino.Geometry;
 using Grasshopper.Kernel.Parameters;
+using Rhino.Geometry;
 
 namespace Extensions.Grasshopper;
 
-public class CurveSnap : GH_Component
+public class CurveSnap() : Component(
+    "Curve Snap",
+    "CrvSnap",
+    "Snaps a curve to discrete segment lengths and directions.",
+    "Discrete",
+    "{4F45F86C-6B7E-4327-9475-467CB82DAF13}",
+    "Polyline")
 {
-    public CurveSnap() : base("Curve Snap", "CrvSnap", "Snaps curves to discrete intervals and directions.", "Extensions", "Discrete") { }
-    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Polyline");
-    public override Guid ComponentGuid => new("{4F45F86C-6B7E-4327-9475-467CB82DAF13}");
-
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-        pManager.AddCurveParameter("Curve", "C", "Curve.", GH_ParamAccess.item);
-        pManager.AddNumberParameter("Segment Length", "L", "Length of the segments.", GH_ParamAccess.item);
-        pManager.AddIntegerParameter("Snap Type", "S", "Directions based on spherical mapping. Right click for types.", GH_ParamAccess.item, 0);
-        pManager.AddIntegerParameter("Subdivisions", "D", "Number of spherical subdivisions.", GH_ParamAccess.item, 0);
+        _ = pManager.AddCurveParameter("Curve", "C", "Curve to snap.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("Segment Length", "L", "Target segment length.", GH_ParamAccess.item);
+        _ = pManager.AddIntegerParameter("Snap Type", "S", "Direction snapping method.", GH_ParamAccess.item, 0);
+        _ = pManager.AddIntegerParameter("Subdivisions", "D", "Number of spherical subdivisions.", GH_ParamAccess.item, 0);
 
-        var param = pManager[2] as Param_Integer;
+        var param = (Param_Integer)pManager[2];
         param.AddNamedValue("Equirectangular", 0);
         param.AddNamedValue("Icosahedral", 1);
         param.AddNamedValue("Quadrangular", 2);
@@ -25,22 +26,17 @@ public class CurveSnap : GH_Component
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-        pManager.AddCurveParameter("Discretized Curve", "C", "Discretized curve.", GH_ParamAccess.item);
+        _ = pManager.AddCurveParameter("Curve", "C", "Snapped curve.", GH_ParamAccess.item);
     }
 
-    protected override void SolveInstance(IGH_DataAccess DA)
+    protected override void SolveComponent(IGH_DataAccess DA)
     {
-        Curve curve = null;
-        double length = 0;
-        int snapType = 0;
-        int divisions = 0;
+        var result = Discrete.CurveSnap.SnapCurve(
+            DA.Get<Curve>(0),
+            DA.Get<double>(1),
+            (Discrete.CurveSnap.SnapType)DA.Get<int>(2),
+            DA.Get<int>(3));
 
-        if (!DA.GetData(0, ref curve)) return;
-        if (!DA.GetData(1, ref length)) return;
-        if (!DA.GetData(2, ref snapType)) return;
-        if (!DA.GetData(3, ref divisions)) return;
-
-        var result = Discrete.CurveSnap.SnapCurve(curve, length, (Discrete.CurveSnap.SnapType)snapType, divisions);
         DA.SetData(0, result);
     }
 }

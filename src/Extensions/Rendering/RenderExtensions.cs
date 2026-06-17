@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Drawing.Imaging;
 using Rhino.Geometry;
 
 namespace Extensions;
@@ -31,10 +32,10 @@ public static class RenderExtensions
             float fx = (float)x;
             float fy = (float)y;
 
-            mesh.TextureCoordinates[face.A] = new Point2f((fx + 0.5) / fSize, (fy + 0.5) / fSize);
-            mesh.TextureCoordinates[face.B] = new Point2f((fx + 1.5) / fSize, (fy + 0.5) / fSize);
-            mesh.TextureCoordinates[face.C] = new Point2f((fx + 1.5) / fSize, (fy + 1.5) / fSize);
-            mesh.TextureCoordinates[face.D] = new Point2f((fx + 0.5) / fSize, (fy + 1.5) / fSize);
+            mesh.TextureCoordinates[face.A] = new((fx + 0.5) / fSize, (fy + 0.5) / fSize);
+            mesh.TextureCoordinates[face.B] = new((fx + 1.5) / fSize, (fy + 0.5) / fSize);
+            mesh.TextureCoordinates[face.C] = new((fx + 1.5) / fSize, (fy + 1.5) / fSize);
+            mesh.TextureCoordinates[face.D] = new((fx + 0.5) / fSize, (fy + 1.5) / fSize);
 
             Color colorA = mesh.VertexColors[face.A];
             colorA = Color.FromArgb(255, colorA.R, colorA.G, colorA.B);
@@ -52,25 +53,28 @@ public static class RenderExtensions
             bitmap.SetPixel(x + 0, y + 0, colorD);
         }
 
-        bitmap.Save(file, System.Drawing.Imaging.ImageFormat.Png);
+        bitmap.Save(file, ImageFormat.Png);
 
         mesh.VertexColors.Clear();
 
         return mesh;
     }
 
-    public static IEnumerable<Mesh> BitmapFromSolidColoredMeshes(IEnumerable<Mesh> meshes, string file)
+    public static IReadOnlyList<Mesh> BitmapFromSolidColoredMeshes(IReadOnlyList<Mesh> meshes, string file)
     {
         var path = Path.GetDirectoryName(file);
-        if (!Directory.Exists(path)) throw new DirectoryNotFoundException($" Directory \"{path}\" not found.");
 
-        int count = meshes.Count();
+        if (!Directory.Exists(path))
+            throw new DirectoryNotFoundException($" Directory \"{path}\" not found.");
+
+        int count = meshes.Count;
         int size = (int)Math.Ceiling(Math.Sqrt(count));
         float fSize = (float)size * 2;
 
         Bitmap bitmap = new(size * 2, size * 2);
 
         int i = 0;
+
         foreach (var mesh in meshes)
         {
             int x = (i % size) * 2;
@@ -95,13 +99,13 @@ public static class RenderExtensions
             i++;
         }
 
-        bitmap.Save(file, System.Drawing.Imaging.ImageFormat.Png);
+        bitmap.Save(file, ImageFormat.Png);
         return meshes;
     }
 
-    public static Mesh SetTextureCoords(Mesh mesh, IEnumerable<Point3d> coords)
+    public static Mesh SetTextureCoords(Mesh mesh, IReadOnlyList<Point3d> coords)
     {
-        if (!coords.Any()) throw new Exception(" There should be at least one texture coordinate.");
+        ArgumentOutOfRangeException.ThrowIfZero(coords.Count, nameof(coords));
 
         var coords2f = coords.Select(p => new Point2f(p.X, p.Y)).ToList();
         if (coords2f.Count < mesh.Vertices.Count)

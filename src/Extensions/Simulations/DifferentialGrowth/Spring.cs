@@ -2,7 +2,7 @@
 
 namespace Extensions.Simulations.DifferentialGrowth;
 
-public class Spring
+class Spring
 {
     public Particle Start;
     public Particle End;
@@ -10,9 +10,6 @@ public class Spring
     public double Length;
     public Vector3d Vector;
     readonly DifferentialGrowth _simulation;
-
-    public Line Line => new(Start.Position, End.Position);
-    public Point3d Mid => new((Start.Position + End.Position) / 2);
 
     public double RestLength
     {
@@ -22,7 +19,7 @@ public class Spring
 
     public void Update()
     {
-        Vector = new Vector3d(End.Position - Start.Position);
+        Vector = new(End.Position - Start.Position);
         Length = Vector.Length;
     }
 
@@ -35,6 +32,8 @@ public class Spring
         start.Neighbours[1] = end;
         end.Neighbours[0] = start;
         Update();
+        ArgumentOutOfRangeException.ThrowIfZero(Length, nameof(Length));
+
         _restLength = Length;
         simulation.Springs.Insert(i, this);
     }
@@ -49,10 +48,8 @@ public class Spring
 
     public void Split(int i)
     {
-        //  Start.Neighbours.Remove(End);
-        //  End.Neighbours.Remove(Start);
         _simulation.Springs.Remove(this);
-        var mid = new Particle((Start.Position + End.Position) * 0.5, _simulation);
+        Particle mid = new((Start.Position + End.Position) * 0.5, _simulation);
         new Spring(mid, End, i, _simulation);
         new Spring(Start, mid, i, _simulation);
     }

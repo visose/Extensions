@@ -1,4 +1,6 @@
 ﻿using System.Drawing;
+using Rhino;
+using Rhino.DocObjects;
 using Rhino.Geometry;
 
 namespace Extensions.Document;
@@ -7,9 +9,9 @@ static class Cache
 {
     const string _layerName = "Cache";
 
-    public static T Read<T>(string name) where T : GeometryBase
+    public static T? Read<T>(string name) where T : GeometryBase
     {
-        var doc = Rhino.RhinoDoc.ActiveDoc;
+        var doc = RhinoDoc.ActiveDoc;
         var layer = doc.Layers.FindName(_layerName);
 
         if (layer is null)
@@ -21,7 +23,7 @@ static class Cache
 
     public static void Write<T>(string name, T geometry) where T : GeometryBase
     {
-        var doc = Rhino.RhinoDoc.ActiveDoc;
+        var doc = RhinoDoc.ActiveDoc;
         var layer = doc.Layers.FindName(_layerName);
 
         if (layer is null)
@@ -30,7 +32,7 @@ static class Cache
             layer = doc.Layers.FindIndex(index);
         }
 
-        var attributes = new Rhino.DocObjects.ObjectAttributes
+        ObjectAttributes attributes = new()
         {
             LayerIndex = layer.Index,
             Name = name

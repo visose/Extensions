@@ -2,18 +2,17 @@ using Rhino.Geometry;
 using Robots;
 using Robots.Commands;
 using static System.Math;
+using CustomCommand = Robots.Commands.Custom;
 
 namespace Extensions.Toolpaths.Extrusion;
 
-struct SimpleTarget
-{
-    public Plane Location;
-    public double Length;
-}
+readonly record struct SimpleTarget(Plane Location, double Length);
 
-public class ExternalExtrusionToolpath : SimpleToolpath
+public class ExternalExtrusionToolpath : TargetListToolpath
 {
-    public List<int> SubPrograms { get; set; } = [];
+    readonly List<int> _subPrograms = [];
+
+    public IReadOnlyList<int> SubPrograms => _subPrograms;
 
     readonly ExtrusionAttributes _att;
     readonly double _extrusionFactor;
@@ -21,8 +20,10 @@ public class ExternalExtrusionToolpath : SimpleToolpath
     readonly double _startDistance;
     readonly double _loopDistance;
 
-    public ExternalExtrusionToolpath(IList<Polyline> polylines, ExtrusionAttributes attributes, double extrusionFactor, double suckBack, double startDistance, double loopDistance)
+    public ExternalExtrusionToolpath(IReadOnlyList<Polyline> polylines, ExtrusionAttributes attributes, double extrusionFactor, double suckBack, double startDistance, double loopDistance)
     {
+        ArgumentOutOfRangeException.ThrowIfZero(polylines.Count, nameof(polylines));
+
         _att = attributes;
         _extrusionFactor = extrusionFactor;
         _suckBack = -suckBack;
@@ -36,7 +37,7 @@ public class ExternalExtrusionToolpath : SimpleToolpath
         CreateTargets(paths);
     }
 
-    public ExternalExtrusionToolpath(List<List<Plane>> locations, List<List<double>> lengths, ExtrusionAttributes attributes, double extrusionFactor, double suckBack, double startDistance, double loopDistance)
+    public ExternalExtrusionToolpath(IReadOnlyList<IReadOnlyList<Plane>> locations, IReadOnlyList<IReadOnlyList<double>> lengths, ExtrusionAttributes attributes, double extrusionFactor, double suckBack, double startDistance, double loopDistance)
     {
         _att = attributes;
         _extrusionFactor = extrusionFactor;
@@ -44,26 +45,25 @@ public class ExternalExtrusionToolpath : SimpleToolpath
         _startDistance = startDistance;
         _loopDistance = loopDistance;
 
-        var paths = new List<List<SimpleTarget>>(locations.Count);
+        List<IReadOnlyList<SimpleTarget>> paths = new(locations.Count);
 
-        if (locations.Count != lengths.Count)
-            throw new ArgumentException("Number of paths in locations and lengths don't match.");
+        ArgumentOutOfRangeException.ThrowIfNotEqual(lengths.Count, locations.Count, nameof(lengths));
 
-        if (locations.Count == 0)
-            throw new ArgumentException("There should be more than one path.");
+        ArgumentOutOfRangeException.ThrowIfZero(locations.Count, nameof(locations));
 
         for (int i = 0; i < locations.Count; i++)
         {
-            if (locations[i].Count != lengths[i].Count)
-                throw new ArgumentException($"Locations and lengths in path {i} don't match.");
+            ArgumentOutOfRangeException.ThrowIfNotEqual(lengths[i].Count, locations[i].Count, nameof(lengths));
 
-            int pathCount = locations[0].Count;
+            int pathCount = locations[i].Count;
 
-            var path = new List<SimpleTarget>(pathCount);
+            ArgumentOutOfRangeException.ThrowIfZero(pathCount, nameof(locations));
 
-            for (int j = 0; j < locations[0].Count; j++)
+            List<SimpleTarget> path = new(pathCount);
+
+            for (int j = 0; j < pathCount; j++)
             {
-                path.Add(new SimpleTarget() { Location = locations[i][j], Length = lengths[i][j] });
+                path.Add(new(locations[i][j], lengths[i][j]));
             }
 
             paths.Add(path);
@@ -74,12 +74,14 @@ public class ExternalExtrusionToolpath : SimpleToolpath
 
     List<SimpleTarget> ToTargets(Polyline path, Point3d robotPosition)
     {
-        var targets = new List<SimpleTarget>(path.Count);
+        ArgumentOutOfRangeException.ThrowIfLessThan(path.Count, 2, nameof(path));
+
+        List<SimpleTarget> targets = new(path.Count);
 
         for (int i = 0; i < path.Count; i++)
         {
             var pos = path[i];
-            var plane = new Plane(pos, Vector3d.ZAxis);
+            Plane plane = new(pos, Vector3d.ZAxis);
             double angle = Vector3d.VectorAngle(robotPosition - pos, plane.XAxis, plane);
             plane.Rotate(-angle, plane.Normal);
 
@@ -103,45 +105,46 @@ public class ExternalExtrusionToolpath : SimpleToolpath
         return ((PI * (_att.BeadWidth * 0.5) * (_att.LayerHeight * 0.5)) * length);
     }
 
-    void CreateTargets(List<List<SimpleTarget>> paths)
+    void CreateTargets(IReadOnlyList<IReadOnlyList<SimpleTarget>> paths)
     {
         double totalDistance = 0;
         var externalCustom = new[] { "motorValue" };
 
-        _targets.Add(HomeStart());
+        AddTarget(HomeStart());
 
         foreach (var path in paths)
         {
+            ArgumentOutOfRangeException.ThrowIfLessThan(path.Count, 2, nameof(paths));
+
             var first = path[0].Location;
             var last = path[path.Count - 1].Location;
 
             var firstSafe = first; firstSafe.Origin += firstSafe.Normal * _att.SafeZOffset;
 
-            _targets.Add(CreateTarget(firstSafe, _att.SafeSpeed, _att.SafeZone, 0));
+            AddTarget(CreateTarget(firstSafe, _att.SafeSpeed, _att.SafeZone, 0));
 
-            _targets.Add(CreateTarget(first, _att.ApproachSpeed, _att.ApproachZone, 0));
-            _targets.Add(CreateTarget(first, _att.ApproachSpeed, _att.ApproachZone, _startDistance));
+            AddTarget(CreateTarget(first, _att.ApproachSpeed, _att.ApproachZone, 0));
+            AddTarget(CreateTarget(first, _att.ApproachSpeed, _att.ApproachZone, _startDistance));
 
             for (int i = 1; i < path.Count; i++)
             {
-                //double segmentLength = path[i - 1].DistanceTo(path[i]);
                 Plane position = path[i].Location;
                 double segmentLength = path[i].Length;
 
                 var zone = i != path.Count - 1 ? _att.ExtrusionZone : _att.ApproachZone;
-                _targets.Add(CreateTarget(position, _att.ExtrusionSpeed, zone, segmentLength));
+                AddTarget(CreateTarget(position, _att.ExtrusionSpeed, zone, segmentLength));
             }
 
-            _targets.Add(CreateTarget(last, _att.ExtrusionSpeed, _att.ApproachZone, _suckBack));
+            AddTarget(CreateTarget(last, _att.ExtrusionSpeed, _att.ApproachZone, _suckBack));
 
             var lastOffset = last; lastOffset.Origin += lastOffset.Normal * (_att.SafeZOffset + _att.LayerHeight);
-            _targets.Add(CreateTarget(lastOffset, _att.ApproachSpeed, _att.SafeZone, 0));
+            AddTarget(CreateTarget(lastOffset, _att.ApproachSpeed, _att.SafeZone, 0));
 
-            SubPrograms.Add(_targets.Count);
+            _subPrograms.Add(TargetCount);
         }
 
-        _targets.Add(HomeEnd());
-        SubPrograms.RemoveAt(SubPrograms.Count - 1);
+        AddTarget(HomeEnd());
+        _subPrograms.RemoveAt(_subPrograms.Count - 1);
 
         Target CreateTarget(Plane location, Speed speed, Zone zone, double externalDistance)
         {
@@ -150,20 +153,20 @@ public class ExternalExtrusionToolpath : SimpleToolpath
 
             totalDistance += externalDistance * _extrusionFactor;
 
-            Command command = null;
+            Command? command = null;
 
             if (externalDistance != 0)
             {
                 string sign = externalDistance < 0 ? "+" : "-";
                 string code = $"motorValue:=motorValue{sign}{Abs(externalDistance):0.000}*extrusionFactor;";
-                var externalCommand = new Robots.Commands.Custom($"SetExternal{_targets.Count}", Manufacturers.ABB, code)
+                CustomCommand externalCommand = new($"SetExternal{TargetCount}", Manufacturers.ABB, code)
                 {
                     RunBefore = true
                 };
                 command = externalCommand;
             }
 
-            var target = new CartesianTarget(location, null, Motions.Linear, tool, speed, zone, command, frame, [totalDistance])
+            CartesianTarget target = new(location, null, Motions.Linear, tool, speed, zone, command, frame, [totalDistance])
             {
                 ExternalCustom = externalCustom
             };
@@ -175,7 +178,7 @@ public class ExternalExtrusionToolpath : SimpleToolpath
             var externalValue = ExternalValue(_loopDistance);
 
             string declaration = $@"VAR num motorValue:= 0;
-PERS num extrusionFactor:={_extrusionFactor: 0.000};
+PERS num extrusionFactor:={_extrusionFactor:0.000};
 VAR robtarget current;
 VAR num choice:=0;
 ";
@@ -193,14 +196,14 @@ WHILE choice = 5 DO
     MoveL Offs(current,0,0,0),{_att.ExtrusionSpeed.Name},{_att.ExtrusionZone.Name},{_att.Tool.Name} \WObj:= {_att.Frame.Name};
 ENDWHILE";
 
-            var initCommand = new Robots.Commands.Custom("Init", Manufacturers.ABB, initCode, declaration)
+            CustomCommand initCommand = new("Init", Manufacturers.ABB, initCode, declaration)
             {
                 RunBefore = true
             };
-            var testCommand = new Robots.Commands.Custom("Test", Manufacturers.ABB, testCode);
+            CustomCommand testCommand = new("Test", Manufacturers.ABB, testCode);
 
-            var command = new Group([initCommand, testCommand]);
-            var home = new JointTarget(_att.Home, _att.Tool, _att.SafeSpeed, _att.SafeZone, command, _att.Frame, [totalDistance])
+            Group command = new([initCommand, testCommand]);
+            JointTarget home = new(_att.Home, _att.Tool, _att.SafeSpeed, _att.SafeZone, command, _att.Frame, [totalDistance])
             {
                 ExternalCustom = externalCustom
             };
@@ -209,12 +212,8 @@ ENDWHILE";
 
         Target HomeEnd()
         {
-            var command = new Group()
-            {
-                new Message("Se acabó."),
-                new Stop()
-            };
-            var home = new JointTarget(_att.Home, _att.Tool, _att.SafeSpeed, _att.SafeZone, command, _att.Frame, [totalDistance])
+            Group command = new([new Message("Se acabó."), new Stop()]);
+            JointTarget home = new(_att.Home, _att.Tool, _att.SafeSpeed, _att.SafeZone, command, _att.Frame, [totalDistance])
             {
                 ExternalCustom = externalCustom
             };

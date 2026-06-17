@@ -1,3 +1,9 @@
+- version: 2.0.0
+  changes:
+  - Targets Rhino 8 on .NET 8; Rhino 7 and .NET Framework are no longer supported.
+  - Updated for compatibility with Robots 2.1.0.
+  - Modernized APIs, validation, Grasshopper integration, dependencies, build, and packaging.
+
 - version: 1.0.5
   changes:
   - Fixed issue with CoreCLR.

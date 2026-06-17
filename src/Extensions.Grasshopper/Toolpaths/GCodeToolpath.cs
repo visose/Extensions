@@ -1,65 +1,48 @@
-using Grasshopper.Kernel;
 using Rhino.Geometry;
 using Robots;
 using Robots.Grasshopper;
+using GCodeToolpathCore = Extensions.Toolpaths.Milling.GCodeToolpath;
 
 namespace Extensions.Grasshopper;
 
-public class GCodeToolpath : GH_Component
+public class GCodeToolpath() : RobotComponent(
+    "G-code Toolpath",
+    "GPath",
+    "Creates a milling toolpath from a G-code file.",
+    "Toolpaths",
+    "{862CF2F9-EF08-444C-88B5-459D365EB60A}",
+    "Fingerprint")
 {
-    public GCodeToolpath() : base("G-code Toolpath", "GPath", "Converts a G-code file to robot targets.", "Extensions", "Toolpaths") { }
-    public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
-    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Fingerprint");
-    public override Guid ComponentGuid => new("{862CF2F9-EF08-444C-88B5-459D365EB60A}");
-
-    protected override void RegisterInputParams(GH_InputParamManager pManager)
+    protected override void RegisterRobotInputParams(GH_InputParamManager pManager)
     {
-        if (ExtensionsInfo.IsRobotsInstalled)
-            Inputs(pManager);
-    }
+        _ = pManager.AddTextParameter("File", "F", "G-code file path.", GH_ParamAccess.item);
+        _ = pManager.AddParameter(new TargetParameter(), "Target", "T", "Reference cartesian target.", GH_ParamAccess.item);
+        _ = pManager.AddPointParameter("Point Alignment", "P", "Optional point used to align target X axes.", GH_ParamAccess.item);
+        _ = pManager.AddBooleanParameter("Add Bit", "A", "Add end mill geometry to the tool.", GH_ParamAccess.item);
 
-    protected override void RegisterOutputParams(GH_OutputParamManager pManager)
-    {
-        if (ExtensionsInfo.IsRobotsInstalled)
-            Outputs(pManager);
-    }
-
-    void Inputs(GH_InputParamManager pManager)
-    {
-        pManager.AddTextParameter("File", "F", "GCode file.", GH_ParamAccess.item);
-        pManager.AddParameter(new TargetParameter(), "Target", "T", "Created targets will use the parameters of this reference target if they're not supplied in the G-code file.", GH_ParamAccess.item);
-        pManager.AddPointParameter("Point alignment", "P", "Aligns the X axis of the tagets to look towards this point (in world coordinate system). If not supplied it will use the X axis of the reference target.", GH_ParamAccess.item);
-        pManager.AddBooleanParameter("Add bit", "A", "Add drill bit to tool.", GH_ParamAccess.item);
         pManager[2].Optional = true;
     }
 
-    void Outputs(GH_OutputParamManager pManager)
+    protected override void RegisterRobotOutputParams(GH_OutputParamManager pManager)
     {
-        pManager.AddParameter(new ToolpathParameter(), "Toolpath", "T", "Milling toolpath.", GH_ParamAccess.item);
-        pManager.AddParameter(new ToolParameter(), "Spindle", "S", "Spindle with end mill.", GH_ParamAccess.item);
-        pManager.AddPlaneParameter("MCS", "P", "Plane of machine coordinate system.", GH_ParamAccess.item);
-        pManager.AddIntegerParameter("Rapid", "R", "Starting index of rapid moves.", GH_ParamAccess.list);
-        pManager.AddTextParameter("Ignored", "I", "Ignored instructions.", GH_ParamAccess.list);
+        _ = pManager.AddParameter(new ToolpathParameter(), "Toolpath", "T", "Robot toolpath.", GH_ParamAccess.item);
+        _ = pManager.AddParameter(new ToolParameter(), "Spindle", "S", "Spindle with end mill.", GH_ParamAccess.item);
+        _ = pManager.AddPlaneParameter("MCS", "P", "Plane of machine coordinate system.", GH_ParamAccess.item);
+        _ = pManager.AddIntegerParameter("Rapid Indices", "R", "Target indices that delimit rapid sections.", GH_ParamAccess.list);
+        _ = pManager.AddTextParameter("Ignored Lines", "I", "Ignored G-code lines.", GH_ParamAccess.list);
     }
 
-    protected override void SolveInstance(IGH_DataAccess DA)
+    protected override void SolveComponent(IGH_DataAccess DA)
     {
-        string file = null;
-        GH_Target target = null;
-        Point3d? point = null;
-        bool addBit = false;
+        var target = DA.Get<Target>(1) as CartesianTarget
+            ?? throw new ArgumentException("Reference target must be a cartesian target.");
 
-        if (!DA.GetData(0, ref file)) return;
-        if (!DA.GetData(1, ref target)) return;
-        DA.GetData(2, ref point);
-        if (!DA.GetData(3, ref addBit)) return;
+        var alignment = DA.MaybeValue<Point3d>(2) is { } point
+            ? (Vector3d)point
+            : Vector3d.XAxis;
 
-        var alignment = Vector3d.XAxis;
-        if (point.HasValue)
-            alignment = (Vector3d)point.Value;
-
-        var toolpath = new Toolpaths.Milling.GCodeToolpath(file, target.Value as CartesianTarget, alignment, addBit);
-        var (tool, mcs, rapidStarts, ignored) = toolpath.Toolpath;
+        GCodeToolpathCore toolpath = new(DA.Get<string>(0), target, alignment, DA.Get<bool>(3));
+        var (tool, mcs, rapidStarts, ignored) = toolpath;
 
         DA.SetData(0, toolpath);
         DA.SetData(1, tool);

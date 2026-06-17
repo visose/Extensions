@@ -1,64 +1,43 @@
-﻿using Grasshopper.Kernel;
 using Rhino.Geometry;
 using Robots.Grasshopper;
 using Extensions.Toolpaths.Extrusion;
 
 namespace Extensions.Grasshopper;
 
-public class CreateExternalExtrusionToolpath : GH_Component
+public class CreateExternalExtrusionToolpath() : RobotComponent(
+    "External Extrusion Toolpath",
+    "ExtPath",
+    "Creates an extrusion toolpath using an external axis.",
+    "Toolpaths",
+    "{08731061-8020-4204-8B69-198AC90BCE5E}",
+    "LayersAdd")
 {
-    public CreateExternalExtrusionToolpath() : base("Extrusion Toolpath Ex", "ExtPath", "Extrusion toolpath with external axis.", "Extensions", "Toolpaths") { }
-    public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
-    protected override System.Drawing.Bitmap Icon => Util.GetIcon("LayersAdd");
-    public override Guid ComponentGuid => new("{08731061-8020-4204-8B69-198AC90BCE5E}");
-
-    protected override void RegisterInputParams(GH_InputParamManager pManager)
+    protected override void RegisterRobotInputParams(GH_InputParamManager pManager)
     {
-        if (ExtensionsInfo.IsRobotsInstalled)
-            Inputs(pManager);
+        _ = pManager.AddCurveParameter("Paths", "P", "Extrusion paths as polylines.", GH_ParamAccess.list);
+        _ = pManager.AddParameter(new ExtrusionAttributesParameter(), "Extrusion Attributes", "A", "Extrusion toolpath settings.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("Extrusion Factor", "F", "External-axis extrusion scale.", GH_ParamAccess.item, 0.21);
+        _ = pManager.AddNumberParameter("Suck Back", "Sb", "Reverse extrusion distance after stopping.", GH_ParamAccess.item, 0);
+        _ = pManager.AddNumberParameter("Start Distance", "Sd", "Extrusion distance before robot motion starts.", GH_ParamAccess.item, 0);
+        _ = pManager.AddNumberParameter("Test Loop", "L", "Test loop distance.", GH_ParamAccess.item, 200);
     }
 
-    protected override void RegisterOutputParams(GH_OutputParamManager pManager)
+    protected override void RegisterRobotOutputParams(GH_OutputParamManager pManager)
     {
-        if (ExtensionsInfo.IsRobotsInstalled)
-            Outputs(pManager);
+        _ = pManager.AddParameter(new ToolpathParameter(), "Toolpath", "T", "Robot toolpath.", GH_ParamAccess.item);
+        _ = pManager.AddIntegerParameter("Layer Indices", "L", "First target index of each layer.", GH_ParamAccess.list);
     }
 
-    void Inputs(GH_InputParamManager pManager)
+    protected override void SolveComponent(IGH_DataAccess DA)
     {
-        pManager.AddCurveParameter("Paths", "P", "Paths as as list of polylines.", GH_ParamAccess.list);
-        pManager.AddParameter(new ExtrusionAttributesParameter(), "Extrusion attributes", "A", "Extrusion attributes.", GH_ParamAccess.item);
-        pManager.AddNumberParameter("Extrusion Factor", "F", "Extrusion factor.", GH_ParamAccess.item, 0.21);
-        pManager.AddNumberParameter("Suck Back", "Sb", "Distance to extrude in reverse immediately after stopping the extrusion. To avoid dripping material.", GH_ParamAccess.item, 0);
-        pManager.AddNumberParameter("Start Distance", "Sd", "Distance to extrude before the robot starts moving. To compensate for material not flowing immediately after starting the extrusion.", GH_ParamAccess.item, 0);
-        pManager.AddNumberParameter("Test Loop", "L", "Distance for test loop.", GH_ParamAccess.item, 200);
-    }
-
-    void Outputs(GH_OutputParamManager pManager)
-    {
-        pManager.AddParameter(new ToolpathParameter(), "Toolpath", "T", "Extrusion toolpath.", GH_ParamAccess.item);
-        pManager.AddIntegerParameter("Layer indices", "L", "Layer indices.", GH_ParamAccess.list);
-    }
-
-    protected override void SolveInstance(IGH_DataAccess DA)
-    {
-        var paths = new List<Curve>();
-        GH_ExtrusionAttributes attributes = null;
-        double factor = 0, suckBack = 0, loop = 0, startDistance = 0;
-
-        if (!DA.GetDataList(0, paths)) return;
-        if (!DA.GetData(1, ref attributes)) return;
-        if (!DA.GetData(2, ref factor)) return;
-        if (!DA.GetData(3, ref suckBack)) return;
-        if (!DA.GetData(4, ref startDistance)) return;
-        if (!DA.GetData(5, ref loop)) return;
-
-        var polylines = paths
-            .Where(p => p.IsPolyline())
-            .Select(p => { p.TryGetPolyline(out Polyline pl); return pl; })
-            .ToList();
-
-        var toolpath = new ExternalExtrusionToolpath(polylines, attributes.Value, factor, suckBack, startDistance, loop);
+        var polylines = DA.List<Curve>(0).Select(static curve => curve.ToPolyline()).ToArray();
+        ExternalExtrusionToolpath toolpath = new(
+            polylines,
+            DA.Get<ExtrusionAttributes>(1),
+            DA.Get<double>(2),
+            DA.Get<double>(3),
+            DA.Get<double>(4),
+            DA.Get<double>(5));
 
         DA.SetData(0, toolpath);
         DA.SetDataList(1, toolpath.SubPrograms);

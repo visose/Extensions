@@ -1,25 +1,33 @@
 using Rhino.Geometry;
 using Robots;
+using System.Globalization;
 
 namespace Extensions.Toolpaths;
 
-// pX,pY,pZ,nX,nY,nZ,F'
-
 public class CSVConverter
 {
-    public List<Target> Targets { get; } = [];
-    public List<Polyline> ToolPath { get; } = [];
+    readonly List<Target> _targets = [];
+    readonly List<Polyline> _toolPath = [];
 
-    readonly string[] _validParameters = ["type", "position", "normal", "xaxis", "speed", "zone"];
+    public IReadOnlyList<Target> Targets => _targets;
+    public IReadOnlyList<Polyline> ToolPath => _toolPath;
+
+    static readonly string[] _validParameters = ["type", "position", "normal", "xaxis", "speed", "zone"];
 
     public CSVConverter(string file, CartesianTarget referenceTarget, string mask, bool reverse, double cutSpeed = 0, Point3d? point = null)
     {
-        var splitMask = mask.Split(',').Select(p => p.Trim().ToLower());
-        if (!splitMask.All(p => _validParameters.Contains(p))) throw new Exception(" Mask not valid.");
+        ArgumentException.ThrowIfNullOrWhiteSpace(file);
+        ArgumentException.ThrowIfNullOrWhiteSpace(mask);
+
+        var splitMask = mask.Split(',').Select(p => p.Trim().ToLowerInvariant()).ToArray();
+
+        if (!splitMask.All(p => _validParameters.Contains(p)))
+            throw new ArgumentException("Mask is not valid.", nameof(mask));
 
         var parameterIndex = splitMask.ToDictionary(p => p, p => -1);
 
         int count = 0;
+
         foreach (var parameter in splitMask)
         {
             parameterIndex[parameter] = count;
@@ -31,19 +39,23 @@ public class CSVConverter
 
         var lines = File.ReadAllLines(file);
 
-        var planes = new List<Plane>(lines.Length);
-        var speedValues = new List<double>(lines.Length);
-        var zoneValues = new List<double>(lines.Length);
-        var types = new List<double>(lines.Length);
+        List<Plane> planes = new(lines.Length);
+        List<double> speedValues = new(lines.Length);
+        List<double> zoneValues = new(lines.Length);
+        List<double> types = new(lines.Length);
 
         foreach (var line in lines)
         {
             var fields = line.Split(',');
-            if (fields.Length != count) continue; //throw new Exception(" Number of values in a line is not correct.");
+
+            if (fields.Length != count)
+                throw new FormatException($"CSV line has {fields.Length} values, expected {count}.");
 
             var numbers = fields.Select(s =>
             {
-                if (!double.TryParse(s, out double n)) throw new Exception(" Can't convert field to number.");
+                if (!double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double n))
+                    throw new FormatException($"Cannot convert field '{s}' to a number.");
+
                 return n;
             }).ToArray();
 
@@ -51,7 +63,8 @@ public class CSVConverter
 
             var position = parameterIndex.TryGetValue("position", out int positionIndex) ? (Point3d)GetVector(positionIndex) : referenceTarget.Plane.Origin;
             var normal = parameterIndex.TryGetValue("normal", out int normalIndex) ? GetVector(normalIndex) : referenceTarget.Plane.Normal;
-            if (reverse) normal *= -1.0;
+            if (reverse)
+                normal *= -1.0;
             var xaxis = parameterIndex.TryGetValue("xaxis", out int xaxisIndex) ? GetVector(xaxisIndex) : referenceTarget.Plane.XAxis;
 
             if (point != null)
@@ -61,7 +74,7 @@ public class CSVConverter
                 xaxis = localPoint - position;
             }
 
-            var plane = new Plane(position, normal);
+            Plane plane = new(position, normal);
             double angle = Vector3d.VectorAngle(plane.XAxis, xaxis, plane);
             plane.Rotate(angle, plane.Normal);
             planes.Add(plane);
@@ -83,23 +96,29 @@ public class CSVConverter
                 types.Add(speed <= cutSpeed ? 1 : 0);
         }
 
-        var distinctSpeeds = speedValues.Distinct().Select(s => new Speed(translation: s, rotationSpeed: referenceTarget.Speed.RotationSpeed));
-        var speeds = speedValues.Select(v => distinctSpeeds.First(s => s.TranslationSpeed == v)).ToList();
+        var speedsByValue = speedValues
+            .Distinct()
+            .ToDictionary(
+                static s => s,
+                s => new Speed(translation: s, rotationSpeed: referenceTarget.Speed.RotationSpeed));
+        var speeds = speedValues.Select(v => speedsByValue[v]).ToArray();
 
-        var distinctZones = zoneValues.Distinct().Select(z => new Zone(distance: z));
-        var zones = zoneValues.Select(v => distinctZones.First(z => z.Distance == v)).ToList();
+        var zonesByValue = zoneValues
+            .Distinct()
+            .ToDictionary(static z => z, static z => new Zone(distance: z));
+        var zones = zoneValues.Select(v => zonesByValue[v]).ToArray();
 
         for (int i = 0; i < planes.Count; i++)
         {
             var speed = parameterIndex.ContainsKey("speed") ? speeds[i] : referenceTarget.Speed;
             var zone = parameterIndex.ContainsKey("zone") ? zones[i] : referenceTarget.Zone;
 
-            var target = new CartesianTarget(planes[i], null, Motions.Joint, referenceTarget.Tool, speed, zone, null, referenceTarget.Frame);
-            Targets.Add(target);
+            CartesianTarget target = new(planes[i], null, Motions.Joint, referenceTarget.Tool, speed, zone, null, referenceTarget.Frame);
+            _targets.Add(target);
         }
 
         {
-            Polyline polyline = null;
+            Polyline? polyline = null;
 
             for (int i = 0; i < planes.Count; i++)
             {
@@ -111,7 +130,7 @@ public class CSVConverter
                     if (polyline == null)
                     {
                         polyline = [];
-                        ToolPath.Add(polyline);
+                        _toolPath.Add(polyline);
                     }
 
                     polyline.Add(vertex);
@@ -123,7 +142,7 @@ public class CSVConverter
             }
         }
 
-        foreach (var polyline in ToolPath)
+        foreach (var polyline in _toolPath)
         {
             polyline.CollapseShortSegments(0.01);
         }

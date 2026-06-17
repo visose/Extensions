@@ -1,51 +1,43 @@
-﻿using Rhino.Geometry;
-using Grasshopper.Kernel;
+using Rhino.Geometry;
+using ColumnCore = Extensions.Toolpaths.Column;
 
 namespace Extensions.Grasshopper;
 
-public class LayeredToolpath : GH_Component
+public class LayeredToolpath() : Component(
+    "Layered Toolpath",
+    "LayeredToolpath",
+    "Creates layered extrusion preview geometry.",
+    "Toolpaths",
+    "{82C1EFE1-97C3-438C-84F4-C23F92574373}",
+    "Layers")
 {
-    public LayeredToolpath() : base("Layered Toolpath", "LayeredToolpath", "Creates a layered extrusion toolpath.", "Extensions", "Toolpaths") { }
-    protected override System.Drawing.Bitmap Icon => Util.GetIcon("Layers");
-    public override Guid ComponentGuid => new("{82C1EFE1-97C3-438C-84F4-C23F92574373}");
-
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-        pManager.AddMeshParameter("Mesh", "M", "Mesh.", GH_ParamAccess.item);
-        pManager.AddNumberParameter("Nozzle diameter", "D", "Nozzle diameter", GH_ParamAccess.item);
-        pManager.AddNumberParameter("Layer height", "H", "Layer height", GH_ParamAccess.item);
-        pManager.AddIntervalParameter("Region", "R", "Region", GH_ParamAccess.item);
+        _ = pManager.AddMeshParameter("Mesh", "M", "Mesh to slice.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("Nozzle Diameter", "D", "Nozzle diameter.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("Layer Height", "H", "Layer height.", GH_ParamAccess.item);
+        _ = pManager.AddIntervalParameter("Region", "R", "Normalized slicing interval.", GH_ParamAccess.item);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-        pManager.AddCurveParameter("Original", "O", "Original contours.", GH_ParamAccess.list);
-        pManager.AddCurveParameter("Clean", "C", "Cleaned contours.", GH_ParamAccess.list);
-        pManager.AddMeshParameter("Pipe", "P", "3D beads.", GH_ParamAccess.list);
-        pManager.AddMeshParameter("Skin", "S", "3D skin for visualization.", GH_ParamAccess.item);
+        _ = pManager.AddCurveParameter("Contours", "O", "Original contours.", GH_ParamAccess.list);
+        _ = pManager.AddCurveParameter("Paths", "C", "Cleaned deposition paths.", GH_ParamAccess.list);
+        _ = pManager.AddMeshParameter("Beads", "P", "Bead preview meshes.", GH_ParamAccess.list);
+        _ = pManager.AddMeshParameter("Skin", "S", "Skin preview mesh.", GH_ParamAccess.item);
     }
 
-    protected override void SolveInstance(IGH_DataAccess DA)
+    protected override void SolveComponent(IGH_DataAccess DA)
     {
-        Mesh mesh = new();
-        double diameter = 0, height = 0;
-        Interval region = Interval.Unset;
+        ColumnCore column = new(
+            DA.Get<Mesh>(0),
+            DA.Get<double>(1),
+            DA.Get<double>(2),
+            DA.Get<Interval>(3));
 
-        DA.GetData(0, ref mesh);
-        DA.GetData(1, ref diameter);
-        DA.GetData(2, ref height);
-        DA.GetData(3, ref region);
-
-        var column = new Toolpaths.Column(mesh, diameter, height, region);
-
-        var original = column.Contours.Select(p => new PolylineCurve(p));
-        var contours = column.Layers.SelectMany(p => p.Select(c => new PolylineCurve(c)));
-        var pipes = column.Pipes.SelectMany(p => p);
-        var skin = column.Skin;
-
-        DA.SetDataList(0, original);
-        DA.SetDataList(1, contours);
-        DA.SetDataList(2, pipes);
-        DA.SetData(3, skin);
+        DA.SetDataList(0, column.Contours.Select(static p => new PolylineCurve(p)));
+        DA.SetDataList(1, column.Layers.SelectMany(static p => p.Select(static c => new PolylineCurve(c))));
+        DA.SetDataList(2, column.Pipes.SelectMany(static p => p));
+        DA.SetData(3, column.Skin);
     }
 }

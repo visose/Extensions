@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Drawing;
-using Grasshopper.Kernel;
 using Grasshopper;
 
 namespace Extensions.Grasshopper;
@@ -11,16 +10,26 @@ public class ExtensionsInfo : GH_AssemblyInfo
 
     public ExtensionsInfo()
     {
-        foreach (var folder in Folders.AssemblyFolders)
+        try
         {
-            var files = Directory.EnumerateFiles(folder.Folder, "Robots.gha", SearchOption.TopDirectoryOnly);
-
-            if (files.Any())
+            foreach (var folder in Folders.AssemblyFolders)
             {
-                Assembly.LoadFrom(files.First());
+                if (!Directory.Exists(folder.Folder))
+                    continue;
+
+                var robots = Directory.EnumerateFiles(folder.Folder, "Robots.gha", SearchOption.TopDirectoryOnly).FirstOrDefault();
+
+                if (robots is null)
+                    continue;
+
+                Assembly.LoadFrom(robots);
                 IsRobotsInstalled = true;
-                break;
+                return;
             }
+        }
+        catch
+        {
+            IsRobotsInstalled = false;
         }
     }
 
@@ -36,7 +45,8 @@ public class ExtensionsInfo : GH_AssemblyInfo
     T GetInfo<T>() where T : Attribute
     {
         var assembly = Assembly.GetExecutingAssembly();
-        return assembly.GetCustomAttribute<T>();
+        return assembly.GetCustomAttribute<T>()
+            ?? throw new InvalidOperationException($"Missing required assembly attribute {typeof(T).Name}.");
     }
 
     string[] GetCompany()

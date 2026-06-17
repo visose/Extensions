@@ -1,15 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Package.props" />
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyTitle>Extensions Core</AssemblyTitle>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Robots.Rhino" Version="1.8.0" ExcludeAssets="runtime" />
+    <PackageReference Include="RhinoCommon" Version="8.21.25188.17001" ExcludeAssets="runtime" />
+    <PackageReference Include="Robots.Rhino" Version="2.1.0" ExcludeAssets="runtime" />
     <PackageReference Include="morelinq" Version="4.4.0" />
     <PackageReference Include="geometry3Sharp" Version="1.0.324" />
-    <PackageReference Include="com.angusj.Clipper" Version="6.4.2" />
+    <PackageReference Include="Clipper2" Version="2.0.0" />
     <PackageReference Include="SkeletonNet" Version="1.0.0" />
 
     <Reference Include="gsGCode" HintPath="..\..\lib\gsGCode.dll" />

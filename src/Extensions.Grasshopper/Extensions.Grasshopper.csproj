@@ -1,8 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Package.props" />
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyTitle>$(Product) Grasshopper</AssemblyTitle>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,21 +19,7 @@
     <None Include="$(RootDir)build\icon.png" CopyToOutputDirectory="PreserveNewest" Visible="false" />
   </ItemGroup>
 
-  <Target Name="Rename" AfterTargets="AfterBuild">
+  <Target Name="Rename" AfterTargets="AfterBuild" Condition="'$(ContinuePackingAfterGeneratingNuspec)' != 'true'">
     <Move SourceFiles="$(TargetPath)" DestinationFiles="$(TargetDir)$(Product).gha" />
-  </Target>
-
-  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform(Windows)) and $(Configuration) == 'Debug'">
-    <StartProgram>C:\Program Files\Rhino 8\System\Rhino.exe</StartProgram>
-    <StartArguments>/nosplash /runscript="-grasshopper window show _enter"</StartArguments>
-    <StartAction>Program</StartAction>
-
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <PackageDir>$(AppData)\McNeel\Rhinoceros\packages\8.0\$(Product)</PackageDir>
-    <OutputPath>$(PackageDir)\$(Version)</OutputPath>
-  </PropertyGroup>
-
-  <Target Name="Manifest" BeforeTargets="Build" Condition="$(Configuration) == 'Debug'">
-    <WriteLinesToFile File="$(PackageDir)\manifest.txt" Overwrite="true" Lines="$(Version)" />
   </Target>
 </Project>

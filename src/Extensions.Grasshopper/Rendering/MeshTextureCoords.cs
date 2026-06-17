@@ -1,33 +1,29 @@
-﻿using Grasshopper.Kernel;
 using Rhino.Geometry;
 
 namespace Extensions.Grasshopper;
 
-public class MeshTextureCoords : GH_Component
+public class MeshTextureCoords() : Component(
+    "Texture Coordinates",
+    "TexCoords",
+    "Sets mesh texture coordinates from points.",
+    "Rendering",
+    "{297d173d-4eac-4a93-947c-fa8216e73cfa}",
+    "EyeDropper")
 {
-    public MeshTextureCoords() : base("Texture Coordinates", "TexCoords", "Sets mesh texture coordinates.", "Extensions", "Rendering") { }
-    protected override System.Drawing.Bitmap Icon => Util.GetIcon("EyeDropper");
-    public override Guid ComponentGuid => new("{297d173d-4eac-4a93-947c-fa8216e73cfa}");
-
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-        pManager.AddMeshParameter("Mesh", "M", "Mesh object.", GH_ParamAccess.item);
-        pManager.AddPointParameter("Texture coords", "T", "Texture coordinates as a list of 3D points. The Z component will be ignored.", GH_ParamAccess.list);
+        _ = pManager.AddMeshParameter("Mesh", "M", "Mesh to update.", GH_ParamAccess.item);
+        _ = pManager.AddPointParameter("Texture Coordinates", "T", "Texture coordinates. Z values are ignored.", GH_ParamAccess.list);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-        pManager.AddMeshParameter("Mesh", "M", "Resulting mesh with texture coordinates.", GH_ParamAccess.item);
+        _ = pManager.AddMeshParameter("Mesh", "M", "Mesh with texture coordinates.", GH_ParamAccess.item);
     }
 
-    protected override void SolveInstance(IGH_DataAccess DA)
+    protected override void SolveComponent(IGH_DataAccess DA)
     {
-        Mesh mesh = new();
-        List<Point3d> coords = [];
-        DA.GetData(0, ref mesh);
-        DA.GetDataList(1, coords);
-
-        Mesh outMesh = RenderExtensions.SetTextureCoords(mesh, coords);
+        var outMesh = RenderExtensions.SetTextureCoords(DA.Get<Mesh>(0), DA.List<Point3d>(1));
         DA.SetData(0, outMesh);
     }
 }

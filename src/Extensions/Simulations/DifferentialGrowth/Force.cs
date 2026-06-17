@@ -2,11 +2,11 @@ using Rhino.Geometry;
 
 namespace Extensions.Simulations.DifferentialGrowth;
 
-public struct Force(Vector3d vector, double weight)
+struct Force(Vector3d vector, double weight)
 {
     public Vector3d Vector = vector;
     public double Weight = weight;
-    private readonly object _thisLock = new();
+    readonly object _thisLock = new();
 
     public void Add(Vector3d vector, double weight)
     {

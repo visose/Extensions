@@ -1,75 +1,55 @@
-﻿using Grasshopper.Kernel;
 using Robots;
 using Robots.Grasshopper;
 using Extensions.Toolpaths.Extrusion;
-using Grasshopper.Kernel.Types;
 
 namespace Extensions.Grasshopper;
 
-public class CreateExtrusionAttributes : GH_Component
+public class CreateExtrusionAttributes() : RobotComponent(
+    "Extrusion Attributes",
+    "ExtAtt",
+    "Creates extrusion toolpath settings.",
+    "Toolpaths",
+    "{0D176FFA-75B1-484A-A6C7-273492F8F53E}",
+    "LayersConfig")
 {
-    public CreateExtrusionAttributes() : base("Extrusion Attributes", "ExtAtt", "Extrusion attributes.", "Extensions", "Toolpaths") { }
-    public override GH_Exposure Exposure => ExtensionsInfo.IsRobotsInstalled ? GH_Exposure.primary : GH_Exposure.hidden;
-    protected override System.Drawing.Bitmap Icon => Util.GetIcon("LayersConfig");
-    public override Guid ComponentGuid => new("{0D176FFA-75B1-484A-A6C7-273492F8F53E}");
-
-    protected override void RegisterInputParams(GH_InputParamManager pManager)
+    protected override void RegisterRobotInputParams(GH_InputParamManager pManager)
     {
-        if (ExtensionsInfo.IsRobotsInstalled)
-            Inputs(pManager);
+        _ = pManager.AddParameter(new TargetParameter(), "Reference Target", "T", "Reference joint target.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("Nozzle Diameter", "D", "Nozzle diameter.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("Layer Height", "H", "Layer height.", GH_ParamAccess.item);
+        _ = pManager.AddNumberParameter("Safe Z Offset", "Z", "Vertical safety offset.", GH_ParamAccess.item);
+        _ = pManager.AddParameter(new SpeedParameter(), "Approach Speed", "As", "Approach speed.", GH_ParamAccess.item);
+        _ = pManager.AddParameter(new SpeedParameter(), "Extrusion Speed", "Es", "Extrusion speed.", GH_ParamAccess.item);
+        _ = pManager.AddParameter(new ZoneParameter(), "Approach Zone", "Az", "Approach zone.", GH_ParamAccess.item);
+        _ = pManager.AddParameter(new ZoneParameter(), "Extrusion Zone", "Ez", "Extrusion zone.", GH_ParamAccess.item);
     }
 
-    protected override void RegisterOutputParams(GH_OutputParamManager pManager)
+    protected override void RegisterRobotOutputParams(GH_OutputParamManager pManager)
     {
-        if (ExtensionsInfo.IsRobotsInstalled)
-            Outputs(pManager);
+        _ = pManager.AddParameter(new ExtrusionAttributesParameter(), "Extrusion Attributes", "A", "Extrusion toolpath settings.", GH_ParamAccess.item);
     }
 
-    void Inputs(GH_InputParamManager pManager)
+    protected override void SolveComponent(IGH_DataAccess DA)
     {
-        pManager.AddParameter(new TargetParameter(), "Reference target", "T", "Create targets will inherit the tool and frame from this target.", GH_ParamAccess.item);
-        pManager.AddNumberParameter("Nozzle diameter", "D", "Nozzle diameter.", GH_ParamAccess.item);
-        pManager.AddNumberParameter("Layer height", "H", "Layer height.", GH_ParamAccess.item);
-        pManager.AddNumberParameter("Safe Z offset", "Z", "Vertical margin to add to approaches.", GH_ParamAccess.item);
-        pManager.AddParameter(new SpeedParameter(), "Approach speed", "As", "Approach speed.", GH_ParamAccess.item);
-        pManager.AddParameter(new SpeedParameter(), "Extrusion speed", "Es", "Extrusion speed.", GH_ParamAccess.item);
-        pManager.AddParameter(new ZoneParameter(), "Approach zone", "Az", "Approach zone.", GH_ParamAccess.item);
-        pManager.AddParameter(new ZoneParameter(), "Extrusion zone", "Ez", "Extrusion zone.", GH_ParamAccess.item);
-    }
+        var target = DA.Get<Target>(0) as JointTarget
+            ?? throw new ArgumentException("Reference target must be a joint target.");
 
-    void Outputs(GH_OutputParamManager pManager)
-    {
-        pManager.AddParameter(new ExtrusionAttributesParameter(), "Extrusion Attributes", "A", "Extrusion attributes.", GH_ParamAccess.item);
-    }
-
-    protected override void SolveInstance(IGH_DataAccess DA)
-    {
-        int inputCount = 8;
-        var inputs = new IGH_Goo[inputCount];
-
-        for (int i = 0; i < inputCount; i++)
+        var attributes = new ExtrusionAttributes
         {
-            if (!DA.GetData(i, ref inputs[i])) return;
-        }
-
-        var target = (inputs[0] as GH_Target).Value as JointTarget;
-
-        var attributes = new ExtrusionAttributes()
-        {
-            NozzleDiameter = (inputs[1] as GH_Number).Value,
-            LayerHeight = (inputs[2] as GH_Number).Value,
-            SafeZOffset = (inputs[3] as GH_Number).Value,
+            NozzleDiameter = DA.Get<double>(1),
+            LayerHeight = DA.Get<double>(2),
+            SafeZOffset = DA.Get<double>(3),
             SafeSpeed = target.Speed,
-            ApproachSpeed = (inputs[4] as GH_Speed).Value,
-            ExtrusionSpeed = (inputs[5] as GH_Speed).Value,
+            ApproachSpeed = DA.Get<Speed>(4),
+            ExtrusionSpeed = DA.Get<Speed>(5),
             SafeZone = target.Zone,
-            ApproachZone = (inputs[6] as GH_Zone).Value,
-            ExtrusionZone = (inputs[7] as GH_Zone).Value,
+            ApproachZone = DA.Get<Zone>(6),
+            ExtrusionZone = DA.Get<Zone>(7),
             Tool = target.Tool,
             Frame = target.Frame,
             Home = target.Joints
         }.Initialize();
 
-        DA.SetData(0, new GH_ExtrusionAttributes(attributes));
+        DA.SetData(0, attributes);
     }
 }

@@ -1,7 +1,7 @@
 using Rhino.Geometry;
 using MoreLinq;
 using static Extensions.Util;
-using ClipperLib;
+using Clipper2Lib;
 
 namespace Extensions.Geometry;
 
@@ -9,55 +9,63 @@ static class Region
 {
     public static Polyline Offset(Polyline polyline, double distance)
     {
-        if (polyline.Count < 2) return [];
+        if (polyline.Count < 2)
+            return [];
 
-        var region = polyline.ToRegion();
-        var offset = new ClipperOffset();
-        offset.AddPath(region, JoinType.jtRound, EndType.etClosedPolygon);
-        PolyTree tree = new();
+        Path64 region = polyline.ToRegion();
+        ClipperOffset offset = new();
+        offset.AddPath(region, JoinType.Round, EndType.Polygon);
+        Paths64 paths = [];
 
-        offset.Execute(ref tree, distance / Tol);
+        offset.Execute(distance / Tol, paths);
 
         var height = polyline[0].Z;
-        var first = tree.ToPolylines(height).Maxima(p => p.Length).FirstOrDefault();
-        return first ?? new Polyline(0);
+        var first = paths.ToPolylines(height).Maxima(static p => p.Length).FirstOrDefault();
+        return first ?? [];
     }
 
     public static Polyline[] Intersection(IEnumerable<Polyline> a, IEnumerable<Polyline> b)
     {
-        Clipper clipper = new(Clipper.ioStrictlySimple);
-        clipper.AddPaths(a.ToRegions(), PolyType.ptClip, true);
-        clipper.AddPaths(b.ToRegions(), PolyType.ptSubject, true);
+        var subjectPolylines = b as IReadOnlyList<Polyline> ?? b.ToList();
+        var subjects = subjectPolylines.ToRegions();
+        Paths64 paths = Clipper.Intersect(subjects, a.ToRegions(), FillRule.NonZero);
 
-        PolyTree tree = new();
-        clipper.Execute(ClipType.ctIntersection, tree);
-
-        double height = b.First()[0].Z;
-        return tree.ToPolylines(height);
+        double height = subjectPolylines.Count > 0 ? subjectPolylines[0][0].Z : 0;
+        return paths.ToPolylines(height);
     }
 
-    public static List<IntPoint> ToRegion(this Polyline polyline)
+    extension(Polyline polyline)
     {
-        return polyline.Select(p => new IntPoint(p.X / Tol, p.Y / Tol)).ToList();
-    }
-
-    public static List<List<IntPoint>> ToRegions(this IEnumerable<Polyline> polylines)
-    {
-        return polylines.Select(ToRegion).ToList();
-    }
-
-    public static Polyline[] ToPolylines(this PolyTree tree, double height)
-    {
-        var polylines = new Polyline[tree.ChildCount];
-
-        for (int i = 0; i < tree.ChildCount; i++)
+        public Path64 ToRegion()
         {
-            var node = tree.Childs[i];
-            var pl = new Polyline(node.Contour.Select(p => new Point3d(p.X * Tol, p.Y * Tol, height)));
-            pl.Add(pl[0]);
-            polylines[i] = pl;
+            return new(polyline.Select(static p => new Point64(p.X / Tol, p.Y / Tol)));
         }
+    }
 
-        return polylines;
+    extension(IEnumerable<Polyline> polylines)
+    {
+        public Paths64 ToRegions()
+        {
+            return new(polylines.Select(static polyline => polyline.ToRegion()));
+        }
+    }
+
+    extension(Paths64 paths)
+    {
+        public Polyline[] ToPolylines(double height)
+        {
+            var polylines = new Polyline[paths.Count];
+
+            for (int i = 0; i < paths.Count; i++)
+            {
+                var path = paths[i];
+                Polyline pl = new(path.Select(p => new Point3d(p.X * Tol, p.Y * Tol, height)));
+                if (pl.Count > 0)
+                    pl.Add(pl[0]);
+                polylines[i] = pl;
+            }
+
+            return polylines;
+        }
     }
 }
